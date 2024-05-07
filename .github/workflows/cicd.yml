@@ -143,7 +143,7 @@ jobs:
           TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
         fi
 
-        DOCKERFILE=ERP.SErvices.API/Dockerfile
+        DOCKERFILE=ERP.Services.API/Dockerfile
 
         echo ::set-output name=tags::${TAGS}
         echo ::set-output name=gcr_tags::${GCR_TAGS}
