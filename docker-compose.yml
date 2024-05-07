@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  erp.services.api:
+    image: ${DOCKER_REGISTRY-}erpservicesapi
+    build:
+      context: .
+      dockerfile: ERP.Services.API/Dockerfile
