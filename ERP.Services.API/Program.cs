@@ -3,6 +3,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
+
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsDev")))
     throw new ArgumentNullException($"{0} is Null", "IsDev");
 
@@ -17,9 +20,6 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
 
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
     throw new ArgumentNullException($"{0} is Null", "PostgreSQL_Password");
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
 var log = new LoggerConfiguration()
                 .WriteTo.Console()
