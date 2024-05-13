@@ -1,0 +1,19 @@
+﻿using AutoMapper;
+using ERP.Services.API.Entities;
+using ERP.Services.API.Models.RequestModels.Organization;
+using ERP.Services.API.Models.ResponseModels.Organization;
+
+namespace ERP.Services.API.Configurations
+{
+    public class OrganizationConfigurations : Profile
+    {
+        public OrganizationConfigurations()
+        {
+            CreateMap<OrganizationRequest, OrganizationEntity>()
+                .ForMember(dest => dest.OrgId, opt => opt.MapFrom(_ => Guid.NewGuid()))
+                .ForMember(dest => dest.OrgCreatedDate, opt => opt.MapFrom(_ => DateTime.UtcNow));
+            CreateMap<OrganizationEntity, OrganizationResponse>()
+                .ForMember(dest => dest.OrgName, opt => opt.MapFrom(src => src.DisplayName));
+        }
+    }
+}
