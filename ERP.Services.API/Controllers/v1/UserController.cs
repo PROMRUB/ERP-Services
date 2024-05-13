@@ -1,0 +1,56 @@
+﻿using ERP.Services.API.Handlers;
+using ERP.Services.API.Interfaces;
+using ERP.Services.API.Models.RequestModels.User;
+using ERP.Services.API.Models.ResponseModels.User;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ERP.Services.API.Controllers.v1
+{
+    [ApiController]
+    [Route("v{version:apiVersion}/api/[controller]")]
+    [ApiVersion("1")]
+    public class UserController : BaseController
+    {
+        private readonly IUserService services;
+        public UserController(IUserService services)
+        {
+            this.services = services;
+        }
+
+        [HttpGet]
+        [Route("org/{id}/action/AdminGetUsers")]
+        [MapToApiVersion("1")]
+        public IActionResult AdminGetUsers(string id)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = services.GetUsers(id);
+                return Ok(ResponseHandler.Response<List<UserResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost]
+        [Route("org/{id}/action/AdminAddUser")]
+        [MapToApiVersion("1")]
+        public IActionResult AdminAddUser(string id, [FromBody] UserRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                services.AddUser(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+    }
+}
