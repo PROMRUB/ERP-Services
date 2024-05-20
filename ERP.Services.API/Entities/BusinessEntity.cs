@@ -1,37 +1,41 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP.Services.API.Entities
 {
-    [Table("Organizations")]
-    [Index(nameof(OrgCustomId), IsUnique = true)]
-    public class OrganizationEntity
+    [Table("Businesses")]
+    [Index(nameof(BusinessCustomId), IsUnique = true)]
+    public class BusinessEntity
     {
-        public OrganizationEntity()
+        public BusinessEntity()
         {
-            OrgId = Guid.NewGuid();
-            OrgCreatedDate = DateTime.UtcNow;
+            BusinessId = Guid.NewGuid();
+            BusinessCreatedDate = DateTime.UtcNow;
         }
 
+
         [Key]
+        [Column("business_id")]
+        public Guid? BusinessId { get; set; }
+
+        [Column("business_custom_id")]
+        public string? BusinessCustomId { get; set; }
+
         [Column("org_id")]
         public Guid? OrgId { get; set; }
-
-        [Column("org_custom_id")]
-        public string? OrgCustomId { get; set; }
 
         [Column("business_type")]
         public string? BusinessType { get; set; }
 
-        [Column("org_name")]
-        public string? OrgName { get; set; }
+        [Column("business_name")]
+        public string? BusinessName { get; set; }
 
         [Column("display_name")]
         public string? DisplayName { get; set; }
 
-        [Column("org_logo")]
-        public string? OrgLogo { get; set; }
+        [Column("business_logo")]
+        public string? BusinessLogo { get; set; }
 
         [Column("tax_id")]
         public string? TaxId { get; set; }
@@ -78,13 +82,13 @@ namespace ERP.Services.API.Entities
         [Column("website")]
         public string? Website { get; set; }
 
-        [Column("org_description")]
-        public string? OrgDescription { get; set; }
+        [Column("business_description")]
+        public string? BusinessDescription { get; set; }
 
-        [Column("org_created_date")]
-        public DateTime? OrgCreatedDate { get; set; }
+        [Column("business_created_date")]
+        public DateTime? BusinessCreatedDate { get; set; }
 
-        [Column("org_status")]
-        public string? OrgStatus { get; set; }
+        [Column("business_status")]
+        public string? BusinessStatus { get; set; }
     }
 }

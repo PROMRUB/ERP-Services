@@ -75,14 +75,68 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/AdminAddOrganization")]
         [MapToApiVersion("1")]
-        public IActionResult AdminAddOrganization(string id, [FromBody] OrganizationRequest request)
+        public async Task<IActionResult> AdminAddOrganization(string id, [FromBody] OrganizationRequest request)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                services.AddOrganization(id, request);
+                await services.AddOrganization(id, request);
                 return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost]
+        [Route("org/{id}/action/AdminAddBusiness")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AdminAddBusiness(string id, [FromBody] OrganizationRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await services.AddBusiness(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpGet]
+        [Route("org/{id}/action/GetBusiness")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetBusiness(string id)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await services.GetBusiness(id);
+                return Ok(ResponseHandler.Response<List<OrganizationResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpGet]
+        [Route("org/{id}/action/GetBusiness/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetBusiness(string id,string businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await services.GetBusinessById(id, businessId);
+                return Ok(ResponseHandler.Response<OrganizationResponse>("1000", null, result));
             }
             catch (Exception ex)
             {

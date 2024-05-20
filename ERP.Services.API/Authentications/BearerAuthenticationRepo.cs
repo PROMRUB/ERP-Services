@@ -31,7 +31,6 @@ namespace ERP.Services.API.Authentications
                 UserName = user,
                 Password = "",
                 UserId = (await userService!.GetUserByName(orgId, user)).UserId,
-                Role = (await organizationService!.GetUserAllowedOrganization(user)).FirstOrDefault()!.RolesList,
                 AuthenType = "JWT",
                 OrgId = orgId,
             };
@@ -39,7 +38,6 @@ namespace ERP.Services.API.Authentications
             result.Claims = new[] {
                 new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()!),
                 new Claim(ClaimTypes.Name, user),
-                new Claim(ClaimTypes.Role, result.Role!),
                 new Claim(ClaimTypes.AuthenticationMethod, result.AuthenType!),
                 new Claim(ClaimTypes.Uri, request.Path),
                 new Claim(ClaimTypes.GroupSid, result.OrgId!),

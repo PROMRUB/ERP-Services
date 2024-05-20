@@ -7,14 +7,13 @@ namespace ERP.Services.API.Entities
 {
     [Table("OrganizationsUsers")]
     [Index(nameof(OrgCustomId), IsUnique = false)]
-    [Index(nameof(OrgCustomId), nameof(UserId), IsUnique = true, Name = "OrgUser_Unique1")]
+    [Index(nameof(OrgCustomId), IsUnique = true, Name = "OrgUser_Unique1")]
     public class OrganizationUserEntity
     {
         public OrganizationUserEntity()
         {
             OrgUserId = Guid.NewGuid();
             CreatedDate = DateTime.UtcNow;
-            RolesList = "";
         }
 
         [Key]
@@ -24,16 +23,25 @@ namespace ERP.Services.API.Entities
         [Column("org_custom_id")]
         public string? OrgCustomId { get; set; }
 
-        [Column("user_id")]
-        public string? UserId { get; set; }
+        [Column("username")]
+        public string? Username { get; set; }
 
-        [Column("user_name")]
-        public string? UserName { get; set; }
+        [Column("password")]
+        public string? Password { get; set; }
+
+        [Column("first_name_th")]
+        public string? FirstNameTh { get; set; }
+
+        [Column("last_name_th")]
+        public string? LastnameTh { get; set; }
+
+        [Column("email")]
+        public string? email { get; set; }
+
+        [Column("tel_no")]
+        public string? TelNo { get; set; }
 
         [Column("created_date")]
         public DateTime? CreatedDate { get; set; }
-
-        [Column("roles_list")]
-        public string? RolesList { get; set; }
     }
 }

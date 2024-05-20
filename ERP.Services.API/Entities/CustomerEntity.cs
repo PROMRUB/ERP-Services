@@ -1,37 +1,40 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP.Services.API.Entities
 {
-    [Table("Organizations")]
-    [Index(nameof(OrgCustomId), IsUnique = true)]
-    public class OrganizationEntity
+    [Table("Customer")]
+    [Index(nameof(CusCustomId), IsUnique = true)]
+    public class CustomerEntity
     {
-        public OrganizationEntity()
+        public CustomerEntity()
         {
-            OrgId = Guid.NewGuid();
-            OrgCreatedDate = DateTime.UtcNow;
+            CusId = Guid.NewGuid();
+            CusCreatedDate = DateTime.UtcNow;
         }
 
         [Key]
+        [Column("cus_id")]
+        public Guid? CusId { get; set; }
+
+        [Column("cus_custom_id")]
+        public string? CusCustomId { get; set; }
+
         [Column("org_id")]
         public Guid? OrgId { get; set; }
 
-        [Column("org_custom_id")]
-        public string? OrgCustomId { get; set; }
+        [Column("business_id")]
+        public Guid? BusinessId { get; set; }
 
-        [Column("business_type")]
-        public string? BusinessType { get; set; }
+        [Column("cus_type")]
+        public string? CusType { get; set; }
 
-        [Column("org_name")]
-        public string? OrgName { get; set; }
+        [Column("cus_name")]
+        public string? CusName { get; set; }
 
         [Column("display_name")]
         public string? DisplayName { get; set; }
-
-        [Column("org_logo")]
-        public string? OrgLogo { get; set; }
 
         [Column("tax_id")]
         public string? TaxId { get; set; }
@@ -78,13 +81,14 @@ namespace ERP.Services.API.Entities
         [Column("website")]
         public string? Website { get; set; }
 
-        [Column("org_description")]
-        public string? OrgDescription { get; set; }
+        [Column("cus_description")]
+        public string? CusDescription { get; set; }
 
-        [Column("org_created_date")]
-        public DateTime? OrgCreatedDate { get; set; }
+        [Column("cus_created_date")]
+        public DateTime? CusCreatedDate { get; set; }
 
-        [Column("org_status")]
-        public string? OrgStatus { get; set; }
+        [Column("cus_status")]
+        public string? CusStatus { get; set; }
+
     }
 }

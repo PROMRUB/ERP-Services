@@ -30,7 +30,7 @@ namespace ERP.Services.API.Repositories
         public async Task<IEnumerable<OrganizationUserEntity>> GetUserAllowedOrganizationAsync(string userName)
         {
             var query = await context!.OrganizationUsers!.Where(
-                x => x!.UserName!.Equals(userName))
+                x => x!.Username!.Equals(userName))
                 .OrderByDescending(e => e.OrgCustomId).ToListAsync();
             return query;
         }
@@ -38,7 +38,7 @@ namespace ERP.Services.API.Repositories
         public bool IsUserNameExist(string userName)
         {
             var count = context!.OrganizationUsers!
-                .Where(x => x!.UserName!.Equals(userName) && x!.OrgCustomId!.Equals(orgId))
+                .Where(x => x!.Username!.Equals(userName) && x!.OrgCustomId!.Equals(orgId))
                 .Count();
             return count >= 1;
         }
@@ -54,15 +54,51 @@ namespace ERP.Services.API.Repositories
         public async Task<OrganizationUserEntity> GetUserInOrganization(string userName)
         {
             var query = await context!.OrganizationUsers!
-                .Where(x => x!.UserName!.Equals(userName) && x!.OrgCustomId!.Equals(orgId))
+                .Where(x => x!.Username!.Equals(userName) && x!.OrgCustomId!.Equals(orgId))
                 .FirstOrDefaultAsync();
             return query!;
         }
 
-        public void AddOrganization(OrganizationEntity org)
+        public async Task AddOrganization(OrganizationEntity org)
         {
             context!.Organizations!.Add(org);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<OrganizationNumberEntity> OrganizationNumberAsync()
+        {
+            try
+            {
+                var currentDate = DateTime.Today.Date.ToUniversalTime().ToString("yyyyMMdd");
+                var query = await context!.OrganizationNumbers!.Where(x => x.OrgDate == currentDate).FirstOrDefaultAsync();
+                bool HaveOrganization = true;
+                while (HaveOrganization)
+                {
+                    if (query == null)
+                    {
+                        var newRec = new OrganizationNumberEntity
+                        {
+                            OrgId = Guid.NewGuid(),
+                            OrgDate = currentDate,
+                            Allocated = 0
+                        };
+                        context.OrganizationNumbers!.Add(newRec);
+                        context.SaveChanges();
+                        query = await context.OrganizationNumbers!.Where(x => x.OrgDate == currentDate).FirstOrDefaultAsync();
+                    }
+                    else
+                    {
+                        HaveOrganization = false;
+                    }
+                }
+                query!.Allocated++;
+                context.SaveChanges();
+                return query;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

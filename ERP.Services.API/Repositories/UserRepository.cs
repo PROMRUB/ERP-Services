@@ -24,6 +24,12 @@ namespace ERP.Services.API.Repositories
             return query;
         }
 
+        public IQueryable<OrganizationUserEntity> GetUserProfiles()
+        {
+            var query = context!.OrganizationUsers!;
+            return query;
+        }
+
         public bool IsEmailExist(string email)
         {
             var count = context!.Users!.Where(p => p!.UserEmail!.Equals(email)).Count();
@@ -54,6 +60,25 @@ namespace ERP.Services.API.Repositories
         {
             var u = await context!.Users!.Where(p => p!.UserName!.Equals(userName)).FirstOrDefaultAsync();
             return u!;
+        }
+
+        public IQueryable<OrganizationUserEntity> GetUserSignIn(string username, string password)
+        {
+            try
+            {
+                var query = context!.OrganizationUsers!.Where(x => x.Username!.Equals(username) && x.Password.Equals(password));
+                return query;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task CreateUserSession(UserSessionEntity session)
+        {
+            context!.UserSessions!.Add(session);
+            await context.SaveChangesAsync();
         }
     }
 }

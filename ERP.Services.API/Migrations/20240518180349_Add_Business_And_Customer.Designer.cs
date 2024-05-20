@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240518180349_Add_Business_And_Customer")]
+    partial class Add_Business_And_Customer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,26 +427,6 @@ namespace ERP.Services.API.Migrations
                     b.ToTable("Organizations");
                 });
 
-            modelBuilder.Entity("ERP.Services.API.Entities.OrganizationNumberEntity", b =>
-                {
-                    b.Property<Guid?>("OrgId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("org_id");
-
-                    b.Property<int?>("Allocated")
-                        .HasColumnType("integer")
-                        .HasColumnName("allocated");
-
-                    b.Property<string>("OrgDate")
-                        .HasColumnType("text")
-                        .HasColumnName("org_date");
-
-                    b.HasKey("OrgId");
-
-                    b.ToTable("OrganizationNo");
-                });
-
             modelBuilder.Entity("ERP.Services.API.Entities.OrganizationUserEntity", b =>
                 {
                     b.Property<Guid?>("OrgUserId")
@@ -455,39 +438,27 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
 
-                    b.Property<string>("FirstNameTh")
-                        .HasColumnType("text")
-                        .HasColumnName("first_name_th");
-
-                    b.Property<string>("LastnameTh")
-                        .HasColumnType("text")
-                        .HasColumnName("last_name_th");
-
                     b.Property<string>("OrgCustomId")
                         .HasColumnType("text")
                         .HasColumnName("org_custom_id");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("RolesList")
                         .HasColumnType("text")
-                        .HasColumnName("password");
+                        .HasColumnName("roles_list");
 
-                    b.Property<string>("TelNo")
+                    b.Property<string>("UserId")
                         .HasColumnType("text")
-                        .HasColumnName("tel_no");
+                        .HasColumnName("user_id");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserName")
                         .HasColumnType("text")
-                        .HasColumnName("username");
-
-                    b.Property<string>("email")
-                        .HasColumnType("text")
-                        .HasColumnName("email");
+                        .HasColumnName("user_name");
 
                     b.HasKey("OrgUserId");
 
                     b.HasIndex("OrgCustomId");
 
-                    b.HasIndex(new[] { "OrgCustomId" }, "OrgUser_Unique1")
+                    b.HasIndex(new[] { "OrgCustomId", "UserId" }, "OrgUser_Unique1")
                         .IsUnique();
 
                     b.ToTable("OrganizationsUsers");
@@ -617,35 +588,6 @@ namespace ERP.Services.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ERP.Services.API.Entities.UserSessionEntity", b =>
-                {
-                    b.Property<Guid>("UserSessionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_session_id");
-
-                    b.Property<string>("SessionStatus")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("session_status");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("token");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("userId");
-
-                    b.HasKey("UserSessionId");
-
-                    b.HasIndex("UserSessionId")
-                        .IsUnique();
-
-                    b.ToTable("UserSession");
                 });
 #pragma warning restore 612, 618
         }
