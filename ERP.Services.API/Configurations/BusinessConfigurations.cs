@@ -17,8 +17,10 @@ namespace ERP.Services.API.Configurations
                 .ForMember(dest => dest.BusinessCustomId, opt => opt.MapFrom(src => src.TaxId + "." + src.BrnId))
                 .ForMember(dest => dest.BusinessDescription, opt => opt.MapFrom(src => src.OrgDescription))
                 .ForMember(dest => dest.BusinessStatus, opt => opt.MapFrom(src => RecordStatus.Active));
+
             CreateMap<BusinessEntity, OrganizationResponse>()
                 .ForMember(dest => dest.OrgName, opt => opt.MapFrom(src => src.DisplayName))
+                .ForMember(dest => dest.BrnId, opt => opt.MapFrom(src => src.BrnId == "00000" ? "สำนักงานใหญ่ (00000)" : src.BrnId))
                 .ForMember(dest => dest.OrgCustomId, opt => opt.MapFrom(src => src.BusinessCustomId))
                 .ForMember(dest => dest.OrgName, opt => opt.MapFrom(src => src.BusinessDescription));
         }

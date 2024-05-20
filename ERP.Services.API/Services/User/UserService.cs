@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ERP.Services.API.Entities;
+using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Authorization;
 using ERP.Services.API.Models.RequestModels.User;
@@ -22,14 +23,16 @@ namespace ERP.Services.API.Services.User
         private readonly IMapper mapper;
         private readonly IConfiguration configuration;
         private readonly IUserRepository repository;
-
+        private readonly UserPrincipalHandler userPrincipalHandler;
         public UserService(IMapper mapper,
             IConfiguration configuration,
-            IUserRepository repository) : base()
+            IUserRepository repository,
+            UserPrincipalHandler userPrincipalHandler) : base()
         {
             this.mapper = mapper;
             this.configuration = configuration;
             this.repository = repository;
+            this.userPrincipalHandler = userPrincipalHandler;
         }
 
         public List<UserResponse> GetUsers(string orgId)
@@ -100,17 +103,21 @@ namespace ERP.Services.API.Services.User
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
-            await repository.CreateUserSession(new UserSessionEntity
+            var session = await repository.GetUserSession().Where(x => x.Token.Equals(result.Token)).FirstOrDefaultAsync();
+            if(session == null)
             {
-                Token = result.Token,
-                UserId = query.OrgUserId
-            });
+                await repository.CreateUserSession(new UserSessionEntity
+                {
+                    Token = result.Token,
+                    UserId = query.OrgUserId
+                });
+            }
             return result;
         }
 
-        public async Task<OrganizationUserResponse> GetUserProfile(Guid userId)
+        public async Task<OrganizationUserResponse> GetUserProfile()
         {
-            var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userId).FirstOrDefaultAsync(); 
+            var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync(); 
             return mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
         }
     }

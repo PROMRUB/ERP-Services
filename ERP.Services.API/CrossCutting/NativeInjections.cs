@@ -8,6 +8,7 @@ using ERP.Services.API.Services.Organization;
 using ERP.Services.API.Services.Role;
 using ERP.Services.API.Services.User;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ERP.Services.API.CrossCutting
 {
@@ -18,7 +19,9 @@ namespace ERP.Services.API.CrossCutting
             services.AddTransient<DataSeeder>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<JwtSecurityTokenHandler>();
             services.AddScoped<IServiceCollection, ServiceCollection>();
+            services.AddScoped<UserPrincipalHandler>();
 
             services.AddTransient<IAuthorizationHandler, GenericRbacHandler>();
             services.AddScoped<IBasicAuthenticationRepo, BasicAuthenticationRepo>();

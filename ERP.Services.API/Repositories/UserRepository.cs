@@ -75,6 +75,11 @@ namespace ERP.Services.API.Repositories
             }
         }
 
+        public IQueryable<UserSessionEntity> GetUserSession()
+        {
+            return context!.UserSessions!;
+        }
+
         public async Task CreateUserSession(UserSessionEntity session)
         {
             context!.UserSessions!.Add(session);
