@@ -14,6 +14,6 @@ namespace ERP.Services.API.Interfaces
         public bool IsUserNameExist(string orgId, string userName);
         public bool IsUserIdExist(string orgId, string userId);
         public Task<AuthorizationResponse> SignIn(string orgId, SignInRequest user);
-        public Task<OrganizationUserResponse> GetUserProfile(Guid userId);
+        public Task<OrganizationUserResponse> GetUserProfile();
     }
 }

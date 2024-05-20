@@ -9,6 +9,5 @@ namespace ERP.Services.API.Models.ResponseModels.Organization
         public string? Username { get; set; }
         public string? Email { get; set; }
         public string? TelNo { get; set; }
-        public string? Token { get; set; }
     }
 }

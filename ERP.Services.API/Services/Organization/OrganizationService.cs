@@ -101,7 +101,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Where(x => x.BusinessCustomId.Equals(businessId)).FirstOrDefaultAsync();
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
             var test = systemRepository.GetDistrictList().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault();
             result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : (query.Building + " ")) +

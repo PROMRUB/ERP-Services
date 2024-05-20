@@ -39,7 +39,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("org/{id}/action/GetUserProfile")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetUserProfile(string id)
@@ -48,7 +48,7 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await userService.GetUserProfile(new Guid());
+                var result = await userService.GetUserProfile();
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
