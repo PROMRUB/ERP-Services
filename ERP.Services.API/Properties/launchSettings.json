@@ -19,7 +19,8 @@
         "PostgreSQL_Host": "localhost",
         "PostgreSQL_Database": "prom-dev",
         "PostgreSQL_User": "admin",
-        "PostgreSQL_Password": "Initial1!"
+        "PostgreSQL_Password": "Initial1!",
+        "Key": "SolutionKP"
       }
     },
     "Docker": {

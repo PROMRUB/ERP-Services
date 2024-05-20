@@ -9,7 +9,10 @@ namespace ERP.Services.API.Interfaces
         public void AddUserToOrganization(string orgId, OrganizationUserRequest user);
         public bool IsUserNameExist(string orgId, string userName);
         public Task<bool> VerifyUserInOrganization(string orgId, string userName);
-        public void AddOrganization(string orgId, OrganizationRequest org);
+        public Task<bool> AddOrganization(string orgId, OrganizationRequest org);
+        public Task<bool> AddBusiness(string orgId, OrganizationRequest org);
+        public Task<List<OrganizationResponse>> GetBusiness(string orgId);
+        public Task<OrganizationResponse> GetBusinessById(string orgId, string businessId);
         public Task<bool> UpdateOrganization(string orgId, OrganizationRequest org);
         public Task<bool> UpdateSecurity(string orgId, OrganizationRequest org);
         public Task<List<OrganizationUserResponse>> GetUserAllowedOrganization(string userName);

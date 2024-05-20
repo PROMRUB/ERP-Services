@@ -30,9 +30,11 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ISystemConfigRepository, SystemConfigRepository>();
 
         }
     }

@@ -6,5 +6,6 @@
         public string? OrgCustomId { get; set; }
         public string? OrgName { get; set; }
         public string? OrgDescription { get; set; }
+        public string? OrgAddress { get; set; }
     }
 }
