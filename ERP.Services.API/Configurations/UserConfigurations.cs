@@ -12,6 +12,8 @@ namespace ERP.Services.API.Configurations
             CreateMap<UserRequest, UserEntity>()
                 .ForMember(dest => dest.UserCreatedDate, opt => opt.MapFrom(_ => DateTime.UtcNow));
             CreateMap<UserEntity, UserResponse>();
+            CreateMap<AddUserToBusinessRequest, UserBusinessEntity>()
+                .ForMember(dest => dest.UserBusinessId, opt => opt.MapFrom(_ => Guid.NewGuid()));
         }
     }
 }

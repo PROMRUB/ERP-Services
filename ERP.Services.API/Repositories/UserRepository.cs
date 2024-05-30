@@ -18,6 +18,12 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
+        public void AddUserToBusiness(UserBusinessEntity user)
+        {
+            context!.UserBusinesses!.Add(user);
+            context.SaveChanges();
+        }
+
         public IEnumerable<UserEntity> GetUsers()
         {
             var query = context!.Users!.Where(p => !p.UserName!.Equals(null)).ToList();

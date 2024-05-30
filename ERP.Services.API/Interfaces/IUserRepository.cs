@@ -9,6 +9,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<OrganizationUserEntity> GetUserProfiles();
         public Task<UserEntity> GetUserByName(string userName);
         public void AddUser(UserEntity user);
+        public void AddUserToBusiness(UserBusinessEntity user);
         public bool IsEmailExist(string email);
         public bool IsUserNameExist(string userName);
         public bool IsUserIdExist(string userId);
