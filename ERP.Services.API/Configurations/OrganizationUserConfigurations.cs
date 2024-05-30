@@ -10,7 +10,8 @@ namespace ERP.Services.API.Configurations
         public OrganizationUserConfigurations()
         {
             CreateMap<OrganizationUserEntity, OrganizationUserResponse>();
-            CreateMap<OrganizationUserRequest, OrganizationUserEntity>();
+            CreateMap<OrganizationUserRequest, OrganizationUserEntity>()
+                .ForMember(dest => dest.OrgUserId, opt => opt.MapFrom(_ => Guid.NewGuid()));
         }
     }
 }
