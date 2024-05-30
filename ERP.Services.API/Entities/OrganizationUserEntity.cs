@@ -6,8 +6,6 @@ using System.Xml.Linq;
 namespace ERP.Services.API.Entities
 {
     [Table("OrganizationsUsers")]
-    [Index(nameof(OrgCustomId), IsUnique = false)]
-    [Index(nameof(OrgCustomId), IsUnique = true, Name = "OrgUser_Unique1")]
     public class OrganizationUserEntity
     {
         public OrganizationUserEntity()
