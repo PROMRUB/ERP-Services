@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ERP.Services.API.Entities;
+using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Organization;
 using ERP.Services.API.Models.ResponseModels.Organization;
@@ -22,7 +23,8 @@ namespace ERP.Services.API.Services.Organization
             IOrganizationRepository organizationRepository,
             IBusinessRepository businessRepository,
             IUserService userService,
-            ISystemConfigRepository systemRepository) : base()
+            ISystemConfigRepository systemRepository,
+            UserPrincipalHandler userPrincipalHandler) : base()
         {
             this.mapper = mapper;
             this.configuration = configuration;
@@ -35,7 +37,7 @@ namespace ERP.Services.API.Services.Organization
         public async Task<bool> AddOrganization(string orgId, OrganizationRequest org)
         {
             var orgData = await organizationRepository.OrganizationNumberAsync();
-            org.OrgCustomId = "PBID" + orgData.OrgDate + "." + orgData.Allocated!.Value.ToString("D5")+".TH";
+            org.OrgCustomId = "PBID" + orgData.OrgDate + "." + orgData.Allocated!.Value.ToString("D5") + ".TH";
             var customOrgId = org.OrgCustomId;
             if (organizationRepository!.IsCustomOrgIdExist(customOrgId!))
                 throw new ArgumentException("1111");
@@ -92,11 +94,19 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).ToListAsync();
-            return mapper.Map<List<BusinessEntity>, List<OrganizationResponse>>(query);
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join(userService.GetUserBusiness(),
+                business => business.BusinessId,
+                user => user.BusinessId,
+                (business, user) => new OrganizationEntity
+                {
+                    OrgId = business.BusinessId,
+                    OrgCustomId = business.BusinessCustomId,
+                    DisplayName = business.BusinessName,
+                }).ToListAsync();
+            return mapper.Map<List<OrganizationEntity>, List<OrganizationResponse>>(query);
         }
 
-        public async Task<OrganizationResponse> GetBusinessById(string orgId,string businessId)
+        public async Task<OrganizationResponse> GetBusinessById(string orgId, string businessId)
         {
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();

@@ -6,6 +6,7 @@ using ERP.Services.API.Seeder.JsonData;
 using ERP.Services.API.Services.ApiKey;
 using ERP.Services.API.Services.Organization;
 using ERP.Services.API.Services.Role;
+using ERP.Services.API.Services.SystemConfig;
 using ERP.Services.API.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,6 +32,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ISystemConfigServices, SystemConfigServices>();
 
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();

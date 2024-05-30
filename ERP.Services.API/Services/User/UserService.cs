@@ -23,15 +23,21 @@ namespace ERP.Services.API.Services.User
         private readonly IMapper mapper;
         private readonly IConfiguration configuration;
         private readonly IUserRepository repository;
+        private readonly IOrganizationRepository organizationRepository;
+        private readonly IBusinessRepository businessRepository;
         private readonly UserPrincipalHandler userPrincipalHandler;
         public UserService(IMapper mapper,
             IConfiguration configuration,
             IUserRepository repository,
-            UserPrincipalHandler userPrincipalHandler) : base()
+            IOrganizationRepository organizationRepository,
+            IBusinessRepository businessRepository,
+        UserPrincipalHandler userPrincipalHandler) : base()
         {
             this.mapper = mapper;
             this.configuration = configuration;
             this.repository = repository;
+            this.organizationRepository = organizationRepository;
+            this.businessRepository = businessRepository;
             this.userPrincipalHandler = userPrincipalHandler;
         }
 
@@ -49,6 +55,19 @@ namespace ERP.Services.API.Services.User
             return mapper.Map<UserEntity, UserResponse>(query);
         }
 
+        public async Task<OrganizationUserResponse> GetUserProfile()
+        {
+            var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync();
+            return mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
+        }
+
+        public IQueryable<UserBusinessEntity> GetUserBusiness()
+        {
+            var userId = userPrincipalHandler.Id;
+            var result = businessRepository.GetUserBusinessList(userId);
+            return result;
+        }
+
         public void AddUser(string orgId, UserRequest request)
         {
             repository!.SetCustomOrgId(orgId);
@@ -56,6 +75,16 @@ namespace ERP.Services.API.Services.User
                 throw new ArgumentException("1111");
             var query = mapper.Map<UserRequest, UserEntity>(request);
             repository!.AddUser(query);
+        }
+
+        public async Task AddUserToBusinessAsync(string orgId, AddUserToBusinessRequest request)
+        {
+            repository!.SetCustomOrgId(orgId);
+            organizationRepository!.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = mapper.Map<AddUserToBusinessRequest, UserBusinessEntity>(request);
+            query.OrgId = organization.OrgId;
+            repository.AddUserToBusiness(query);
         }
 
         public bool IsEmailExist(string orgId, string email)
@@ -113,12 +142,6 @@ namespace ERP.Services.API.Services.User
                 });
             }
             return result;
-        }
-
-        public async Task<OrganizationUserResponse> GetUserProfile()
-        {
-            var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync(); 
-            return mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
         }
     }
 }

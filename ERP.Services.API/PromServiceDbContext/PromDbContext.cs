@@ -23,6 +23,7 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<RoleEntity>? Roles { get; set; }
         public DbSet<UserEntity>? Users { get; set; }
         public DbSet<OrganizationUserEntity>? OrganizationUsers { get; set; }
+        public DbSet<UserBusinessEntity> UserBusinesses { get; set; }
         public DbSet<UserSessionEntity>? UserSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,6 +39,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<RoleEntity>();
             modelBuilder.Entity<UserEntity>();
             modelBuilder.Entity<OrganizationUserEntity>();
+            modelBuilder.Entity<UserBusinessEntity>();
             modelBuilder.Entity<UserSessionEntity>();
         }
     }

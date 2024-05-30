@@ -219,14 +219,14 @@ namespace ERP.Services.API.Seeder.JsonData
             SeedDefaultOrganization();
             UpdateDefaultOrganizationCustomId();
 
-            //SeedGlobalOrganization();
-            //SeedDefaultRoles();
-            //UpdateApiKeyRole();
-            //SeedDefaultRoles2();
+            SeedGlobalOrganization();
+            SeedDefaultRoles();
+            UpdateApiKeyRole();
+            SeedDefaultRoles2();
 
-            //SeedProvinces();
-            //SeedDistrict();
-            //SeedSubDistrict();
+            SeedProvinces();
+            SeedDistrict();
+            SeedSubDistrict();
         }
     }
 }

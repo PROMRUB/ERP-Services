@@ -2,6 +2,7 @@
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Authorization;
 using ERP.Services.API.Models.RequestModels.Organization;
+using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,23 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpPost   ]
+        [Route("org/{id}/action/AddUserToBusiness")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AddUserToBusiness(string id, AddUserToBusinessRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await userService.AddUserToBusinessAsync(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         [HttpPost]
         [Route("org/{id}/action/SignOut")]

@@ -18,6 +18,12 @@ namespace ERP.Services.API.Repositories
             return query;
         }
 
+        public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid userId)
+        {
+            var query = context!.UserBusinesses!.Where(x => x.UserId == userId);
+            return query;
+        }
+
         public bool IsCustomBusinessIdExist(string orgCustomId)
         {
             var count = context!.Businesses!
