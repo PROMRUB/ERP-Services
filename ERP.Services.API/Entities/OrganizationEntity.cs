@@ -63,8 +63,8 @@ namespace ERP.Services.API.Entities
         [Column("alley")]
         public string? Alley { get; set; }
 
-        [Column("provice")]
-        public string? Provice { get; set; }
+        [Column("province")]
+        public string? Province { get; set; }
 
         [Column("district")]
         public string? District { get; set; }

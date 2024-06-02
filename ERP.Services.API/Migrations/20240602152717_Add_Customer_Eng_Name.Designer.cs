@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240602152717_Add_Customer_Eng_Name")]
+    partial class Add_Customer_Eng_Name
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,9 +141,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("text")
                         .HasColumnName("post_code");
 
-                    b.Property<string>("Province")
+                    b.Property<string>("Provice")
                         .HasColumnType("text")
-                        .HasColumnName("province");
+                        .HasColumnName("provice");
 
                     b.Property<string>("Road")
                         .HasColumnType("text")
@@ -253,9 +256,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("text")
                         .HasColumnName("post_code");
 
-                    b.Property<string>("Province")
+                    b.Property<string>("Provice")
                         .HasColumnType("text")
-                        .HasColumnName("province");
+                        .HasColumnName("provice");
 
                     b.Property<string>("Road")
                         .HasColumnType("text")
@@ -287,34 +290,6 @@ namespace ERP.Services.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Customer");
-                });
-
-            modelBuilder.Entity("ERP.Services.API.Entities.CustomerNumberEntity", b =>
-                {
-                    b.Property<Guid?>("CusNoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("cus_no_id");
-
-                    b.Property<int?>("Allocated")
-                        .HasColumnType("integer")
-                        .HasColumnName("allocated");
-
-                    b.Property<Guid?>("BusinessId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("business_id");
-
-                    b.Property<string>("Character")
-                        .HasColumnType("text")
-                        .HasColumnName("character");
-
-                    b.Property<Guid?>("OrgId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("org_id");
-
-                    b.HasKey("CusNoId");
-
-                    b.ToTable("CustomerNo");
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.DistrictEntity", b =>
@@ -420,9 +395,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("text")
                         .HasColumnName("post_code");
 
-                    b.Property<string>("Province")
+                    b.Property<string>("Provice")
                         .HasColumnType("text")
-                        .HasColumnName("province");
+                        .HasColumnName("provice");
 
                     b.Property<string>("Road")
                         .HasColumnType("text")

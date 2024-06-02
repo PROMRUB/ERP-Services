@@ -124,7 +124,7 @@ namespace ERP.Services.API.Services.Organization
                                 (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
                                 (string.IsNullOrEmpty(query.SubDistrict) ? "" : (systemRepository.GetSubDistrictList().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
                                 (string.IsNullOrEmpty(query.District) ? "" : (systemRepository.GetDistrictList().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.Provice) ? "" : (systemRepository.GetProvinceList().Where(x => x.ProvinceCode.ToString().Equals(query.Provice)).FirstOrDefault().ProvinceNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.Province) ? "" : (systemRepository.GetProvinceList().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
                                 (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
             return result;
         }

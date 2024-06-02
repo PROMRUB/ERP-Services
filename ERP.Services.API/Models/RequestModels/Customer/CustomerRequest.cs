@@ -1,12 +1,16 @@
-﻿namespace ERP.Services.API.Models.RequestModels.Organization
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ERP.Services.API.Models.RequestModels.Customer
 {
-    public class OrganizationRequest
+    public class CustomerRequest
     {
-        public string? OrgCustomId { get; set; }
-        public string? BusinessType { get; set; }
-        public string? OrgName { get; set; }
+        public Guid? CusId { get; set; }
+        public string? CusCustomId { get; set; }
+        public Guid? BusinessId { get; set; }
+        public string? CusType { get; set; }
+        public string? CusName { get; set; }
+        public string? CusNameEng { get; set; }
         public string? DisplayName { get; set; }
-        public string? OrgLogo { get; set; }
         public string? TaxId { get; set; }
         public string? BrnId { get; set; }
         public string? Building { get; set; }
@@ -22,6 +26,5 @@
         public string? SubDistrict { get; set; }
         public string? PostCode { get; set; }
         public string? Website { get; set; }
-        public string? OrgDescription { get; set; }
     }
 }
