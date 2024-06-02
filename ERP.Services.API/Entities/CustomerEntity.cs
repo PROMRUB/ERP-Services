@@ -33,6 +33,9 @@ namespace ERP.Services.API.Entities
         [Column("cus_name")]
         public string? CusName { get; set; }
 
+        [Column("cus_name_eng")]
+        public string? CusNameEng { get; set; }
+
         [Column("display_name")]
         public string? DisplayName { get; set; }
 
@@ -66,8 +69,8 @@ namespace ERP.Services.API.Entities
         [Column("alley")]
         public string? Alley { get; set; }
 
-        [Column("provice")]
-        public string? Provice { get; set; }
+        [Column("province")]
+        public string? Province { get; set; }
 
         [Column("district")]
         public string? District { get; set; }

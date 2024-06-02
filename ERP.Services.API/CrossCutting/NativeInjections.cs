@@ -4,6 +4,7 @@ using ERP.Services.API.Interfaces;
 using ERP.Services.API.Repositories;
 using ERP.Services.API.Seeder.JsonData;
 using ERP.Services.API.Services.ApiKey;
+using ERP.Services.API.Services.Customer;
 using ERP.Services.API.Services.Organization;
 using ERP.Services.API.Services.Role;
 using ERP.Services.API.Services.SystemConfig;
@@ -33,6 +34,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISystemConfigServices, SystemConfigServices>();
+            services.AddScoped<ICustomerService, CustomerService>();
 
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -40,6 +42,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ISystemConfigRepository, SystemConfigRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         }
     }

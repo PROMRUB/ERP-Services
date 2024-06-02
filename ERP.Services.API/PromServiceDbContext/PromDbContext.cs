@@ -19,6 +19,7 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<OrganizationNumberEntity>? OrganizationNumbers { get; set; }
         public DbSet<BusinessEntity>? Businesses { get; set; }
         public DbSet<CustomerEntity>? Customers { get; set; }
+        public DbSet<CustomerNumberEntity> CustomerNumbers { get; set; }
         public DbSet<ApiKeyEntity>? ApiKeys { get; set; }
         public DbSet<RoleEntity>? Roles { get; set; }
         public DbSet<UserEntity>? Users { get; set; }
@@ -35,6 +36,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<OrganizationNumberEntity>();
             modelBuilder.Entity<BusinessEntity>();
             modelBuilder.Entity<CustomerEntity>();
+            modelBuilder.Entity<CustomerNumberEntity>();
             modelBuilder.Entity<ApiKeyEntity>();
             modelBuilder.Entity<RoleEntity>();
             modelBuilder.Entity<UserEntity>();

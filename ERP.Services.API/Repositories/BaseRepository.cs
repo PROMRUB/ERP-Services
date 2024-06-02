@@ -16,7 +16,14 @@ namespace ERP.Services.API.Repositories
 
         public void Commit()
         {
-            context!.SaveChanges();
+            try
+            {
+                context!.SaveChanges();
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
     }
 }
