@@ -34,7 +34,7 @@ namespace ERP.Services.API.Services.Customer
 
         public async Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId, Guid customerId)
         {
-            organizationRepository.SetCustomOrgId(orgId);
+            organizationRepository.SetCustomOrgId(orgId);   
             var organization = await organizationRepository.GetOrganization();
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusId == customerId).FirstOrDefaultAsync();
             return mapper.Map<CustomerEntity, CustomerResponse>(result);
