@@ -24,5 +24,6 @@
         public string? SubDistrict { get; set; }
         public string? PostCode { get; set; }
         public string? Website { get; set; }
+        public string? CusStatus { get; set; }
     }
 }
