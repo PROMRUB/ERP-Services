@@ -20,6 +20,11 @@ namespace ERP.Services.API.Repositories
             return result!;
         }
 
+        public IQueryable<OrganizationEntity> GetOrganizationList()
+        {
+            return context!.Organizations;
+        }
+
         public void AddUserToOrganization(OrganizationUserEntity user)
         {
             user.OrgCustomId = orgId;

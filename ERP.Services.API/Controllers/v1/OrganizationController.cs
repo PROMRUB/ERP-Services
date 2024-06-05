@@ -37,6 +37,24 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
+        [Route("org/{id}/action/GetOrganization/{taxId}/{brnId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetOrganizationByTaxId(string id, string taxId, string brnId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await services.GetOrganizationByTaxId(id, taxId, brnId);
+                return Ok(ResponseHandler.Response<OrganizationResponse>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpGet]
         [Route("org/{id}/action/AdminGetUserAllowedOrganization/{userName}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> AdminGetUserAllowedOrganization(string id, string userName)

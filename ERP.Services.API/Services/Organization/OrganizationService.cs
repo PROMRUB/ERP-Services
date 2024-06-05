@@ -89,6 +89,12 @@ namespace ERP.Services.API.Services.Organization
             return mapper.Map<OrganizationEntity, OrganizationResponse>(query);
         }
 
+        public async Task<OrganizationResponse> GetOrganizationByTaxId(string orgId, string taxId, string brnId)
+        {
+            var query = await organizationRepository!.GetOrganizationList().Where(x => x.TaxId.Equals(taxId) && x.BrnId.Equals(brnId)).FirstOrDefaultAsync();
+            return mapper.Map<OrganizationEntity, OrganizationResponse>(query);
+        }
+
         public async Task<List<OrganizationResponse>> GetBusiness(string orgId)
         {
             organizationRepository!.SetCustomOrgId(orgId);
