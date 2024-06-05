@@ -14,7 +14,8 @@ namespace ERP.Services.API.Controllers.v1
     public class CustomerController : BaseController
     {
         private readonly ICustomerService customerService;
-        public CustomerController(ICustomerService customerService) {
+        public CustomerController(ICustomerService customerService)
+        {
             this.customerService = customerService;
         }
 
@@ -64,6 +65,24 @@ namespace ERP.Services.API.Controllers.v1
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
                 await customerService.CreateCustomer(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost()]
+        [Route("org/{id}/action/ImportExcel/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportExcel(string id, Guid businessId, IFormFile request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await customerService.ImportExcel(id, businessId, request);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)
