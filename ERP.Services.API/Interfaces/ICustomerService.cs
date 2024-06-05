@@ -12,6 +12,7 @@ namespace ERP.Services.API.Interfaces
         public Task<List<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId);
         public Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId, Guid customerId);
         public Task CreateCustomer(string orgId, CustomerRequest request);
+        public Task ImportExcel(string orgId, Guid businessId, IFormFile request);
         public Task UpdateCustomer(string orgId, Guid businessId, Guid customerId, CustomerRequest request);
         public Task DeleteCustomer(string orgId, List<CustomerRequest> request);
     }
