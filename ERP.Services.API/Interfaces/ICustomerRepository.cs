@@ -1,4 +1,5 @@
 ﻿using ERP.Services.API.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ERP.Services.API.Interfaces
 {
@@ -9,7 +10,8 @@ namespace ERP.Services.API.Interfaces
         public void CreateCustomer(CustomerEntity query);
         public void UpdateCustomer(CustomerEntity query);
         public void DeleteCustomer(CustomerEntity query);
-        public Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet);
+        public Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode);
+        public IDbContextTransaction BeginTransaction();
         public void Commit();
     }
 }

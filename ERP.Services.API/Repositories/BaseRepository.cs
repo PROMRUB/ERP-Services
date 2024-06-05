@@ -1,4 +1,6 @@
 ﻿using ERP.Services.API.PromServiceDbContext;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace ERP.Services.API.Repositories
 {
@@ -14,13 +16,25 @@ namespace ERP.Services.API.Repositories
             orgId = customOrgId;
         }
 
+        public IDbContextTransaction BeginTransaction()
+        {
+            try
+            {
+                return context!.Database.BeginTransaction();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public void Commit()
         {
             try
             {
                 context!.SaveChanges();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
