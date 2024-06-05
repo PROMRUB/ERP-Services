@@ -8,7 +8,8 @@ namespace ERP.Services.API.Repositories
 {
     public class CustomerRepository : BaseRepository, ICustomerRepository
     {
-        public CustomerRepository(PromDbContext context) {
+        public CustomerRepository(PromDbContext context)
+        {
             this.context = context;
         }
 
@@ -33,7 +34,7 @@ namespace ERP.Services.API.Repositories
             query.CusStatus = RecordStatus.InActive.ToString();
             context.Customers!.Update(query);
         }
-        public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet)
+        public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode)
         {
             try
             {
