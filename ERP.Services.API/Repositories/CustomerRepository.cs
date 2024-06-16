@@ -36,38 +36,54 @@ namespace ERP.Services.API.Repositories
         }
         public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode)
         {
-            try
+            using (var transaction = await context.Database.BeginTransactionAsync())
             {
-                var query = await context!.CustomerNumbers!.Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Character == alphabet).FirstOrDefaultAsync();
-                bool HaveCustomerNo = true;
-                while (HaveCustomerNo)
+                try
                 {
-                    if (query == null)
+                    var query = await context.CustomerNumbers!
+                        .Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Character == alphabet)
+                        .FirstOrDefaultAsync();
+
+                    bool haveCustomerNo = true;
+                    while (haveCustomerNo)
                     {
-                        var newRec = new CustomerNumberEntity
+                        if (query == null)
                         {
-                            CusNoId = Guid.NewGuid(),
-                            OrgId = orgId,
-                            BusinessId = businessId,
-                            Character = alphabet,
-                            Allocated = 0
-                        };
-                        context.CustomerNumbers!.Add(newRec);
-                        context.SaveChanges();
-                        query = await context.CustomerNumbers!.Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Character == alphabet).FirstOrDefaultAsync();
+                            var newRec = new CustomerNumberEntity
+                            {
+                                CusNoId = Guid.NewGuid(),
+                                OrgId = orgId,
+                                BusinessId = businessId,
+                                Character = alphabet,
+                                Allocated = 0
+                            };
+                            context.CustomerNumbers!.Add(newRec);
+                            await context.SaveChangesAsync();
+
+                            query = await context.CustomerNumbers!
+                                .Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Character == alphabet)
+                                .FirstOrDefaultAsync();
+                        }
+                        else
+                        {
+                            haveCustomerNo = false;
+                        }
                     }
-                    else
-                    {
-                        HaveCustomerNo = false;
-                    }
+
+                    query!.Allocated++;
+                    await context.SaveChangesAsync();
+
+                    // Commit the transaction
+                    await transaction.CommitAsync();
+
+                    return query;
                 }
-                query!.Allocated++;
-                context.SaveChanges();
-                return query;
-            }
-            catch (Exception)
-            {
-                throw;
+                catch (Exception ex)
+                {
+                    // Rollback the transaction in case of an error
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
         }
     }
