@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240616215748_Add-Unique-key")]
+    partial class AddUniquekey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,7 +341,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("CusId");
 
-                    b.HasIndex("CusCustomId", "OrgId", "BusinessId")
+                    b.HasIndex("CusCustomId")
                         .IsUnique();
 
                     b.ToTable("Customer");

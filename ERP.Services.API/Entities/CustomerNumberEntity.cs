@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Entities
 {
     [Table("CustomerNo")]
+    [Index(nameof(CusNoId), IsUnique = true)]
+    [Index(nameof(OrgId), nameof(BusinessId), nameof(Character), IsUnique = true)]
     public class CustomerNumberEntity
     {
         [Key]
