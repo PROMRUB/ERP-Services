@@ -78,6 +78,7 @@ namespace ERP.Services.API.Services.Customer
                 using (var stream = new MemoryStream())
                 {
                     request.CopyTo(stream);
+                    stream.Position = 0;
                     using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets[0];
@@ -111,6 +112,7 @@ namespace ERP.Services.API.Services.Customer
                                 CusCreatedDate = DateTime.UtcNow
                             });
                         }
+                        stream.Dispose();
                     }
                 }
 
@@ -149,6 +151,8 @@ namespace ERP.Services.API.Services.Customer
             query.CusName = request.CusName;
             query.CusNameEng = request.CusNameEng;
             query.DisplayName = request.DisplayName;
+            query.TaxId = request.TaxId;
+            query.BrnId = request.BrnId;
             query.Building = request.Building;
             query.RoomNo = request.RoomNo;
             query.Floor = request.Floor;
