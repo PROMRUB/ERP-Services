@@ -10,6 +10,7 @@ namespace ERP.Services.API.Configurations
     { 
         public CustomerConfigurations() {
             CreateMap<CustomerRequest, CustomerEntity>()
+                .ForMember(dest => dest.CusId, opt => opt.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.CusStatus, opt => opt.MapFrom(src => RecordStatus.Active.ToString()))
                 .ForMember(dest => dest.CusCreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow));
             CreateMap<CustomerEntity, CustomerResponse>()

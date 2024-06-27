@@ -49,16 +49,23 @@ namespace ERP.Services.API.Services.Customer
 
         public async Task CreateCustomer(string orgId, CustomerRequest request)
         {
-            organizationRepository.SetCustomOrgId(orgId);
-            var organization = await organizationRepository.GetOrganization();
-            var query = mapper.Map<CustomerRequest, CustomerEntity>(request);
-            string cleanedCusNameEng = Regex.Replace(request.CusNameEng, "[^a-zA-Z0-9]+", "");
-            char firstCharacter = cleanedCusNameEng.ToUpper().FirstOrDefault();
-            var runNo = await customerRepository.CustomerNumberAsync((Guid)organization.OrgId, (Guid)request.BusinessId, firstCharacter.ToString(), 1);
-            query.OrgId = organization.OrgId;
-            query.CusCustomId = "C." + runNo.Character + "-" + runNo.Allocated.Value.ToString("D5") + ".D";
-            customerRepository.CreateCustomer(query);
-            customerRepository.Commit();
+            try
+            {
+                organizationRepository.SetCustomOrgId(orgId);
+                var organization = await organizationRepository.GetOrganization();
+                var query = mapper.Map<CustomerRequest, CustomerEntity>(request);
+                string cleanedCusNameEng = Regex.Replace(request.CusNameEng, "[^a-zA-Z0-9]+", "");
+                char firstCharacter = cleanedCusNameEng.ToUpper().FirstOrDefault();
+                var runNo = await customerRepository.CustomerNumberAsync((Guid)organization.OrgId, (Guid)request.BusinessId, firstCharacter.ToString(), 1);
+                query.OrgId = organization.OrgId;
+                query.CusCustomId = "C." + runNo.Character + "-" + runNo.Allocated.Value.ToString("D5") + ".D";
+                customerRepository.CreateCustomer(query);
+                customerRepository.Commit();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task ImportExcel(string orgId, Guid businessId, IFormFile request)
