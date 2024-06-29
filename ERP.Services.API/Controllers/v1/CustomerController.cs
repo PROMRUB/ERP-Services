@@ -58,7 +58,7 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/CreateCustomer")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> CreateCustomer(string id, CustomerRequest request)
+        public async Task<IActionResult> CreateCustomer(string id, [FromBody] CustomerRequest request)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/UpdateCustomer/{businessId}/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> UpdateCustomer(string id, Guid businessId, Guid customerId, CustomerRequest request)
+        public async Task<IActionResult> UpdateCustomer(string id, Guid businessId, Guid customerId, [FromBody] CustomerRequest request)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/DeleteCustomer")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> DeleteCustomer(string id, List<CustomerRequest> request)
+        public async Task<IActionResult> DeleteCustomer(string id, [FromBody] List<CustomerRequest> request)
         {
             try
             {
@@ -126,5 +126,89 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+
+        //[HttpGet]
+        //[Route("org/{id}/action/GetCustomerContactList")]
+        //[MapToApiVersion("1")]
+        //public async Task<IActionResult> GetCustomerContactList(string id)
+        //{
+        //    try
+        //    {
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ResponseHandler.Response(ex.Message, null));
+        //    }
+        //}
+
+        //[HttpGet]
+        //[Route("org/{id}/action/GetCustomerContactInformation/{cusConId}")]
+        //[MapToApiVersion("1")]
+        //public async Task<IActionResult> GetCustomerContactInformation(string id, Guid cusConId)
+        //{
+        //    try
+        //    {
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ResponseHandler.Response(ex.Message, null));
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("org/{id}/action/AddCustomerContact")]
+        //[MapToApiVersion("1")]
+        //public async Task<IActionResult> AddCustomerContact(string id, [FromBody] CustomerContactRequest request)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+        //            throw new ArgumentException("1101");
+        //        await customerService.DeleteCustomer(id, request);
+        //        return Ok(ResponseHandler.Response("1000", null));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ResponseHandler.Response(ex.Message, null));
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("org/{id}/action/UpdateCustomerContact/{cusConId}")]
+        //[MapToApiVersion("1")]
+        //public async Task<IActionResult> UpdateCustomerContact(string id, Guid cusConId, [FromBody] CustomerContactRequest request)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+        //            throw new ArgumentException("1101");
+        //        await customerService.DeleteCustomer(id, request);
+        //        return Ok(ResponseHandler.Response("1000", null));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ResponseHandler.Response(ex.Message, null));
+        //    }
+        //}
+
+        //[HttpPost]
+        //[Route("org/{id}/action/DeleteCustomerContact")]
+        //[MapToApiVersion("1")]
+        //public async Task<IActionResult> DeleteCustomerContact(string id, [FromBody] List<CustomerContactRequest> request)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+        //            throw new ArgumentException("1101");
+        //        await customerService.DeleteCustomer(id, request);
+        //        return Ok(ResponseHandler.Response("1000", null));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ResponseHandler.Response(ex.Message, null));
+        //    }
+        //}
     }
 }
