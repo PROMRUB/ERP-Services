@@ -11,7 +11,10 @@ namespace ERP.Services.API.Interfaces
         public void UpdateCustomer(CustomerEntity query);
         public void DeleteCustomer(CustomerEntity query);
         public Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode);
-        public IDbContextTransaction BeginTransaction();
+        public IQueryable<CustomerContactEntity> GetCustomerContactByCustomer(Guid orgId, Guid customerId);
+        public void CreateCustomerContact(CustomerContactEntity query);
+        public void UpdateCustomerContact(CustomerContactEntity query);
+        public void DeleteCustomerContact(CustomerContactEntity query);
         public void Commit();
     }
 }

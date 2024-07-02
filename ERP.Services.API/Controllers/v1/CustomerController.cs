@@ -127,88 +127,94 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        //[HttpGet]
-        //[Route("org/{id}/action/GetCustomerContactList")]
-        //[MapToApiVersion("1")]
-        //public async Task<IActionResult> GetCustomerContactList(string id)
-        //{
-        //    try
-        //    {
+        [HttpGet]
+        [Route("org/{id}/action/GetCustomerContactList/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetCustomerContactList(string id,Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await customerService.GetCustomerContactByCustomer(id, businessId);
+                return Ok(ResponseHandler.Response<List<CustomerContactResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(ResponseHandler.Response(ex.Message, null));
-        //    }
-        //}
+        [HttpGet]
+        [Route("org/{id}/action/GetCustomerContactInformation/{cusConId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetCustomerContactInformation(string id,Guid businessId, Guid customerId, Guid cusConId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await customerService.GetCustomerContactInformationByIdAsync(id,businessId, customerId, cusConId);
+                return Ok(ResponseHandler.Response<CustomerContactResponse>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
-        //[HttpGet]
-        //[Route("org/{id}/action/GetCustomerContactInformation/{cusConId}")]
-        //[MapToApiVersion("1")]
-        //public async Task<IActionResult> GetCustomerContactInformation(string id, Guid cusConId)
-        //{
-        //    try
-        //    {
+        [HttpPost]
+        [Route("org/{id}/action/AddCustomerContact")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AddCustomerContact(string id, [FromBody] CustomerContactRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await customerService.CreateCustomerContact(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(ResponseHandler.Response(ex.Message, null));
-        //    }
-        //}
+        [HttpPost]
+        [Route("org/{id}/action/UpdateCustomerContact/{businessId}/{customerId}/{cusConId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> UpdateCustomerContact(string id,Guid businessId, Guid customerId, Guid cusConId, [FromBody] CustomerContactRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await customerService.UpdateCustomerContact(id, businessId, customerId, cusConId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
-        //[HttpPost]
-        //[Route("org/{id}/action/AddCustomerContact")]
-        //[MapToApiVersion("1")]
-        //public async Task<IActionResult> AddCustomerContact(string id, [FromBody] CustomerContactRequest request)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-        //            throw new ArgumentException("1101");
-        //        await customerService.DeleteCustomer(id, request);
-        //        return Ok(ResponseHandler.Response("1000", null));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(ResponseHandler.Response(ex.Message, null));
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Route("org/{id}/action/UpdateCustomerContact/{cusConId}")]
-        //[MapToApiVersion("1")]
-        //public async Task<IActionResult> UpdateCustomerContact(string id, Guid cusConId, [FromBody] CustomerContactRequest request)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-        //            throw new ArgumentException("1101");
-        //        await customerService.DeleteCustomer(id, request);
-        //        return Ok(ResponseHandler.Response("1000", null));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(ResponseHandler.Response(ex.Message, null));
-        //    }
-        //}
-
-        //[HttpPost]
-        //[Route("org/{id}/action/DeleteCustomerContact")]
-        //[MapToApiVersion("1")]
-        //public async Task<IActionResult> DeleteCustomerContact(string id, [FromBody] List<CustomerContactRequest> request)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-        //            throw new ArgumentException("1101");
-        //        await customerService.DeleteCustomer(id, request);
-        //        return Ok(ResponseHandler.Response("1000", null));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(ResponseHandler.Response(ex.Message, null));
-        //    }
-        //}
+        [HttpPost]
+        [Route("org/{id}/action/DeleteCustomerContact")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> DeleteCustomerContact(string id, [FromBody] List<CustomerContactRequest> request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await customerService.DeleteCustomerContact(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }

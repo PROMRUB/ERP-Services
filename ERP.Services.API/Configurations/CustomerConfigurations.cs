@@ -17,6 +17,12 @@ namespace ERP.Services.API.Configurations
                 .ForMember(dest => dest.CusStatus, opt => opt.MapFrom(src => src.CusStatus == RecordStatus.Active.ToString() ? "ปกติ" : "เลิกใช้งาน"));
             CreateMap<CustomerRequest, CustomerContactEntity>();
             CreateMap<CustomerEntity, CustomerResponse>();
+
+            CreateMap<CustomerContactRequest, CustomerContactEntity>()
+                .ForMember(dest => dest.CusConId, opt => opt.MapFrom(src => Guid.NewGuid()))
+                .ForMember(dest => dest.CusConStatus, opt => opt.MapFrom(src => RecordStatus.Active.ToString()));
+            CreateMap<CustomerContactEntity, CustomerContactResponse>()
+                .ForMember(dest => dest.CusConName, opt => opt.MapFrom(src => src.CusConFirstname + " " + src.CusConLastname));
         }
     }
 }

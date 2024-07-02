@@ -2,6 +2,9 @@
 {
     public class CustomerContactRequest
     {
+        public Guid? CusConId { get; set; }
+        public Guid? BusinessId { get; set; }
+        public Guid? CusId { get; set; }
         public string? CusConFirstname { get; set; }
         public string? CusConLastname { get; set; }
         public string? TelNo { get; set; }

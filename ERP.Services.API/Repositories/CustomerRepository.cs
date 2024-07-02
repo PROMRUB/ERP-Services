@@ -34,6 +34,26 @@ namespace ERP.Services.API.Repositories
             query.CusStatus = RecordStatus.InActive.ToString();
             context.Customers!.Update(query);
         }
+        public IQueryable<CustomerContactEntity> GetCustomerContactByCustomer(Guid orgId, Guid customerId)
+        {
+            var query = context.CustomerContacts!.Where(x => x.OrgId == orgId && x.CusId == customerId);
+            return query;
+        }
+        public void CreateCustomerContact(CustomerContactEntity query)
+        {
+            context.CustomerContacts!.Add(query);
+        }
+
+        public void UpdateCustomerContact(CustomerContactEntity query)
+        {
+            context.CustomerContacts!.Update(query);
+        }
+
+        public void DeleteCustomerContact(CustomerContactEntity query)
+        {
+            query.CusConStatus = RecordStatus.InActive.ToString();
+            context.CustomerContacts!.Update(query);
+        }
         public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())

@@ -188,5 +188,67 @@ namespace ERP.Services.API.Services.Customer
             }
             customerRepository.Commit();
         }
+
+        public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid cusId)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, cusId).Where(x => x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
+        }
+
+        public async Task<CustomerContactResponse> GetCustomerContactInformationByIdAsync(string orgId, Guid businessId, Guid customerId, Guid cusConId)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, customerId).Where(x => x.CusConId == cusConId).FirstOrDefaultAsync();
+            return mapper.Map<CustomerContactEntity, CustomerContactResponse>(result);
+        }
+
+        public async Task CreateCustomerContact(string orgId, CustomerContactRequest request)
+        {
+            try
+            {
+                organizationRepository.SetCustomOrgId(orgId);
+                var organization = await organizationRepository.GetOrganization();
+                var query = mapper.Map<CustomerContactRequest, CustomerContactEntity>(request);
+                query.OrgId = organization.OrgId;
+                customerRepository.CreateCustomerContact(query);
+                customerRepository.Commit();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task UpdateCustomerContact(string orgId, Guid businessId, Guid customerId, Guid cusConId, CustomerContactRequest request)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, customerId).Where(x => x.CusConId == cusConId).FirstOrDefaultAsync();
+            if (query == null)
+                throw new ArgumentException("1111");
+            query.CusConFirstname = request.CusConFirstname;
+            query.CusConLastname = request.CusConLastname;
+            query.TelNo = request.TelNo;
+            query.ExtentNo = request.ExtentNo;
+            query.MobileNo = request.MobileNo;
+            query.Email = request.Email;
+            customerRepository.UpdateCustomerContact(query);
+            customerRepository.Commit();
+        }
+
+        public async Task DeleteCustomerContact(string orgId, List<CustomerContactRequest> request)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            foreach (var customer in request)
+            {
+                var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, (Guid)customer.CusId).Where(x => x.CusConId == customer.CusConId).FirstOrDefaultAsync();
+                customerRepository.DeleteCustomerContact(query);
+            }
+            customerRepository.Commit();
+        }
     }
 }
