@@ -46,6 +46,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<ISystemConfigRepository, SystemConfigRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
         }
     }
 }

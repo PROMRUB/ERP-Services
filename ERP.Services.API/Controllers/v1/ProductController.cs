@@ -59,7 +59,7 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetProducInformation/{businessId}/{productId}")]
+        [Route("org/{id}/action/GetProductInformation/{businessId}/{productId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetProducInformation(string id, Guid businessId, Guid productId)
         {
@@ -94,7 +94,7 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpPost]
-        [Route("org/{id}/action/CreateCustomer")]
+        [Route("org/{id}/action/CreateProduct")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> CreateProduct(string id, [FromBody] ProductRequest request)
         {
