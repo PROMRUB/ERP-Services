@@ -8,6 +8,8 @@ namespace ERP.Services.API.Models.ResponseModels.Customer
         public Guid? OrgId { get; set; }
         public Guid? BusinessId { get; set; }
         public Guid? CusId { get; set; }
+        public string? CusConFirstname { get; set; }
+        public string? CusConLastname { get; set; }
         public string? CusConName { get; set; }
         public string? TelNo { get; set; }
         public string? ExtentNo { get; set; }
