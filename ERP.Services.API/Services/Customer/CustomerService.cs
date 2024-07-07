@@ -62,7 +62,7 @@ namespace ERP.Services.API.Services.Customer
                 customerRepository.CreateCustomer(query);
                 customerRepository.Commit();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -205,7 +205,7 @@ namespace ERP.Services.API.Services.Customer
             return mapper.Map<CustomerContactEntity, CustomerContactResponse>(result);
         }
 
-        public async Task CreateCustomerContact(string orgId, CustomerContactRequest request)
+        public async Task CreateCustomerContact(string orgId, Guid businessId, Guid customerId, CustomerContactRequest request)
         {
             try
             {
@@ -213,6 +213,8 @@ namespace ERP.Services.API.Services.Customer
                 var organization = await organizationRepository.GetOrganization();
                 var query = mapper.Map<CustomerContactRequest, CustomerContactEntity>(request);
                 query.OrgId = organization.OrgId;
+                query.BusinessId = businessId;
+                query.CusId = customerId;
                 customerRepository.CreateCustomerContact(query);
                 customerRepository.Commit();
             }

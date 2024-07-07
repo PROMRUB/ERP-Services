@@ -17,7 +17,7 @@ namespace ERP.Services.API.Interfaces
         public Task DeleteCustomer(string orgId, List<CustomerRequest> request);
         public Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid cusId);
         public Task<CustomerContactResponse> GetCustomerContactInformationByIdAsync(string orgId, Guid businessId, Guid customerId, Guid cusConId);
-        public Task CreateCustomerContact(string orgId, CustomerContactRequest request);
+        public Task CreateCustomerContact(string orgId, Guid businessId, Guid customerId, CustomerContactRequest request);
         public Task UpdateCustomerContact(string orgId, Guid businessId, Guid customerId, Guid cusConId, CustomerContactRequest request);
         public Task DeleteCustomerContact(string orgId, List<CustomerContactRequest> request);
     }

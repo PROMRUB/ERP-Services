@@ -130,7 +130,7 @@ namespace ERP.Services.API.Controllers.v1
         [HttpGet]
         [Route("org/{id}/action/GetCustomerContactList/{businessId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerContactList(string id,Guid businessId)
+        public async Task<IActionResult> GetCustomerContactList(string id, Guid businessId)
         {
             try
             {
@@ -148,13 +148,13 @@ namespace ERP.Services.API.Controllers.v1
         [HttpGet]
         [Route("org/{id}/action/GetCustomerContactInformation/{cusConId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerContactInformation(string id,Guid businessId, Guid customerId, Guid cusConId)
+        public async Task<IActionResult> GetCustomerContactInformation(string id, Guid businessId, Guid customerId, Guid cusConId)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerContactInformationByIdAsync(id,businessId, customerId, cusConId);
+                var result = await customerService.GetCustomerContactInformationByIdAsync(id, businessId, customerId, cusConId);
                 return Ok(ResponseHandler.Response<CustomerContactResponse>("1000", null, result));
             }
             catch (Exception ex)
@@ -164,15 +164,15 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpPost]
-        [Route("org/{id}/action/AddCustomerContact")]
+        [Route("org/{id}/action/AddCustomerContact/{businessId}/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> AddCustomerContact(string id, [FromBody] CustomerContactRequest request)
+        public async Task<IActionResult> AddCustomerContact(string id, Guid businessId, Guid customerId, [FromBody] CustomerContactRequest request)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                await customerService.CreateCustomerContact(id, request);
+                await customerService.CreateCustomerContact(id, businessId, customerId, request);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)
@@ -184,7 +184,7 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/UpdateCustomerContact/{businessId}/{customerId}/{cusConId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> UpdateCustomerContact(string id,Guid businessId, Guid customerId, Guid cusConId, [FromBody] CustomerContactRequest request)
+        public async Task<IActionResult> UpdateCustomerContact(string id, Guid businessId, Guid customerId, Guid cusConId, [FromBody] CustomerContactRequest request)
         {
             try
             {
