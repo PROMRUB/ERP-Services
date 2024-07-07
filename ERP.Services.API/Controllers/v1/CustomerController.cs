@@ -146,7 +146,7 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetCustomerContactInformation/{cusConId}")]
+        [Route("org/{id}/action/GetCustomerContactInformation/{businessId}/{customerId}/{cusConId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetCustomerContactInformation(string id, Guid businessId, Guid customerId, Guid cusConId)
         {
