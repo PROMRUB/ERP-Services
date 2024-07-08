@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ERP.Services.API.Entities
 {
     [Table("Product")]
-    [Index(nameof(ProductCustomId), IsUnique = true)]
+    [Index(nameof(ProductId), nameof(OrgId), nameof(BusinessId), nameof(ProductCustomId), IsUnique = true)]
     public class ProductEntity
     {
         [Key]
@@ -28,6 +28,6 @@ namespace ERP.Services.API.Entities
         [Column("lw_price")]
         public decimal? LwPrice { get; set; }
         [Column("product_status")]
-        public string?  ProductStatus { get; set; }
+        public string? ProductStatus { get; set; }
     }
 }

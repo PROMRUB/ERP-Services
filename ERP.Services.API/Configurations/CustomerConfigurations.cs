@@ -15,7 +15,7 @@ namespace ERP.Services.API.Configurations
                 .ForMember(dest => dest.CusStatus, opt => opt.MapFrom(src => RecordStatus.Active.ToString()))
                 .ForMember(dest => dest.CusCreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow));
             CreateMap<CustomerEntity, CustomerResponse>()
-                .ForMember(dest => dest.CusStatus, opt => opt.MapFrom(src => src.CusStatus == RecordStatus.Active.ToString() ? "ปกติ" : "เลิกใช้งาน"));
+                .ForMember(dest => dest.CusStatus, opt => opt.MapFrom(src => src.CusStatus == RecordStatus.Active.ToString() ? "รออนุมัติ" : "เลิกใช้งาน"));
             CreateMap<CustomerEntity, CustomerResponse>();
 
             CreateMap<CustomerContactRequest, CustomerContactEntity>()

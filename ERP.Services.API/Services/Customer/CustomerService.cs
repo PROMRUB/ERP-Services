@@ -35,8 +35,16 @@ namespace ERP.Services.API.Services.Customer
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusStatus == RecordStatus.Active.ToString()).OrderBy(x => x.CusCustomId).ToListAsync();
-            return mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(result);
+            var query = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusStatus == RecordStatus.Active.ToString()).OrderBy(x => x.CusCustomId).ToListAsync();
+            var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
+            foreach(var item in result)
+            {
+                if(item.CusStatus == RecordStatus.Active.ToString())
+                {
+                    item.CusStatus = "ปกติ";
+                }
+            }
+            return result;
         }
 
         public async Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId, Guid customerId)

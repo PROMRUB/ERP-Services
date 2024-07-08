@@ -181,5 +181,41 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+
+        [HttpPost]
+        [Route("org/{id}/action/ImportCategory/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportCategory(string id, Guid businessId, [FromForm] IFormFile request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await productService.ImportProductCategory(id, businessId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost]
+        [Route("org/{id}/action/ImportProduct/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportProduct(string id, Guid businessId, [FromForm] IFormFile request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await productService.ImportProduct(id, businessId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }

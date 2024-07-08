@@ -38,8 +38,19 @@ namespace ERP.Services.API.Services.Product
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProductCustomId).ToListAsync();
-            return mapper.Map<List<ProductEntity>, List<ProductResponse>>(result);
+            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProductCustomId).ToListAsync();
+            var result = mapper.Map<List<ProductEntity>, List<ProductResponse>>(query);
+            var cat = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).ToListAsync();
+            foreach (var item in result)
+            {
+                item.ProductCategory = cat.Where(x => x.ProductCatId == item.ProductCatId).FirstOrDefault()?.CategoryName;
+                item.ProductSubCategory = cat.Where(x => x.ProductCatId == item.ProductSubCatId).FirstOrDefault()?.CategoryName;
+                if (item.ProductStatus == RecordStatus.Active.ToString())
+                {
+                    item.ProductStatus = "ปกติ";
+                }
+            }
+            return result;
         }
 
         public async Task<ProductResponse> GetProductInformationById(string orgId, Guid businessId, Guid productId)
@@ -112,43 +123,50 @@ namespace ERP.Services.API.Services.Product
 
         public async Task ImportProductCategory(string orgId, Guid businessId, IFormFile request)
         {
-            organizationRepository.SetCustomOrgId(orgId);
-            var organization = await organizationRepository.GetOrganization();
-
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-
-            var items = new List<ProductCategoryEntity>();
-
-            using (var stream = new MemoryStream())
+            try
             {
-                request.CopyTo(stream);
-                stream.Position = 0;
-                using (var package = new ExcelPackage(stream))
+                organizationRepository.SetCustomOrgId(orgId);
+                var organization = await organizationRepository.GetOrganization();
+
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                var items = new List<ProductCategoryEntity>();
+
+                using (var stream = new MemoryStream())
                 {
-                    var worksheet = package.Workbook.Worksheets[0];
-
-                    for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                    request.CopyTo(stream);
+                    stream.Position = 0;
+                    using (var package = new ExcelPackage(stream))
                     {
-                        items.Add(new ProductCategoryEntity
-                        {
-                            ProductCatId = Guid.NewGuid(),
-                            OrgId = organization.OrgId,
-                            BusinessId = businessId,
-                            CustomCatId = worksheet.Cells[row, 2].Text,
-                            ParentCatId = worksheet.Cells[row, 3].Text,
-                            CategoryName = worksheet.Cells[row, 4].Text,
-                            CategoryStatus = RecordStatus.Active.ToString()
-                        });
-                    }
-                    stream.Dispose();
-                }
-            }
+                        var worksheet = package.Workbook.Worksheets[0];
 
-            foreach(var item in items)
-            {
-                productRepository.AddProductCategory(item);
+                        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                        {
+                            items.Add(new ProductCategoryEntity
+                            {
+                                ProductCatId = Guid.NewGuid(),
+                                OrgId = organization.OrgId,
+                                BusinessId = businessId,
+                                CustomCatId = worksheet.Cells[row, 1].Text,
+                                ParentCatId = worksheet.Cells[row, 2].Text,
+                                CategoryName = worksheet.Cells[row, 3].Text,
+                                CategoryStatus = RecordStatus.Active.ToString()
+                            });
+                        }
+                        stream.Dispose();
+                    }
+                }
+
+                foreach (var item in items)
+                {
+                    productRepository.AddProductCategory(item);
+                }
+                productRepository.Commit();
             }
-            productRepository.Commit();
+            catch
+            {
+                throw;
+            }
         }
         public async Task ImportProduct(string orgId, Guid businessId, IFormFile request)
         {
