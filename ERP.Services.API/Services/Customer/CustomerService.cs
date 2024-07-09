@@ -39,9 +39,15 @@ namespace ERP.Services.API.Services.Customer
             var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
             foreach(var item in result)
             {
-                if(item.CusStatus == RecordStatus.Active.ToString())
+                switch(item.CusStatus)
                 {
-                    item.CusStatus = "ปกติ";
+                    case "1":
+                        item.CusStatus = "ปกติ";
+                        break;
+                    case "2":
+                        item.CusStatus = "รออนุมัติ";
+                        break;
+
                 }
             }
             return result;
@@ -123,7 +129,7 @@ namespace ERP.Services.API.Services.Customer
                                 Province = worksheet.Cells[row, 20].Text.Replace("จังหวัด", ""),
                                 PostCode = worksheet.Cells[row, 21].Text,
                                 OrgId = organization.OrgId,
-                                CusStatus = RecordStatus.Active.ToString(),
+                                CusStatus = RecordStatus.Waiting.ToString(),
                                 CusCreatedDate = DateTime.UtcNow
                             });
                         }
