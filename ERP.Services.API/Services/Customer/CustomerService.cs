@@ -35,7 +35,7 @@ namespace ERP.Services.API.Services.Customer
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusStatus == RecordStatus.Active.ToString()).OrderBy(x => x.CusCustomId).ToListAsync();
+            var query = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusStatus != RecordStatus.InActive.ToString()).OrderBy(x => x.CusCustomId).ToListAsync();
             var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
             foreach(var item in result)
             {
