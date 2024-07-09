@@ -37,18 +37,12 @@ namespace ERP.Services.API.Services.Customer
             var organization = await organizationRepository.GetOrganization();
             var query = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CusStatus != RecordStatus.InActive.ToString()).OrderBy(x => x.CusCustomId).ToListAsync();
             var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
-            foreach(var item in result)
+            foreach (var item in result)
             {
-                switch(item.CusStatus)
-                {
-                    case "1":
-                        item.CusStatus = "ปกติ";
-                        break;
-                    case "2":
-                        item.CusStatus = "รออนุมัติ";
-                        break;
-
-                }
+                if (item.CusStatus.Equals(RecordStatus.Waiting.ToString()))
+                    item.CusStatus = "รออนุมัติ";
+                else if (item.CusStatus.Equals(RecordStatus.Active.ToString()))
+                    item.CusStatus = "ปกติ";
             }
             return result;
         }
