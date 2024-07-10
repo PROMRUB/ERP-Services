@@ -9,7 +9,9 @@ using ERP.Services.API.Models.ResponseModels.Condition;
 using ERP.Services.API.Models.ResponseModels.Product;
 using ERP.Services.API.Models.ResponseModels.Project;
 using ERP.Services.API.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System.Runtime.CompilerServices;
 
 namespace ERP.Services.API.Services.Condition
@@ -71,6 +73,53 @@ namespace ERP.Services.API.Services.Condition
             var query = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
             conditionRepository.DeleteCondition(query);
             conditionRepository.Commit();
+        }
+
+        public async Task ImportCondition(string orgId, Guid businessId, IFormFile request)
+        {
+            try
+            {
+                organizationRepository.SetCustomOrgId(orgId);
+                var organization = await organizationRepository.GetOrganization();
+
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                var items = new List<ConditionEntity>();
+
+                using (var stream = new MemoryStream())
+                {
+                    request.CopyTo(stream);
+                    stream.Position = 0;
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0];
+
+                        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                        {
+                            items.Add(new ConditionEntity
+                            {
+                                ConditionId = Guid.NewGuid(),
+                                OrgId = organization.OrgId,
+                                BusinessId = businessId,
+                                ConditionDescription = worksheet.Cells[row, 1].Text,
+                                OrderBy = Int32.Parse(worksheet.Cells[row, 2].Text),
+                                ConditionStatus = RecordStatus.Active.ToString()
+                            });
+                        }
+                        stream.Dispose();
+                    }
+                }
+
+                foreach (var item in items)
+                {
+                    conditionRepository.AddCondition(item);
+                }
+                conditionRepository.Commit();
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

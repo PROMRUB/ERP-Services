@@ -52,6 +52,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<UserSessionEntity>();
             modelBuilder.Entity<ProductCategoryEntity>();
             modelBuilder.Entity<ProductEntity>();
+            modelBuilder.Entity<ProjectEntity>();
             modelBuilder.Entity<ProjectNumberEntity>();
             modelBuilder.Entity<ConditionEntity>();
             modelBuilder.Entity<PaymentAccountEntity>();

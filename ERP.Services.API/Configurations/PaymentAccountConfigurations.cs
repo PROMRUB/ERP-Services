@@ -8,7 +8,7 @@ namespace ERP.Services.API.Configurations
 {
     public class PaymentAccountConfigurations : Profile
     {
-        PaymentAccountConfigurations()
+        public PaymentAccountConfigurations()
         {
             CreateMap<PaymentAccountRequest, PaymentAccountEntity>()
                     .ForMember(dest => dest.PaymentAccountId, opt => opt.MapFrom(_ => Guid.NewGuid()))

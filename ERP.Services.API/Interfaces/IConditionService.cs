@@ -16,5 +16,6 @@ namespace ERP.Services.API.Interfaces
         public Task CreateCondition(string orgId, ConditionRequest request);
         public Task UpdateCondition(string orgId, Guid businessId, Guid conditionId, ConditionRequest request);
         public Task DeleteCondition(string orgId, Guid businessId, Guid conditionId, ConditionRequest request);
+        public Task ImportCondition(string orgId, Guid businessId, IFormFile request);
     }
 }

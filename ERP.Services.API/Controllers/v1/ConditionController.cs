@@ -38,5 +38,23 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+
+        [HttpPost()]
+        [Route("org/{id}/action/ImportExcel/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportExcel(string id, Guid businessId, [FromForm] IFormFile request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await conditionService.ImportCondition(id, businessId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }

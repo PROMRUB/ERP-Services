@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ERP.Services.API.Entities
 {
     [Table("CustomerContact")]
-    [Index(nameof(CusConId), IsUnique = true)]
+    [Index(nameof(CusConId), nameof(OrgId), nameof(BusinessId), nameof(CusId), nameof(UserId), IsUnique = true)]
     public class CustomerContactEntity
     {
         public CustomerContactEntity()
@@ -22,6 +22,8 @@ namespace ERP.Services.API.Entities
         public Guid? BusinessId { get; set; }
         [Column("cus_id")]
         public Guid? CusId { get; set; }
+        [Column("user_id")]
+        public Guid? UserId { get; set; }
         [Column("cus_firstname")]
         public string? CusConFirstname { get; set; }
         [Column("cus_lastname")]
