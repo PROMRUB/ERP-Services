@@ -10,7 +10,7 @@ namespace ERP.Services.API.Interfaces
     public interface IProjectService
     {
         public Task<List<ProjectResponse>> GetProjectListByBusiness(string orgId, Guid businessId);
-        public Task<ProjectResponse> GeProjectInformationById(string orgId, Guid businessId, Guid projectId);
+        public Task<ProjectResponse> GetProjectInformationById(string orgId, Guid businessId, Guid projectId);
         public Task CreateProject(string orgId, ProjectRequest request);
         public Task UpdateProject(string orgId, Guid businessId, Guid projectId, ProjectRequest request);
         public Task DeleteProject(string orgId, Guid businessId, Guid projectId, ProjectRequest request);

@@ -48,7 +48,7 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await projectService.GeProjectInformationById(id, businessId, projectId);
+                var result = await projectService.GetProjectInformationById(id, businessId, projectId);
                 return Ok(ResponseHandler.Response<ProjectResponse>("1000", null, result));
             }
             catch (Exception ex)

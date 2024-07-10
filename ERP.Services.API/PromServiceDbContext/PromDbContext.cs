@@ -30,6 +30,9 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<ProductCategoryEntity>? ProductCategories { get; set; }
         public DbSet<ProductEntity>? Products { get; set; }
         public DbSet<ProjectEntity>? Projects { get; set; }
+        public DbSet<ProjectNumberEntity> ProjectNumbers { get; set; }
+        public DbSet<ConditionEntity> Conditions { get; set; }
+        public DbSet<PaymentAccountEntity> PaymentAccounts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ProvinceEntity>();
@@ -49,7 +52,9 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<UserSessionEntity>();
             modelBuilder.Entity<ProductCategoryEntity>();
             modelBuilder.Entity<ProductEntity>();
-            modelBuilder.Entity<ProjectEntity>();
+            modelBuilder.Entity<ProjectNumberEntity>();
+            modelBuilder.Entity<ConditionEntity>();
+            modelBuilder.Entity<PaymentAccountEntity>();
         }
     }
 }

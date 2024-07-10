@@ -2,6 +2,7 @@
 using ERP.Services.API.Enum;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.PromServiceDbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Repositories
 {
@@ -50,6 +51,55 @@ namespace ERP.Services.API.Repositories
                 throw;
             }
         }
+        public async Task<ProjectNumberEntity> ProjectNumberAsync(Guid orgId, Guid businessId, string year, int mode)
+        {
+            using (var transaction = await context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var query = await context.ProjectNumbers!
+                        .Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Year == year)
+                        .FirstOrDefaultAsync();
 
+                    bool haveProjectNo = true;
+                    while (haveProjectNo)
+                    {
+                        if (query == null)
+                        {
+                            var newRec = new ProjectNumberEntity
+                            {
+                                CusNoId = Guid.NewGuid(),
+                                OrgId = orgId,
+                                BusinessId = businessId,
+                                Year = year,
+                                Allocated = 0
+                            };
+                            context.ProjectNumbers!.Add(newRec);
+                            await context.SaveChangesAsync();
+
+                            query = await context.ProjectNumbers!
+                                .Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.Year == year)
+                                .FirstOrDefaultAsync();
+                        }
+                        else
+                        {
+                            haveProjectNo = false;
+                        }
+                    }
+
+                    query!.Allocated++;
+                    await context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+
+                    return query;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
     }
 }

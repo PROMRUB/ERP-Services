@@ -61,6 +61,11 @@ namespace ERP.Services.API.Services.Customer
             {
                 organizationRepository.SetCustomOrgId(orgId);
                 var organization = await organizationRepository.GetOrganization();
+                var customer = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, (Guid)request.BusinessId).Where(x => x.CusStatus == RecordStatus.Active.ToString() && x.TaxId.Equals(request.TaxId) && x.BrnId.Equals(request.BrnId)).OrderBy(x => x.CusCustomId).ToListAsync();
+                if(customer != null)
+                {
+                    throw new ArgumentException("1111");
+                }
                 var query = mapper.Map<CustomerRequest, CustomerEntity>(request);
                 string cleanedCusNameEng = Regex.Replace(request.CusNameEng, "[^a-zA-Z0-9]+", "");
                 char firstCharacter = cleanedCusNameEng.ToUpper().FirstOrDefault();
