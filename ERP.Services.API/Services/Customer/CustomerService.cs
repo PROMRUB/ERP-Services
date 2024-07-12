@@ -66,7 +66,7 @@ namespace ERP.Services.API.Services.Customer
                 organizationRepository.SetCustomOrgId(orgId);
                 var organization = await organizationRepository.GetOrganization();
                 var customer = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, (Guid)request.BusinessId).Where(x => x.CusStatus == RecordStatus.Active.ToString() && x.TaxId.Equals(request.TaxId) && x.BrnId.Equals(request.BrnId)).OrderBy(x => x.CusCustomId).ToListAsync();
-                if(customer != null)
+                if(customer.Count != 0)
                 {
                     throw new ArgumentException("1111");
                 }

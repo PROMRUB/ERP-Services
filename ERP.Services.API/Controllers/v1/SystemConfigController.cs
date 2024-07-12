@@ -63,7 +63,7 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid)
                     throw new ArgumentException("1101");
-                var result = await systemConfigServices.GetSubDIstrictsAsync();
+                var result = await systemConfigServices.GetSubDistrictsAsync();
                 return Ok(ResponseHandler.Response<List<SubDIstrictResponse>>("1000", null, result));
             }
             catch (Exception ex)
