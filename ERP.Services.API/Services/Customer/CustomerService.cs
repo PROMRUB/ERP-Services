@@ -96,9 +96,9 @@ namespace ERP.Services.API.Services.Customer
 
                 var items = new List<CustomerEntity>();
 
-                var subDistricts = await systemConfigRepository.GetSubDistrictList().ToListAsync();
-                var districts = await systemConfigRepository.GetDistrictList().ToListAsync();
-                var provinces = await systemConfigRepository.GetProvinceList().ToListAsync();
+                var subDistricts = await systemConfigRepository.GetAll<SubDistrictEntity>().ToListAsync();
+                var districts = await systemConfigRepository.GetAll<DistrictEntity>().ToListAsync();
+                var provinces = await systemConfigRepository.GetAll<ProvinceEntity>().ToListAsync();
                 using (var stream = new MemoryStream())
                 {
                     request.CopyTo(stream);

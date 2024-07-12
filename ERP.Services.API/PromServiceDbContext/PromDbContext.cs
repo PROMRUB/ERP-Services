@@ -12,6 +12,8 @@ namespace ERP.Services.API.PromServiceDbContext
             Configuration = configuration;
         }
 
+        public DbSet<BankEntity> Banks { get; set; }
+        public DbSet<BankBranchEntity> BankBranches { get; set; }
         public DbSet<ProvinceEntity>? Provinces { get; set; }
         public DbSet<DistrictEntity>? District { get; set; }
         public DbSet<SubDistrictEntity>? SubDistrict { get; set; }
@@ -35,6 +37,8 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<PaymentAccountEntity> PaymentAccounts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BankEntity>();
+            modelBuilder.Entity<BankBranchEntity>();
             modelBuilder.Entity<ProvinceEntity>();
             modelBuilder.Entity<DistrictEntity>();
             modelBuilder.Entity<SubDistrictEntity>();

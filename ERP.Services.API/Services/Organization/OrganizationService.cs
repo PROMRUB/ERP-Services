@@ -119,7 +119,6 @@ namespace ERP.Services.API.Services.Organization
             businessRepository!.SetCustomOrgId(orgId);
             var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
-            var test = systemRepository.GetDistrictList().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault();
             result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : (query.Building + " ")) +
                                 (string.IsNullOrEmpty(query.RoomNo) ? "" : (query.RoomNo + " ")) +
                                 (string.IsNullOrEmpty(query.Floor) ? "" : (query.Floor + " ")) +
@@ -128,9 +127,9 @@ namespace ERP.Services.API.Services.Organization
                                 (string.IsNullOrEmpty(query.Moo) ? "" : (query.Moo + " ")) +
                                 (string.IsNullOrEmpty(query.Alley) ? "" : (query.Alley + " ")) +
                                 (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
-                                (string.IsNullOrEmpty(query.SubDistrict) ? "" : (systemRepository.GetSubDistrictList().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.District) ? "" : (systemRepository.GetDistrictList().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.Province) ? "" : (systemRepository.GetProvinceList().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.SubDistrict) ? "" : (systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.District) ? "" : (systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.Province) ? "" : (systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
                                 (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
             return result;
         }

@@ -4,8 +4,11 @@ namespace ERP.Services.API.Interfaces
 {
     public interface ISystemConfigRepository
     {
-        public IQueryable<ProvinceEntity> GetProvinceList();
-        public IQueryable<DistrictEntity> GetDistrictList();
-        public IQueryable<SubDistrictEntity> GetSubDistrictList();
+        IQueryable<T> GetAll<T>() where T : class;
+        Task<T> GetByIdAsync<T>(Guid id) where T : class;
+        Task AddAsync<T>(T entity) where T : class;
+        void Update<T>(T entity) where T : class;
+        void Delete<T>(T entity) where T : class;
+        void Commit();
     }
 }

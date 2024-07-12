@@ -11,19 +11,34 @@ namespace ERP.Services.API.Repositories
             this.context = context;
         }
 
-        public IQueryable<ProvinceEntity> GetProvinceList()
+        public IQueryable<T> GetAll<T>() where T : class
         {
-            return context.Provinces;
+            return context.Set<T>();
         }
 
-        public IQueryable<DistrictEntity> GetDistrictList()
+        public async Task<T> GetByIdAsync<T>(Guid id) where T : class
         {
-            return context.District;
+            return await context.Set<T>().FindAsync(id);
         }
 
-        public IQueryable<SubDistrictEntity> GetSubDistrictList()
+        public async Task AddAsync<T>(T entity) where T : class 
         {
-            return context.SubDistrict;
+            await context.Set<T>().AddAsync(entity);
+        }
+
+        public void Update<T>(T entity) where T : class
+        {
+            context.Set<T>().Update(entity);
+        }
+
+        public void Delete<T>(T entity) where T : class
+        {
+            context.Set<T>().Remove(entity);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
         }
     }
 }

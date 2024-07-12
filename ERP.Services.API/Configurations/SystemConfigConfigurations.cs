@@ -16,6 +16,8 @@ namespace ERP.Services.API.Configurations
                 .ForMember(dest => dest.DistrictName, opt => opt.MapFrom(src => src.DistrictNameTh));
             CreateMap<SubDistrictEntity, SubDIstrictResponse>()
                 .ForMember(dest => dest.SubDistrictName, opt => opt.MapFrom(src => src.SubDistrictNameTh));
+            CreateMap<BankEntity, BankResponse>();
+            CreateMap<BankBranchEntity, BankBranchResponse>();
         }
     }
 }
