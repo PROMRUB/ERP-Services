@@ -16,7 +16,9 @@ namespace ERP.Services.API.Entities
         [Column("business_id")]
         public Guid? BusinessId { get; set; }
         [Column("cus_id")]
-        public Guid CustomerId { get; set; }
+        public Guid? CustomerId { get; set; }
+        [Column("user_id")]
+        public Guid? UserId { get; set; }
         [Column("project_cus_Id")]
         public string? ProjectCustomId { get; set; }
         [Column("project_name")]
