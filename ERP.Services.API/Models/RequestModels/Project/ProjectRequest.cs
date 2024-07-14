@@ -2,7 +2,7 @@
 {
     public class ProjectRequest
     {
-        public Guid ProductCatId { get; set; }
+        public Guid ProjectId { get; set; }
         public Guid? OrgId { get; set; }
         public Guid? BusinessId { get; set; }
         public Guid CustomerId { get; set; }
