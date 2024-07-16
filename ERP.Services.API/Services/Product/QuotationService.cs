@@ -31,7 +31,7 @@ public class QuotationService
             ProductId = x.ProductId,
             ProductName = x.Product.ProductName,
             Quantity = x.Quantity,
-            Unit = x.Product.Unit,
+            // Unit = x.Product.Unit,
             Amount = x.Amount,
             BasePrice = x.Product.LwPrice.Value,
             Order = x.Order

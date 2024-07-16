@@ -18,8 +18,8 @@ namespace ERP.Services.API.Entities
         [Column("msrp")] public decimal? MSRP { get; set; }
         [Column("lw_price")] public decimal? LwPrice { get; set; }
         [Column("product_status")] public string? ProductStatus { get; set; }
-        [Column("unit")] public string Unit { get; set; }
-        [Column("inventory")] public int Inventory { get; set; }
+        // [Column("unit")] public string Unit { get; set; }
+        // [Column("inventory")] public int Inventory { get; set; }
         
         
     }
