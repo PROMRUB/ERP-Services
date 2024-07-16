@@ -10,70 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/ERP.Services.API.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/ERP.Services.API.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/ApiKeyEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/ApiKeyEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/BusinessEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/BusinessEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/CustomerContactEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/CustomerContactEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/CustomerEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/CustomerEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/CustomerNumberEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/CustomerNumberEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/DistrictEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/DistrictEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/OrganizationEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/OrganizationEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/OrganizationNumberEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/OrganizationNumberEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/OrganizationUserEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/OrganizationUserEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/ProductCategoryEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/ProductCategoryEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/ProductEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/ProductEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/ProjectEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/ProjectEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/ProvinceEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/ProvinceEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/RoleEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/RoleEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/SubDistrictEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/SubDistrictEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/UserBusinessEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/UserBusinessEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/UserEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/UserEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Entities/UserSessionEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Entities/UserSessionEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240513114600_Initial_Database.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240513114600_Initial_Database.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240513114600_Initial_Database.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240513114600_Initial_Database.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240518180349_Add_Business_And_Customer.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240518180349_Add_Business_And_Customer.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240518180349_Add_Business_And_Customer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240518180349_Add_Business_And_Customer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240518190221_Add_Organization_No.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240518190221_Add_Organization_No.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240518190221_Add_Organization_No.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240518190221_Add_Organization_No.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519085955_Modify_User.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519085955_Modify_User.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519085955_Modify_User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519085955_Modify_User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519100136_Add_Contract_User.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519100136_Add_Contract_User.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519100136_Add_Contract_User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519100136_Add_Contract_User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519155806_User_Session.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519155806_User_Session.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240519155806_User_Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240519155806_User_Session.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240530092524_Add_User_to_Business.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240530092524_Add_User_to_Business.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240530092524_Add_User_to_Business.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240530092524_Add_User_to_Business.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240530111614_Fix_Create_Account.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240530111614_Fix_Create_Account.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240530111614_Fix_Create_Account.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240530111614_Fix_Create_Account.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602152717_Add_Customer_Eng_Name.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602152717_Add_Customer_Eng_Name.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602152717_Add_Customer_Eng_Name.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602152717_Add_Customer_Eng_Name.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602203400_Rename.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602203400_Rename.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602203400_Rename.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602203400_Rename.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602204058_Add_Customer_No.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602204058_Add_Customer_No.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240602204058_Add_Customer_No.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240602204058_Add_Customer_No.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240606090343_Add_Customer_Contact.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240606090343_Add_Customer_Contact.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240606090343_Add_Customer_Contact.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240606090343_Add_Customer_Contact.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616215430_Add-Table-Key.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616215430_Add-Table-Key.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616215430_Add-Table-Key.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616215430_Add-Table-Key.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616215748_Add-Unique-key.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616215748_Add-Unique-key.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616215748_Add-Unique-key.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616215748_Add-Unique-key.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616220213_Add-Unique-Key-Customer.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616220213_Add-Unique-Key-Customer.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240616220213_Add-Unique-Key-Customer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240616220213_Add-Unique-Key-Customer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240627053440_Change_Customer_PK.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240627053440_Change_Customer_PK.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240627053440_Change_Customer_PK.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240627053440_Change_Customer_PK.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240705035138_Add_Product_and_Project.Designer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240705035138_Add_Product_and_Project.Designer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/20240705035138_Add_Product_and_Project.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/20240705035138_Add_Product_and_Project.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Migrations/PromDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Database/Migrations/PromDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/ApiKeyRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/ApiKeyRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/BaseRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/BaseRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/BusinessRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/BusinessRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/CustomerRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/CustomerRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/OrganizationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/OrganizationRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/ProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/ProjectRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/ProjectRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/RoleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/RoleRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/SystemConfigRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/SystemConfigRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Repositories/UserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.Core/Repositories/UserRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,49 +22,41 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1af6ffa8cee75f0266ceb188fc7b4dd49b4673386a5681842e9a8867259ed52/ISystemClock.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Configurations/CustomerConfigurations.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/ERP.Services.Core/Interfaces/IApiKeyService.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/ERP.Services.Core/Interfaces/IAuthenticationRepo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/ERP.Services.Core/Interfaces/ICustomerRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/393e5c61f45111b96c555e0fc4998665295af303db45491f25c21c20739d53/RelationalDatabaseFacadeExtensions.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2j3c8B6e0WE33iIc9vPHvpvSPK0" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/restructure",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/repository&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "/Users/kornkunayothin/Library/Application Support/JetBrains/Rider2023.2/resharper-host/DecompilerCache",
-      "/Users/kornkunayothin/Library/Application Support/JetBrains/Rider2023.2/resharper-host/SourcesCache",
-      "/Users/kornkunayothin/.local/share/Symbols/src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;/Users/kornkunayothin/Library/Application Support/JetBrains/Rider2023.2/resharper-host/DecompilerCache&quot;,
+      &quot;/Users/kornkunayothin/Library/Application Support/JetBrains/Rider2023.2/resharper-host/SourcesCache&quot;,
+      &quot;/Users/kornkunayothin/.local/share/Symbols/src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.ERP.Services.API">
     <configuration name="ERP.Services.API" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/ERP.Services.API/ERP.Services.API.csproj" />
@@ -157,11 +86,17 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
-      <deployment type="docker-compose.yml" />
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
       <method v="2" />
     </configuration>
     <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
@@ -187,7 +122,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1720619040125</updated>
-      <workItem from="1720619041710" duration="45748000" />
+      <workItem from="1720619041710" duration="48390000" />
+      <workItem from="1721128860062" duration="14000" />
+      <workItem from="1721129066551" duration="3783000" />
     </task>
     <servers />
   </component>
