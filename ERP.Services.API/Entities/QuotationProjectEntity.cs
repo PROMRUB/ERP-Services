@@ -8,7 +8,9 @@ namespace ERP.Services.API.Entities;
 [Index(nameof(QuotationId), nameof(ProjectId), IsUnique = true)]
 public class QuotationProjectEntity
 {
-    [Key] [Column("quotation_id")] public Guid QuotationId { get; set; }
+    [Column("quotation_id")] public Guid QuotationId { get; set; }
+    public QuotationEntity Quotation { get; set; }
+
     [Column("project_id")] public Guid ProjectId { get; set; }
 
     public ProjectEntity Project { get; set; }

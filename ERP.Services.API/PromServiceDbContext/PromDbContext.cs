@@ -1,4 +1,5 @@
-﻿using ERP.Services.API.Entities;
+﻿using ERP.Services.API.Configurations;
+using ERP.Services.API.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.PromServiceDbContext
@@ -64,9 +65,11 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<ProjectNumberEntity>();
             modelBuilder.Entity<ConditionEntity>();
             modelBuilder.Entity<PaymentAccountEntity>();
-            modelBuilder.Entity<QuotationEntity>();
-            modelBuilder.Entity<QuotationProductEntity>();
-            modelBuilder.Entity<QuotationProjectEntity>();
+
+
+            modelBuilder.ApplyConfiguration(new QuotationEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new QuotationProductEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new QuotationProjectEntityConfiguration());
         }
     }
 }
