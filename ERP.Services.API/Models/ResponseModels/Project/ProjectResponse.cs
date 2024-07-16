@@ -4,7 +4,7 @@ namespace ERP.Services.API.Models.ResponseModels.Project
 {
     public class ProjectResponse
     {
-        public Guid ProductCatId { get; set; }
+        public Guid ProjectId { get; set; }
         public Guid? OrgId { get; set; }
         public Guid? BusinessId { get; set; }
         public Guid CustomerId { get; set; }

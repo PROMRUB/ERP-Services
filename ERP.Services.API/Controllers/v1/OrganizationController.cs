@@ -145,9 +145,9 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetBusiness/{businessId}")]
+        [Route("org/{id}/action/GetBusinessById/{businessId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetBusiness(string id,string businessId)
+        public async Task<IActionResult> GetBusinessById(string id,string businessId)
         {
             try
             {

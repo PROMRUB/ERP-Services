@@ -115,7 +115,7 @@ namespace ERP.Services.API.Services.SystemConfig
                         {
                             items.Add(new BankBranchEntity
                             {
-                                 BankBranchId = Guid.NewGuid(),
+                                BankBranchId = Guid.NewGuid(),
                                 BankCode = worksheet.Cells[row, 1].Text,
                                 BankBranchCode = worksheet.Cells[row, 2].Text,
                                 BankBranchTHName = worksheet.Cells[row, 3].Text,
