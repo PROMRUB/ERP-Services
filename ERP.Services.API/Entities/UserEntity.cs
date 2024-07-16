@@ -15,17 +15,17 @@ namespace ERP.Services.API.Entities
             UserCreatedDate = DateTime.UtcNow;
         }
 
-        [Key]
-        [Column("user_id")]
-        public Guid? UserId { get; set; }
+        [Key] [Column("user_id")] public Guid? UserId { get; set; }
 
-        [Column("user_name")]
-        public string? UserName { get; set; }
+        [Column("user_name")] public string? UserName { get; set; }
 
-        [Column("user_email")]
-        public string? UserEmail { get; set; }
+        [Column("user_email")] public string? UserEmail { get; set; }
 
-        [Column("user_created_date")]
-        public DateTime? UserCreatedDate { get; set; }
+        [Column("user_created_date")] public DateTime? UserCreatedDate { get; set; }
+
+        public string DisplayName()
+        {
+            return $"{UserName}";
+        }
     }
 }

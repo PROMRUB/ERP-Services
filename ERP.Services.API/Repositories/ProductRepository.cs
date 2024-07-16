@@ -20,6 +20,18 @@ namespace ERP.Services.API.Repositories
             return context.Products.Where(x => x.OrgId == orgId && x.BusinessId == businessId);
         }
 
+        public IQueryable<ProductEntity> GetProductList(string keyword)
+        {
+            keyword = keyword.ToLower();
+            return context.Products.Where(x =>
+                x.ProductName.ToLower().Contains(keyword) || x.ProductCustomId.Contains(keyword));
+        }
+
+        public IQueryable<ProductEntity> GetProductListQueryable()
+        {
+            return context.Products;
+        }
+
         public void AddProductCategory(ProductCategoryEntity query) {
             try
             {

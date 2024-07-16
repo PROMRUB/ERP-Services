@@ -8,26 +8,19 @@ namespace ERP.Services.API.Entities
     [Index(nameof(ProductId), nameof(OrgId), nameof(BusinessId), nameof(ProductCustomId), IsUnique = true)]
     public class ProductEntity
     {
-        [Key]
-        [Column("product_id")]
-        public Guid? ProductId { get; set; }
-        [Column("org_id")]
-        public Guid? OrgId { get; set; }
-        [Column("business_id")]
-        public Guid? BusinessId { get; set; }
-        [Column("product_cat_Id")]
-        public Guid? ProductCatId { get; set; }
-        [Column("product_sub_cat_Id")]
-        public Guid? ProductSubCatId { get; set; }
-        [Column("product_custom_Id")]
-        public string? ProductCustomId { get; set; }
-        [Column("product_name")]
-        public string? ProductName { get; set; }
-        [Column("msrp")]
-        public decimal? MSRP { get; set; }
-        [Column("lw_price")]
-        public decimal? LwPrice { get; set; }
-        [Column("product_status")]
-        public string? ProductStatus { get; set; }
+        [Key] [Column("product_id")] public Guid? ProductId { get; set; }
+        [Column("org_id")] public Guid? OrgId { get; set; }
+        [Column("business_id")] public Guid? BusinessId { get; set; }
+        [Column("product_cat_Id")] public Guid? ProductCatId { get; set; }
+        [Column("product_sub_cat_Id")] public Guid? ProductSubCatId { get; set; }
+        [Column("product_custom_Id")] public string? ProductCustomId { get; set; }
+        [Column("product_name")] public string? ProductName { get; set; }
+        [Column("msrp")] public decimal? MSRP { get; set; }
+        [Column("lw_price")] public decimal? LwPrice { get; set; }
+        [Column("product_status")] public string? ProductStatus { get; set; }
+        [Column("unit")] public string Unit { get; set; }
+        [Column("inventory")] public int Inventory { get; set; }
+        
+        
     }
 }

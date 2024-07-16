@@ -43,6 +43,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IConditionService, ConditionService>();
             services.AddScoped<IPaymentAccountService, PaymentAccountService>();
+            services.AddScoped<IQuotationService, QuotationService>();
 
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -55,6 +56,7 @@ namespace ERP.Services.API.CrossCutting
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IConditionRepository, ConditionRepository>();
             services.AddScoped<IPaymentAccountRepository, PaymentAccountRepository>();
+            services.AddScoped<IQuotationRepository, QuotationRepository>();
         }
     }
 }

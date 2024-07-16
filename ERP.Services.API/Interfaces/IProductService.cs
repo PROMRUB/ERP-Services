@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
 using ERP.Services.API.Models.RequestModels.Product;
 using ERP.Services.API.Models.ResponseModels.Product;

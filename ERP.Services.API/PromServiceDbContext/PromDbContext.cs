@@ -35,6 +35,10 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<ProjectNumberEntity> ProjectNumbers { get; set; }
         public DbSet<ConditionEntity> Conditions { get; set; }
         public DbSet<PaymentAccountEntity> PaymentAccounts { get; set; }
+        public DbSet<QuotationEntity> Quotation { get; set; }
+        public DbSet<QuotationProductEntity> QuotationProduct { get; set; }
+        public DbSet<QuotationProjectEntity> QuotationProject { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BankEntity>();
@@ -60,6 +64,9 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<ProjectNumberEntity>();
             modelBuilder.Entity<ConditionEntity>();
             modelBuilder.Entity<PaymentAccountEntity>();
+            modelBuilder.Entity<QuotationEntity>();
+            modelBuilder.Entity<QuotationProductEntity>();
+            modelBuilder.Entity<QuotationProjectEntity>();
         }
     }
 }
