@@ -6,6 +6,7 @@ using ERP.Services.API.Models.RequestModels.Organization;
 using ERP.Services.API.Models.ResponseModels.Organization;
 using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.FormulaExpressions;
 
 namespace ERP.Services.API.Services.Organization
 {
@@ -16,6 +17,7 @@ namespace ERP.Services.API.Services.Organization
         private readonly IOrganizationRepository organizationRepository;
         private readonly IBusinessRepository businessRepository;
         private readonly IUserService userService;
+        private readonly IUserRepository userRepository;
         private readonly ISystemConfigRepository systemRepository;
 
         public OrganizationService(IMapper mapper,
@@ -23,6 +25,7 @@ namespace ERP.Services.API.Services.Organization
             IOrganizationRepository organizationRepository,
             IBusinessRepository businessRepository,
             IUserService userService,
+            IUserRepository userRepository,
             ISystemConfigRepository systemRepository,
             UserPrincipalHandler userPrincipalHandler) : base()
         {
@@ -100,7 +103,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join(userService.GetUserBusiness(),
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join((await userService.GetUserBusiness(orgId)),
                 business => business.BusinessId,
                 user => user.BusinessId,
                 (business, user) => new OrganizationEntity

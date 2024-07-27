@@ -22,7 +22,7 @@ namespace ERP.Services.API.Repositories
 
         public IQueryable<OrganizationEntity> GetOrganizationList()
         {
-            return context!.Organizations;
+            return context!.Organizations!;
         }
 
         public void AddUserToOrganization(OrganizationUserEntity user)
@@ -30,6 +30,11 @@ namespace ERP.Services.API.Repositories
             user.OrgCustomId = orgId;
             context!.OrganizationUsers!.Add(user);
             context.SaveChanges();
+        }
+
+        public IQueryable<OrganizationUserEntity> GetUserListAsync()
+        {
+            return context!.OrganizationUsers!;
         }
 
         public async Task<IEnumerable<OrganizationUserEntity>> GetUserAllowedOrganizationAsync(string userName)
