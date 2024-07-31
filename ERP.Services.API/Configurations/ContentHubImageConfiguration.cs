@@ -9,15 +9,18 @@ public class QuotationEntityConfiguration : IEntityTypeConfiguration<QuotationEn
     public void Configure(EntityTypeBuilder<QuotationEntity> builder)
     {
         builder.HasKey(b => b.QuotationId);
-        builder.HasOne(b => b.PaymentAccountEntity)
-            .WithMany()
-            .HasForeignKey(x => x.PaymentId);
         builder.HasOne(b => b.IssuedByUser)
             .WithMany()
+            .IsRequired(false)
             .HasForeignKey(x => x.IssuedById);
         builder.HasOne(b => b.SalePerson)
             .WithMany()
+            .IsRequired(false)
             .HasForeignKey(x => x.SalePersonId);
+        builder.HasOne(b => b.PaymentAccountEntity)
+            .WithMany()
+            .IsRequired(false)
+            .HasForeignKey(x => x.PaymentId);
     }
 }
 

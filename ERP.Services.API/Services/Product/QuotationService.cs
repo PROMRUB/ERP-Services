@@ -59,38 +59,47 @@ public class QuotationService
 
     public QuotationResponse MapEntityToResponse(QuotationEntity quotation)
     {
-        var response = new QuotationResponse
+        try
         {
-            CustomerId = quotation.CustomerId,
-            CustomerNo = quotation.Customer.CusCustomId,
-            CustomerName = quotation.Customer.DisplayName,
-            Address = quotation.Customer.Address(),
-            ContactPerson = quotation.CustomerContact.DisplayName(),
-            ContactPersonId = quotation.CustomerContactId,
-            QuotationNo = quotation.QuotationNo,
-            QuotationDateTime = quotation.QuotationDateTime.ToString("dd/MM/yyyyy"),
-            EditTime = quotation.EditTime,
-            IssuedByUser = quotation.IssuedById,
-            IssuedByUserName = quotation.IssuedByUser.DisplayName(),
-            SalePersonId = quotation.SalePersonId,
-            SalePersonIName = quotation.SalePerson.DisplayName(),
-            Status = quotation.Status,
-            Products = MapProductEntityToResource(quotation.Products),
-            Projects = MapProjectEntityToResource(quotation.Projects),
-            Price = quotation.Price,
-            Vat = quotation.Vat,
-            Amount = quotation.Amount,
-            AccountNo = quotation.PaymentId,
-            
-        };
+            var response = new QuotationResponse
+            {
+                QuotationId = quotation.QuotationId.Value,
+                CustomerId = quotation.CustomerId,
+                CustomerNo = quotation.Customer.CusCustomId,
+                CustomerName = quotation.Customer.DisplayName,
+                Address = quotation.Customer.Address(),
+                ContactPerson = quotation.CustomerContact.DisplayName(),
+                ContactPersonId = quotation.CustomerContactId,
+                QuotationNo = quotation.QuotationNo,
+                QuotationDateTime = quotation.QuotationDateTime.ToString("dd/MM/yyyyy"),
+                EditTime = quotation.EditTime,
+                IssuedByUser = quotation.IssuedById,
+                IssuedByUserName = quotation.IssuedByUser.DisplayName(),
+                SalePersonId = quotation.SalePersonId,
+                SalePersonIName = quotation.SalePerson.DisplayName(),
+                Status = quotation.Status,
+                Products = MapProductEntityToResource(quotation.Products),
+                Projects = MapProjectEntityToResource(quotation.Projects),
+                Price = quotation.Price,
+                Vat = quotation.Vat,
+                Amount = quotation.Amount,
+                AccountNo = quotation.PaymentId ?? Guid.NewGuid(),
+            };
 
-        return response;
+            return response;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public List<QuotationProductEntity> MutateResourceProduct(List<QuotationProductResource> resources)
     {
         var products = resources.Select((x, i) => new QuotationProductEntity
         {
+            
             ProductId = x.ProductId,
             Discount = x.Discount,
             Quantity = x.Quantity,
@@ -117,54 +126,60 @@ public class QuotationService
 
     public async Task<QuotationResponse> Create(QuotationResource resource)
     {
-        var quotation = new QuotationEntity
-        {
-            EditTime = 0,
-            CustomerId = resource.CustomerId,
-            CustomerContactId = resource.ContactPersonId,
-            QuotationDateTime = DateTime.UtcNow,
-            SalePersonId = resource.SalePersonId,
-            IssuedById = resource.IssuedById,
-            IsApproved = false,
-            Remark = resource.Remark,
-            BusinessId = resource.BusinessId,
-            Status = resource.Status
-        };
-
-        quotation.Products = MutateResourceProduct(resource.Products);
-        quotation.Projects = MutateResourceProject(resource.Projects);
-
-        quotationRepository.Add(quotation);
-
-        var result = await this.Calculate(resource.Products);
-
-        quotation.Price = result.Price;
-        quotation.Vat = result.Vat;
-        quotation.Amount = result.Amount;
-        
-        quotationRepository.Add(quotation);
-        
         try
         {
-            await quotationRepository.Context().SaveChangesAsync();
+            var quotation = new QuotationEntity
+            {
+                EditTime = 0,
+                CustomerId = resource.CustomerId,
+                CustomerContactId = resource.ContactPersonId,
+                QuotationDateTime = DateTime.UtcNow,
+                SalePersonId = null,
+                IssuedById = null,
+                IsApproved = false,
+                Remark = resource.Remark,
+                BusinessId = resource.BusinessId,
+                Status = resource.Status
+            };
+
+            quotation.Products = MutateResourceProduct(resource.Products);
+            quotation.Projects = MutateResourceProject(resource.Projects);
+
+            var result = await this.Calculate(resource.Products);
+
+            quotation.Price = result.Price;
+            quotation.Vat = result.Vat;
+            quotation.Amount = result.Amount;
+
+            quotationRepository.Add(quotation);
+
+            try
+            {
+                await quotationRepository.Context().SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            var entity = await quotationRepository.GetQuotationQuery()
+                .FirstOrDefaultAsync(x => x.QuotationId == quotation.QuotationId);
+
+            if (entity == null)
+            {
+                throw new Exception("not quotation exist");
+            }
+
+            var response = MapEntityToResponse(entity);
+
+            return response;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
-
-        var entity = await quotationRepository.GetQuotationQuery()
-            .FirstOrDefaultAsync(x => x.QuotationId == quotation.QuotationId);
-
-        if (entity == null)
-        {
-            throw new Exception("not quotation exist");
-        }
-        
-        var response = MapEntityToResponse(entity);
-
-        return response;
     }
 
     public async Task<QuotationResponse> Update(Guid id, QuotationResource resource)

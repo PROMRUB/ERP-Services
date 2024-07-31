@@ -24,11 +24,11 @@ public class QuotationEntity
 
     [Column("quotation_date")] public DateTime QuotationDateTime { get; set; }
 
-    [Column("sale_person_id")] public Guid SalePersonId { get; set; }
+    [Column("sale_person_id")] public Guid? SalePersonId { get; set; }
 
     public UserEntity SalePerson { get; set; }
 
-    [Column("issued_by")] public Guid IssuedById { get; set; }
+    [Column("issued_by")] public Guid? IssuedById { get; set; }
 
     public UserEntity IssuedByUser { get; set; }
 
@@ -43,7 +43,7 @@ public class QuotationEntity
     [Column("price")] public decimal Price { get; set; }
 
     [Column("is_approved")] public bool IsApproved { get; set; }
-    [Column("account_no")] public Guid PaymentId { get; set; }
+    [Column("account_no")] public Guid? PaymentId { get; set; }
     public PaymentAccountEntity PaymentAccountEntity { get; set; }
     [Column("status")] public string Status { get; set; }
     [Column("business_id")] public Guid BusinessId { get; set; }

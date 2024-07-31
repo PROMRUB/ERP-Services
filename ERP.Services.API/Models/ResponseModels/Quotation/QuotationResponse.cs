@@ -2,6 +2,7 @@ namespace ERP.Services.API.Models.ResponseModels.Quotation;
 
 public class QuotationResponse
 {
+    public Guid QuotationId { get; set; }
     public Guid CustomerId { get; set; }
     public string CustomerNo { get; set; }
     public string CustomerName { get; set; }
