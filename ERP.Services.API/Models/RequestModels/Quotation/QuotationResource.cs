@@ -5,8 +5,8 @@ public class QuotationResource
     public Guid CustomerId { get; set; }
     public Guid? ProjectId { get; set; }
     public Guid ContactPersonId { get; set; }
-    public Guid SalePersonId { get; set; }
-    public Guid IssuedById { get; set; }
+    public Guid? SalesPersonId { get; set; }
+    public Guid? IssuedById { get; set; }
     public Guid BusinessId { get; set; }
 
     public List<QuotationProductResource> Products { get; set; }
