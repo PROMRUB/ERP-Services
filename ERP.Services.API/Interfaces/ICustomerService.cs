@@ -9,7 +9,7 @@ namespace ERP.Services.API.Interfaces
 {
     public interface ICustomerService
     {
-        public Task<List<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId);
+        public Task<List<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId,string keyword);
         public Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId, Guid customerId);
         public Task CreateCustomer(string orgId, CustomerRequest request);
         public Task ImportExcel(string orgId, Guid businessId, IFormFile request);

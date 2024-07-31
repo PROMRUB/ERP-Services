@@ -72,7 +72,7 @@ namespace ERP.Services.API.Repositories
         {
             try
             {
-                var query = context!.OrganizationUsers!.Where(x => x.Username!.Equals(username) && x.Password.Equals(password));
+                var query = context!.OrganizationUsers!.Where(x => x.Username!.Equals(username) && x.Password!.Equals(password));
                 return query;
             }
             catch (Exception)

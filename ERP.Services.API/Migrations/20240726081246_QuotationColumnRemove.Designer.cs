@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726081246_QuotationColumnRemove")]
+    partial class QuotationColumnRemove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -925,8 +928,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
 
-                    b.Property<Guid>("BusinessId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("BusinessId")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("business_id");
 
                     b.Property<Guid>("CustomerContactId")
@@ -949,9 +953,8 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("issued_by");
 
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("account_no");
+                    b.Property<Guid>("IssuedByUserUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric")
@@ -964,11 +967,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("QuotationNo")
                         .HasColumnType("text")
                         .HasColumnName("quotation_no");
-
-                    b.Property<string>("Remark")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("remark");
 
                     b.Property<Guid>("SalePersonId")
                         .HasColumnType("uuid")
@@ -989,9 +987,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("IssuedById");
-
-                    b.HasIndex("PaymentId");
+                    b.HasIndex("IssuedByUserUserId");
 
                     b.HasIndex("QuotationId")
                         .IsUnique();
@@ -1014,10 +1010,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer")
@@ -1257,13 +1249,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasOne("ERP.Services.API.Entities.UserEntity", "IssuedByUser")
                         .WithMany()
-                        .HasForeignKey("IssuedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ERP.Services.API.Entities.PaymentAccountEntity", "PaymentAccountEntity")
-                        .WithMany()
-                        .HasForeignKey("PaymentId")
+                        .HasForeignKey("IssuedByUserUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1278,8 +1264,6 @@ namespace ERP.Services.API.Migrations
                     b.Navigation("CustomerContact");
 
                     b.Navigation("IssuedByUser");
-
-                    b.Navigation("PaymentAccountEntity");
 
                     b.Navigation("SalePerson");
                 });

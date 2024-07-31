@@ -17,6 +17,7 @@ namespace ERP.Services.API.Services.Product
         private readonly IMapper mapper;
         private readonly IProductRepository productRepository;
         private readonly IOrganizationRepository organizationRepository;
+
         public ProductService(IMapper mapper,
             IProductRepository productRepository
             , IOrganizationRepository organizationRepository)
@@ -30,26 +31,38 @@ namespace ERP.Services.API.Services.Product
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CategoryStatus == RecordStatus.Active.ToString()).OrderBy(x => x.CustomCatId).ToListAsync();
+            var result = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.CategoryStatus == RecordStatus.Active.ToString()).OrderBy(x => x.CustomCatId)
+                .ToListAsync();
             return mapper.Map<List<ProductCategoryEntity>, List<ProductCategoryResponse>>(result);
         }
 
-        public async Task<List<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId)
+        public async Task<List<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId, string keyword)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProductCustomId).ToListAsync();
+            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x =>
+                x.ProductStatus == RecordStatus.Active.ToString()
+                && (string.IsNullOrWhiteSpace(keyword) ||
+                    (!string.IsNullOrWhiteSpace(x.ProductCustomId) && x.ProductCustomId.Contains(keyword))
+                    || (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.ToLower().Contains(keyword))
+                )
+            ).OrderBy(x => x.ProductCustomId).ToListAsync();
             var result = mapper.Map<List<ProductEntity>, List<ProductResponse>>(query);
-            var cat = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).ToListAsync();
+            var cat = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                .ToListAsync();
             foreach (var item in result)
             {
-                item.ProductCategory = cat.Where(x => x.ProductCatId == item.ProductCatId).FirstOrDefault()?.CategoryName;
-                item.ProductSubCategory = cat.Where(x => x.ProductCatId == item.ProductSubCatId).FirstOrDefault()?.CategoryName;
+                item.ProductCategory =
+                    cat.Where(x => x.ProductCatId == item.ProductCatId).FirstOrDefault()?.CategoryName;
+                item.ProductSubCategory = cat.Where(x => x.ProductCatId == item.ProductSubCatId).FirstOrDefault()
+                    ?.CategoryName;
                 if (item.ProductStatus == RecordStatus.Active.ToString())
                 {
                     item.ProductStatus = "ปกติ";
                 }
             }
+
             return result;
         }
 
@@ -57,7 +70,8 @@ namespace ERP.Services.API.Services.Product
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductId == productId).FirstOrDefaultAsync();
+            var result = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ProductId == productId).FirstOrDefaultAsync();
             return mapper.Map<ProductEntity, ProductResponse>(result);
         }
 
@@ -85,7 +99,8 @@ namespace ERP.Services.API.Services.Product
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductId == productId).FirstOrDefaultAsync();
+            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ProductId == productId).FirstOrDefaultAsync();
             query.ProductName = request.ProductName;
             query.MSRP = request.MSRP;
             query.LwPrice = request.LwPrice;
@@ -93,30 +108,36 @@ namespace ERP.Services.API.Services.Product
             productRepository.Commit();
         }
 
-        public async Task UpdateProductCategory(string orgId, Guid businessId, Guid productCatId, ProductCategoryRequest request)
+        public async Task UpdateProductCategory(string orgId, Guid businessId, Guid productCatId,
+            ProductCategoryRequest request)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductCatId == productCatId).FirstOrDefaultAsync();
+            var query = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ProductCatId == productCatId).FirstOrDefaultAsync();
             query.ParentCatId = request.ParentCatId;
             query.CategoryName = request.CategoryName;
             productRepository.UpdateProductCategory(query);
             productRepository.Commit();
         }
+
         public async Task DeleteProduct(string orgId, Guid businessId, Guid productId, ProductRequest request)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductId == productId).FirstOrDefaultAsync();
+            var query = await productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ProductId == productId).FirstOrDefaultAsync();
             productRepository.DeleteProduct(query);
             productRepository.Commit();
         }
 
-        public async Task DeleteProductCategory(string orgId, Guid businessId, Guid productCatId, ProductCategoryRequest request)
+        public async Task DeleteProductCategory(string orgId, Guid businessId, Guid productCatId,
+            ProductCategoryRequest request)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ProductCatId == productCatId).FirstOrDefaultAsync();
+            var query = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ProductCatId == productCatId).FirstOrDefaultAsync();
             productRepository.DeleteProductCategory(query);
             productRepository.Commit();
         }
@@ -153,6 +174,7 @@ namespace ERP.Services.API.Services.Product
                                 CategoryStatus = RecordStatus.Active.ToString()
                             });
                         }
+
                         stream.Dispose();
                     }
                 }
@@ -161,6 +183,7 @@ namespace ERP.Services.API.Services.Product
                 {
                     productRepository.AddProductCategory(item);
                 }
+
                 productRepository.Commit();
             }
             catch
@@ -168,6 +191,7 @@ namespace ERP.Services.API.Services.Product
                 throw;
             }
         }
+
         public async Task ImportProduct(string orgId, Guid businessId, IFormFile request)
         {
             organizationRepository.SetCustomOrgId(orgId);
@@ -187,8 +211,12 @@ namespace ERP.Services.API.Services.Product
 
                     for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                     {
-                        var category = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 1].Text)).FirstOrDefaultAsync();
-                        var subCategory = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId).Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 2].Text)).FirstOrDefaultAsync();
+                        var category = await productRepository
+                            .GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                            .Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 1].Text)).FirstOrDefaultAsync();
+                        var subCategory = await productRepository
+                            .GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                            .Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 2].Text)).FirstOrDefaultAsync();
                         items.Add(new ProductEntity
                         {
                             ProductId = Guid.NewGuid(),
@@ -203,6 +231,7 @@ namespace ERP.Services.API.Services.Product
                             ProductStatus = RecordStatus.Active.ToString()
                         });
                     }
+
                     stream.Dispose();
                 }
             }

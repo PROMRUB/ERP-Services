@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726084203_QuotatitionRemark")]
+    partial class QuotatitionRemark
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -949,6 +952,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("issued_by");
 
+                    b.Property<Guid>("IssuedByUserUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("PaymentId")
                         .HasColumnType("uuid")
                         .HasColumnName("account_no");
@@ -989,7 +995,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("IssuedById");
+                    b.HasIndex("IssuedByUserUserId");
 
                     b.HasIndex("PaymentId");
 
@@ -1014,10 +1020,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount");
 
                     b.Property<int>("Order")
                         .HasColumnType("integer")
@@ -1257,7 +1259,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasOne("ERP.Services.API.Entities.UserEntity", "IssuedByUser")
                         .WithMany()
-                        .HasForeignKey("IssuedById")
+                        .HasForeignKey("IssuedByUserUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

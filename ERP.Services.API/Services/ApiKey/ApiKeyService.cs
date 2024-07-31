@@ -10,7 +10,7 @@ namespace ERP.Services.API.Services.ApiKey
     public class ApiKeyService : BaseService, IApiKeyService
     {
         private readonly IApiKeyRepository? repository;
-        private DateTime compareDate = DateTime.Now;
+        private DateTime compareDate = DateTime.UtcNow;
         private readonly IMapper mapper;
 
         public ApiKeyService(IMapper mapper,
