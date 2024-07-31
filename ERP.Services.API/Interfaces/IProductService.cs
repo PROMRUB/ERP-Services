@@ -10,7 +10,7 @@ namespace ERP.Services.API.Interfaces
     public interface IProductService
     {
         public Task<List<ProductCategoryResponse>> GetProducCategorytListByBusiness(string orgId, Guid businessId);
-        public Task<List<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId);
+        public Task<List<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,string keyword);
         public Task<ProductResponse> GetProductInformationById(string orgId, Guid businessId, Guid productId);
         public Task CreateProduct(string orgId, ProductRequest request);
         public Task CreateProductCategory(string orgId, ProductCategoryRequest request);

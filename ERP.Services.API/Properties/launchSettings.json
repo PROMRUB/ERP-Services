@@ -6,7 +6,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-   
+        
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7279;http://localhost:5206"
@@ -16,12 +16,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "IsDev": "true",
-        "PostgreSQL_Host": "localhost",
-        "PostgreSQL_Database": "prom-dev",
-        "PostgreSQL_User": "postgres",
-        "PostgreSQL_Password": "Initial1!",
-        "Key": "SolutionKP"
+        
       }
     },
     "Docker": {

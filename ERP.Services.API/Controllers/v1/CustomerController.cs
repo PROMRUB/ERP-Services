@@ -13,6 +13,8 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class CustomerController : BaseController
     {
+        public record BaseParameter(string? Keyword);
+        
         private readonly ICustomerService customerService;
         public CustomerController(ICustomerService customerService)
         {
@@ -22,13 +24,13 @@ namespace ERP.Services.API.Controllers.v1
         [HttpGet]
         [Route("org/{id}/action/GetCustomerList/{businessId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerList(string id, Guid businessId)
+        public async Task<IActionResult> GetCustomerList(string id, Guid businessId,[FromQuery]BaseParameter baseParameter)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerByBusinessAsync(id, businessId);
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword ?? "");
                 return Ok(ResponseHandler.Response<List<CustomerResponse>>("1000", null, result));
             }
             catch (Exception ex)
@@ -128,15 +130,15 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetCustomerContactList/{businessId}")]
+        [Route("org/{id}/action/GetCustomerContactList/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerContactList(string id, Guid businessId)
+        public async Task<IActionResult> GetCustomerContactList(string id, Guid customerId)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerContactByCustomer(id, businessId);
+                var result = await customerService.GetCustomerContactByCustomer(id, customerId);
                 return Ok(ResponseHandler.Response<List<CustomerContactResponse>>("1000", null, result));
             }
             catch (Exception ex)

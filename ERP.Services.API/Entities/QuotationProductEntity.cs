@@ -18,4 +18,5 @@ public class QuotationProductEntity
     [Column("price")] public int Price { get; set; }
     [Column("order")] public int Order { get; set; }
     [Column("amount")] public decimal Amount { get; set; }
+    [Column("discount")] public decimal Discount { get; set; }
 }

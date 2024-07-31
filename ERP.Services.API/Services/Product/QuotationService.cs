@@ -1,13 +1,19 @@
+using AutoMapper;
 using ERP.Services.API.Entities;
+using ERP.Services.API.Enum;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Quotation;
+using ERP.Services.API.Models.ResponseModels.PaymentAccount;
 using ERP.Services.API.Models.ResponseModels.Quotation;
+using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Services.Product;
 
 public class QuotationService
-    (IQuotationRepository quotationRepository, IProductRepository productRepository) : IQuotationService
+(IMapper mapper, IQuotationRepository quotationRepository, IProductRepository productRepository,
+    IOrganizationRepository organizationRepository,
+    IPaymentAccountRepository paymentAccountRepository) : IQuotationService
 {
     public async Task<QuotationResponse> GetQuotationById(string keyword)
     {
@@ -71,10 +77,11 @@ public class QuotationService
             Status = quotation.Status,
             Products = MapProductEntityToResource(quotation.Products),
             Projects = MapProjectEntityToResource(quotation.Projects),
-            Price = quotation.Price.ToString(),
-            Vat = quotation.Vat.ToString(),
-            Amount = quotation.Amount.ToString(),
-            AccountNo = quotation.AccountNo
+            Price = quotation.Price,
+            Vat = quotation.Vat,
+            Amount = quotation.Amount,
+            AccountNo = quotation.PaymentId,
+            
         };
 
         return response;
@@ -85,6 +92,7 @@ public class QuotationService
         var products = resources.Select((x, i) => new QuotationProductEntity
         {
             ProductId = x.ProductId,
+            Discount = x.Discount,
             Quantity = x.Quantity,
             Order = i,
         }).ToList();
@@ -112,12 +120,15 @@ public class QuotationService
         var quotation = new QuotationEntity
         {
             EditTime = 0,
-            CustomerId = resource.CustomerId.Value,
-            CustomerContactId = resource.ContactPersonId.Value,
-            QuotationDateTime = DateTime.Now,
-            SalePersonId = resource.SalePersonId.Value,
-            IssuedById = resource.IssuedById.Value,
+            CustomerId = resource.CustomerId,
+            CustomerContactId = resource.ContactPersonId,
+            QuotationDateTime = DateTime.UtcNow,
+            SalePersonId = resource.SalePersonId,
+            IssuedById = resource.IssuedById,
             IsApproved = false,
+            Remark = resource.Remark,
+            BusinessId = resource.BusinessId,
+            Status = resource.Status
         };
 
         quotation.Products = MutateResourceProduct(resource.Products);
@@ -125,14 +136,33 @@ public class QuotationService
 
         quotationRepository.Add(quotation);
 
-        await quotationRepository.Context()!.SaveChangesAsync();
+        var result = await this.Calculate(resource.Products);
 
-        //todo : amount
+        quotation.Price = result.Price;
+        quotation.Vat = result.Vat;
+        quotation.Amount = result.Amount;
+        
+        quotationRepository.Add(quotation);
+        
+        try
+        {
+            await quotationRepository.Context().SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
 
         var entity = await quotationRepository.GetQuotationQuery()
             .FirstOrDefaultAsync(x => x.QuotationId == quotation.QuotationId);
 
-        var response = new QuotationResponse();
+        if (entity == null)
+        {
+            throw new Exception("not quotation exist");
+        }
+        
+        var response = MapEntityToResponse(entity);
 
         return response;
     }
@@ -163,7 +193,7 @@ public class QuotationService
     {
         return Task.FromResult(new List<QuotationStatus>()
         {
-            new() { Status = "เสนอราคา" },
+            new() { Status = "รอการอนุมติ" },
             new() { Status = "ยกเลิก" },
             new() { Status = "ปิดการขาย" },
         });
@@ -230,11 +260,10 @@ public class QuotationService
                 throw new KeyNotFoundException("product not exists");
             }
 
-            decimal calPrice = product.Price > (selected.LwPrice ?? (decimal)0)
-                ? (decimal)selected.LwPrice!
-                : (decimal)product.Price;
+            var discountPrice = (selected.MSRP * (product.Discount / 100) ?? 0);
 
-            price += (calPrice * product.Quantity);
+
+            price += (discountPrice * product.Quantity);
         }
 
         amount = price * (decimal)1.07;
@@ -243,12 +272,64 @@ public class QuotationService
 
         var response = new QuotationResponse()
         {
-            Products = MapProductEntityToResource(products),
-            Amount = amount.ToString(),
-            Vat = vat.ToString(),
-            Price = price.ToString()
+            // Products = MapProductEntityToResource(products),
+            Amount = amount,
+            Vat = vat,
+            Price = price
         };
 
         return response;
+    }
+
+    public async Task<List<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId)
+    {
+        organizationRepository.SetCustomOrgId(orgId);
+        var organization = await organizationRepository.GetOrganization();
+        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+            .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
+            .OrderBy(x => x.AccountBank).ToListAsync();
+        return result.Select(x => new PaymentAccountResponse
+        {
+            PaymentAccountId = x.PaymentAccountId,
+            OrgId = x.OrgId,
+            PaymentAccountName = x.PaymentAccountName,
+            AccountType = x.AccountType,
+            AccountBank = x.AccountBank,
+            // AccountBankName = x.AccountBank,
+            AccountBrn = x.AccountBrn,
+            // AccountBankBrn = x,AccountBankBrn,
+            PaymentAccountNo = x.PaymentAccountNo,
+            AccountStatus = "Active"
+        }).ToList();
+    }
+
+    public async Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId,
+        Guid paymentAccountId)
+    {
+        organizationRepository.SetCustomOrgId(orgId);
+        var organization = await organizationRepository.GetOrganization();
+        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+            .Where(x => x.PaymentAccountId == paymentAccountId).FirstOrDefaultAsync();
+        return mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
+    }
+
+    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize)
+    {
+        keyword = keyword.ToLower();
+        var query = quotationRepository.GetQuotationQuery()
+            .Where(x => x.Customer.CusName.Contains(keyword)
+                        || x.QuotationNo.Contains(keyword) ||
+                        x.Products.Any(p => p.Product.ProductName.Contains(keyword)));
+
+
+        var pagedList = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
+
+
+        throw new Exception();
+    }
+
+    public Task<QuotationResponse> GetById(Guid id)
+    {
+        throw new NotImplementedException();
     }
 }

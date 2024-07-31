@@ -36,25 +36,30 @@ public class QuotationEntity
     public List<QuotationProductEntity> Products { get; set; }
     public List<QuotationProjectEntity> Projects { get; set; }
 
-    [Column("amount")] public double Amount { get; set; }
+    [Column("amount")] public decimal Amount { get; set; }
 
-    [Column("vat")] public double Vat { get; set; }
+    [Column("vat")] public decimal Vat { get; set; }
 
-    [Column("price")] public double Price { get; set; }
+    [Column("price")] public decimal Price { get; set; }
 
     [Column("is_approved")] public bool IsApproved { get; set; }
-    [Column("account_no")] public string AccountNo { get; set; }
+    [Column("account_no")] public Guid PaymentId { get; set; }
+    public PaymentAccountEntity PaymentAccountEntity { get; set; }
     [Column("status")] public string Status { get; set; }
+    [Column("business_id")] public Guid BusinessId { get; set; }
+    [Column("remark")] public string Remark { get; set; }
+    
 
     public void SubmitStatus(string status)
     {
         EditTime += 1;
-        QuotationDateTime = DateTime.Now;
+        QuotationDateTime = DateTime.UtcNow;
         Status = status;
     }
 
 
     public void Process()
     {
+        Status = "Delete";
     }
 }

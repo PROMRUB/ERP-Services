@@ -22,6 +22,7 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
             .Include(x => x.Projects)
             .Include(x => x.SalePerson)
             .Include(x => x.Customer)
+            .Include(x => x.Customer)
             .Include(x => x.CustomerContact);
     }
 

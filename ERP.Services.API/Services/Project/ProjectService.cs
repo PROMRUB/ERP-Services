@@ -35,7 +35,9 @@ namespace ERP.Services.API.Services.Project
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId).Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProjectCustomId).ToListAsync();
+            var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProjectCustomId)
+                .ToListAsync();
             var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);
             foreach (var item in result)
             {
