@@ -74,9 +74,8 @@ namespace ERP.Services.API.Services.SystemConfig
                             {
                                 BankId = Guid.NewGuid(),
                                 BankCode = worksheet.Cells[row, 1].Text,
-                                BankAbbr = worksheet.Cells[row, 2].Text,
-                                BankTHName = worksheet.Cells[row, 3].Text,
-                                BankENName = worksheet.Cells[row, 4].Text
+                                BankTHName = worksheet.Cells[row, 2].Text,
+                                BankENName = worksheet.Cells[row, 3].Text
                             });
                         }
                         stream.Dispose();
