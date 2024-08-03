@@ -18,24 +18,6 @@ namespace ERP.Services.API.Controllers.v1
             this.services = services;
         }
 
-        [HttpGet]
-        [Route("org/{id}/action/AdminGetUsers")]
-        [MapToApiVersion("1")]
-        public IActionResult AdminGetUsers(string id)
-        {
-            try
-            {
-                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-                    throw new ArgumentException("1101");
-                var result = services.GetUsers(id);
-                return Ok(ResponseHandler.Response<List<UserResponse>>("1000", null, result));
-            }
-            catch (Exception ex)
-            {
-                return Ok(ResponseHandler.Response(ex.Message, null));
-            }
-        }
-
         [HttpPost]
         [Route("org/{id}/action/AdminAddUser")]
         [MapToApiVersion("1")]

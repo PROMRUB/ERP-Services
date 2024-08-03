@@ -41,11 +41,44 @@ namespace ERP.Services.API.Services.User
             this.userPrincipalHandler = userPrincipalHandler;
         }
 
-        public List<UserResponse> GetUsers(string orgId)
+        public async Task<List<OrganizationUserResponse>> GetUsers(string orgId, Guid businessId, string role)
         {
-            repository!.SetCustomOrgId(orgId);
-            var query = repository!.GetUsers();
-            return mapper.Map<IEnumerable<UserEntity>, List<UserResponse>>(query);
+            var result = new List<OrganizationUserResponse>();
+            organizationRepository!.SetCustomOrgId(orgId);
+            var org = await organizationRepository.GetOrganization();
+            var userId = userPrincipalHandler.Id;
+            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!);
+            var userQuery = repository.GetUserProfiles();
+            if (!role.Equals("All"))
+            {
+                businessQuery = businessQuery.Where(x => x.Role!.Contains(role));
+            }
+            foreach(var item in businessQuery)
+            {
+                var user = userQuery.Where(x => x.OrgUserId == item.UserId).FirstOrDefault();
+                var orgUser = new OrganizationUserResponse
+                {
+                    OrgUserId = user.OrgUserId,
+                    OrgCustomId = orgId,
+                    Username = user.Username,
+                    Firstname = user.FirstNameTh,
+                    Lastname = user.LastnameTh,
+                    Fullname = user.FirstNameTh + " " + user.LastnameTh,
+                    Email = user.email,
+                    TelNo = user.TelNo
+                };
+
+                List<string> roles = item.Role
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(k => k.Trim())
+                    .ToList();
+                foreach(var roleItem in roles)
+                {
+                    orgUser.Role!.Add(roleItem);
+                }
+                result.Add(orgUser);
+            }
+            return result;
         }
 
         public async Task<UserResponse> GetUserByName(string orgId, string userName)
@@ -55,16 +88,46 @@ namespace ERP.Services.API.Services.User
             return mapper.Map<UserEntity, UserResponse>(query);
         }
 
+
         public async Task<OrganizationUserResponse> GetUserProfile()
         {
             var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync();
-            return mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
+            var result = mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
+            return result;
         }
 
-        public IQueryable<UserBusinessEntity> GetUserBusiness()
+        public async Task<OrganizationUserResponse> GetRole(string orgId, Guid businessId)
         {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var org = await organizationRepository.GetOrganization();
+            var request = await repository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync();
+            var result = mapper.Map<OrganizationUserEntity, OrganizationUserResponse>(request);
+            var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)org.OrgId!).Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
+
+            List<string> titles = new List<string>
+            {
+                "SalesRepresentative",
+                "SalesManager"
+            };
+
+            result.Role = role!.Role!.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(k => k.Trim())
+                .ToList();
+
+            // result.Role = keywords;  
+            // foreach (var title in keywords)
+            // {
+            //     result.Role?.Add(title);
+            // }
+            return result;
+        }
+        public async Task<IQueryable<UserBusinessEntity>> GetUserBusiness(string orgId)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var org = await organizationRepository.GetOrganization();
             var userId = userPrincipalHandler.Id;
-            var result = businessRepository.GetUserBusinessList(userId);
+            var result = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!);
+            var test = await result.ToListAsync();
             return result;
         }
 
@@ -133,7 +196,7 @@ namespace ERP.Services.API.Services.User
                 Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
             var session = await repository.GetUserSession().Where(x => x.Token.Equals(result.Token)).FirstOrDefaultAsync();
-            if(session == null)
+            if (session == null)
             {
                 await repository.CreateUserSession(new UserSessionEntity
                 {

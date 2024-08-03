@@ -18,9 +18,15 @@ namespace ERP.Services.API.Repositories
             return query;
         }
 
-        public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid userId)
+        public IQueryable<UserBusinessEntity> GetBusinessUserList(Guid orgId, Guid businessId)
         {
-            var query = context!.UserBusinesses!.Where(x => x.UserId == userId);
+            var query = context!.UserBusinesses!.Where(x => x.OrgId == orgId && x.BusinessId == businessId);
+            return query;
+        }
+
+        public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid userId, Guid orgId)
+        {
+            var query = context!.UserBusinesses!.Where(x => x.OrgId == orgId && x.UserId == userId);
             return query;
         }
 

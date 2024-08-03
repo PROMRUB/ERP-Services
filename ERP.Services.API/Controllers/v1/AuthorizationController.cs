@@ -75,6 +75,24 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetUserRole/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetUserRole(string id,Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await userService.GetRole(id, businessId);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         [HttpPost]
         [Route("org/{id}/action/SignOut")]

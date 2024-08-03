@@ -21,5 +21,8 @@ namespace ERP.Services.API.Entities
 
         [Column("business_id")]
         public Guid? BusinessId { get; set; }
+
+        [Column("role")]
+        public string? Role { get; set; }
     }
 }
