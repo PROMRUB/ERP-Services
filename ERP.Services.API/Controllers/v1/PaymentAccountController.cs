@@ -1,5 +1,6 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
+using ERP.Services.API.Models.RequestModels.PaymentAccount;
 using ERP.Services.API.Models.ResponseModels.Condition;
 using ERP.Services.API.Models.ResponseModels.PaymentAccount;
 using ERP.Services.API.Services.Condition;
@@ -31,6 +32,25 @@ namespace ERP.Services.API.Controllers.v1
                     throw new ArgumentException("1101");
                 var result = await paymentAccountService.GetPaymentAccountListByBusiness(id, businessId);
                 return Ok(ResponseHandler.Response<List<PaymentAccountResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+
+        [HttpPost]
+        [Route("org/{id}/action/CreatePaymentAccount")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> CreatePaymentAccount(string id, PaymentAccountRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await paymentAccountService.CreatePaymentAccount(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)
             {

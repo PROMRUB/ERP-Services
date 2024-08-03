@@ -21,22 +21,34 @@ namespace ERP.Services.API.Services.PaymentAccount
         private readonly IMapper mapper;
         private readonly IOrganizationRepository organizationRepository;
         private readonly IPaymentAccountRepository paymentAccountRepository;
+        private readonly ISystemConfigRepository systemConfigRepository;
 
         public PaymentAccountService(IMapper mapper,
             IOrganizationRepository organizationRepository,
-            IPaymentAccountRepository paymentAccountRepository)
+            IPaymentAccountRepository paymentAccountRepository,
+            ISystemConfigRepository systemConfigRepository)
         {
             this.mapper = mapper;
             this.organizationRepository = organizationRepository;
             this.paymentAccountRepository = paymentAccountRepository;
+            this.systemConfigRepository = systemConfigRepository;
         }
 
         public async Task<List<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.AccountStatus == RecordStatus.Active.ToString()).OrderBy(x => x.AccountBank).ToListAsync();
-            return mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(result);
+            var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.AccountStatus == RecordStatus.Active.ToString()).OrderBy(x => x.AccountBank).ToListAsync();
+            var result = mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(query);
+            var bankQuery = await systemConfigRepository.GetAll<BankEntity>().ToListAsync();
+            foreach (var item in result)
+            {
+                var bank = bankQuery.Where(x => x.BankId == item.AccountBank).FirstOrDefault();
+                item.AccountBankName = bank.BankTHName;
+                var branch = await systemConfigRepository.GetAll<BankBranchEntity>().Where(x => x.BankCode.Equals(bank.BankCode)).ToListAsync();
+                item.AccountBankBrn = branch.Where(x => x.BankBranchId == item.AccountBrn).FirstOrDefault().BankBranchTHName;
+            }
+            return result;
         }
 
         public async Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId, Guid paymentAccountId)

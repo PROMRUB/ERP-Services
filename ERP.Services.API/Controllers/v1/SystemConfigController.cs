@@ -71,5 +71,41 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+
+        [HttpPost]
+        [Route("org/{id}/action/ImportBank")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportBank(string id, IFormFile file)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    throw new ArgumentException("1101");
+                await systemConfigServices.ImportBank(file);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost]
+        [Route("org/{id}/action/ImportBankBranch")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> ImportBankBranch(string id, IFormFile file)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    throw new ArgumentException("1101");
+                await systemConfigServices.ImportBankBranch(file);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }
