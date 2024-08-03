@@ -110,16 +110,18 @@ namespace ERP.Services.API.Services.User
                 "SalesManager"
             };
 
-            List<string> keywords = role!.Role!.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+
+            result.Role = role!.Role!.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(k => k.Trim())
                 .ToList();
-            foreach (var title in keywords)
-            {
-                result.Role?.Add(title);
-            }
+
+            // result.Role = keywords;  
+            // foreach (var title in keywords)
+            // {
+            //     result.Role?.Add(title);
+            // }
             return result;
         }
-
         public async Task<IQueryable<UserBusinessEntity>> GetUserBusiness(string orgId)
         {
             organizationRepository!.SetCustomOrgId(orgId);
