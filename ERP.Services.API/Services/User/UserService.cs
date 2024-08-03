@@ -47,11 +47,11 @@ namespace ERP.Services.API.Services.User
             organizationRepository!.SetCustomOrgId(orgId);
             var org = await organizationRepository.GetOrganization();
             var userId = userPrincipalHandler.Id;
-            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!);
-            var userQuery = repository.GetUserProfiles();
+            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!).ToList();
+            var userQuery = repository.GetUserProfiles().ToList();
             if (!role.Equals("All"))
             {
-                businessQuery = businessQuery.Where(x => x.Role!.Contains(role));
+                businessQuery = businessQuery.Where(x => x.Role!.Contains(role)).ToList();
             }
             foreach(var item in businessQuery)
             {
@@ -65,17 +65,15 @@ namespace ERP.Services.API.Services.User
                     Lastname = user.LastnameTh,
                     Fullname = user.FirstNameTh + " " + user.LastnameTh,
                     Email = user.email,
-                    TelNo = user.TelNo
+                    TelNo = user.TelNo,
+                    Role = new List<string> { role }
                 };
 
                 List<string> roles = item.Role
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(k => k.Trim())
                     .ToList();
-                foreach(var roleItem in roles)
-                {
-                    orgUser.Role!.Add(roleItem);
-                }
+                orgUser.Role = roles.Distinct().ToList();
                 result.Add(orgUser);
             }
             return result;

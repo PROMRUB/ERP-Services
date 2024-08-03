@@ -130,15 +130,16 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetCustomerContactList/{customerId}")]
+        [Route("org/{id}/action/GetCustomerContactList/{businessId}/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerContactList(string id, Guid customerId)
+        public async Task<IActionResult> GetCustomerContactList(string id, Guid businessId, Guid customerId)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerContactByCustomer(id, customerId);
+
+                var result = await customerService.GetCustomerContactByCustomer(id, businessId, customerId);
                 return Ok(ResponseHandler.Response<List<CustomerContactResponse>>("1000", null, result));
             }
             catch (Exception ex)
