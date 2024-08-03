@@ -206,11 +206,11 @@ namespace ERP.Services.API.Services.Customer
             customerRepository.Commit();
         }
 
-        public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid cusId)
+        public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid businessId, Guid cusId)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
             return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
         }
 
@@ -218,7 +218,7 @@ namespace ERP.Services.API.Services.Customer
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, customerId).Where(x => x.UserId == userPrincipalHandler.Id &&  x.CusConId == cusConId).FirstOrDefaultAsync();
+            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId).Where(x => x.UserId == userPrincipalHandler.Id &&  x.CusConId == cusConId).FirstOrDefaultAsync();
             return mapper.Map<CustomerContactEntity, CustomerContactResponse>(result);
         }
 
@@ -246,7 +246,7 @@ namespace ERP.Services.API.Services.Customer
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, customerId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == cusConId).FirstOrDefaultAsync();
+            var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == cusConId).FirstOrDefaultAsync();
             if (query == null)
                 throw new ArgumentException("1111");
             query.CusConFirstname = request.CusConFirstname;
@@ -265,7 +265,7 @@ namespace ERP.Services.API.Services.Customer
             var organization = await organizationRepository.GetOrganization();
             foreach (var customer in request)
             {
-                var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, (Guid)customer.CusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == customer.CusConId).FirstOrDefaultAsync();
+                var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, (Guid)customer.BusinessId, (Guid)customer.CusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == customer.CusConId).FirstOrDefaultAsync();
                 customerRepository.DeleteCustomerContact(query);
             }
             customerRepository.Commit();
