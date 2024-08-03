@@ -1,6 +1,7 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.User;
+using ERP.Services.API.Models.ResponseModels.Organization;
 using ERP.Services.API.Models.ResponseModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

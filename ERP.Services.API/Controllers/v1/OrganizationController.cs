@@ -12,10 +12,13 @@ namespace ERP.Services.API.Controllers.v1
     public class OrganizationController : BaseController
     {
         private readonly IOrganizationService services;
+        private readonly IUserService userService;
 
-        public OrganizationController(IOrganizationService services)
+        public OrganizationController(IOrganizationService services,
+            IUserService userService)
         {
             this.services = services;
+            this.userService = userService;
         }
 
         [HttpGet]
@@ -172,6 +175,24 @@ namespace ERP.Services.API.Controllers.v1
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
                 await services.UpdateOrganization(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost]
+        [Route("org/{id}/action/GetUser/{businessId}/{role}")]
+        [MapToApiVersion("1")]
+        public IActionResult GetUser(string id, Guid businessId, string role)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                userService.GetUsers(id!, businessId, role);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)

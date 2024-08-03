@@ -8,6 +8,7 @@ namespace ERP.Services.API.Interfaces
         public Task<OrganizationEntity> GetOrganization();
         public IQueryable<OrganizationEntity> GetOrganizationList();
         public void AddUserToOrganization(OrganizationUserEntity user);
+        public IQueryable<OrganizationUserEntity> GetUserListAsync();
         public bool IsUserNameExist(string userName);
         public bool IsCustomOrgIdExist(string orgCustomId);
         public Task<OrganizationUserEntity> GetUserInOrganization(string userName);
