@@ -73,7 +73,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("org/{id}/action/ImportExcel/{businessId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> ImportExcel(string id, Guid businessId, [FromForm] IFormFile request)
