@@ -119,14 +119,14 @@ NativeInjections.RegisterServices(builder.Services);
 
 var app = builder.Build();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var dbContext = scope.ServiceProvider.GetRequiredService<PromDbContext>();
-//     dbContext.Database.Migrate();
-//
-//     var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-//     service.Seed();
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PromDbContext>();
+    dbContext.Database.Migrate();
+    //
+    // var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    // service.Seed();
+}
 
 
 app.UseCors(x => x

@@ -197,11 +197,11 @@ namespace ERP.Services.API.Controllers.v1
 
         [HttpPost("approve_sale_price/{id:guid}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> ApproveSalePrice(Guid id,[FromBody] ApproveStatus resource)
+        public async Task<IActionResult> ApproveSalePrice(Guid id)
         {
             try
             {
-                // var result = await service.ApproveSalePrice(id);
+                var result = await service.ApproveSalePrice(id);
 
                 return Ok();
                 // return Ok(result);
