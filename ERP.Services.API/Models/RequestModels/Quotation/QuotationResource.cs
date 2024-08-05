@@ -1,9 +1,10 @@
 namespace ERP.Services.API.Models.RequestModels.Quotation;
 
+
 public class QuotationResource
 {
+    public Guid QuotationId { get; set; }
     public Guid CustomerId { get; set; }
-    public Guid? ProjectId { get; set; }
     public Guid ContactPersonId { get; set; }
     public Guid? SalesPersonId { get; set; }
     public Guid? IssuedById { get; set; }
@@ -13,4 +14,5 @@ public class QuotationResource
     public List<QuotationProjectResource> Projects { get; set; }
     public string Remark { get; set; }
     public string Status { get; set; } = "รออนุมัติ";
+    public Guid? PaymentAccountId { get; set; }
 }

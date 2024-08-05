@@ -13,26 +13,27 @@ using QuestPDF.Infrastructure;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using ERP.Services.API.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsDev")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "IsDev"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Host")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Host"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Database")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Database"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_User"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsDev")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "IsDev"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Host")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Host"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Database")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Database"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_User"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
 
 var log = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -43,16 +44,12 @@ var cfg = builder.Configuration;
 
 QuestPDF.Settings.License = LicenseType.Community;
 
-// cfg["IsDev"] = Environment.GetEnvironmentVariable("IsDev")!;
-// cfg["PostgreSQL:Host"] = Environment.GetEnvironmentVariable("PostgreSQL_Host")!;
-// cfg["PostgreSQL:Database"] = Environment.GetEnvironmentVariable("PostgreSQL_Database")!;
-// cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
-// cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
-cfg["IsDev"] = "true";
-cfg["PostgreSQL:Host"] = "scaleup.cq959xqsa8na.ap-southeast-1.rds.amazonaws.com";
-cfg["PostgreSQL:Database"] = "erp";
-cfg["PostgreSQL:User"] = "postgres";
-cfg["PostgreSQL:Password"] = "12345678";
+cfg["IsDev"] = Environment.GetEnvironmentVariable("IsDev")!;
+cfg["PostgreSQL:Host"] = Environment.GetEnvironmentVariable("PostgreSQL_Host")!;
+cfg["PostgreSQL:Database"] = Environment.GetEnvironmentVariable("PostgreSQL_Database")!;
+cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
+cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
+
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -62,6 +59,7 @@ builder.Services.AddDbContext<PromDbContext>(options => options.UseNpgsql(connSt
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApiVersioning();
+// builder.Services.Configure<MailConfig>(builder.Configuration.GetSection("MailConfig"));
 
 
 builder.Services.AddAuthentication("BasicOrBearer")
@@ -116,6 +114,8 @@ builder.Services.AddSwaggerGen(config =>
 });
 
 NativeInjections.RegisterServices(builder.Services);
+
+
 
 var app = builder.Build();
 

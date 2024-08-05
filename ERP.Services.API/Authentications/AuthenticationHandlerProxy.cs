@@ -35,7 +35,7 @@ namespace ERP.Services.API.Authentications
             signer = sn;
         }
 
-        protected override async Task<User> AuthenticateBasic(string orgId, byte[]? jwtBytes, HttpRequest request)
+        protected override async Task<Models.Authentications.User> AuthenticateBasic(string orgId, byte[]? jwtBytes, HttpRequest request)
         {
             var credentials = Encoding.UTF8.GetString(jwtBytes!).Split(new[] { ':' }, 2);
             var username = credentials[0];
@@ -45,7 +45,7 @@ namespace ERP.Services.API.Authentications
             return user;
         }
 
-        protected override async Task<User>? AuthenticateBearer(string orgId, byte[]? jwtBytes, HttpRequest request)
+        protected override async Task<Models.Authentications.User>? AuthenticateBearer(string orgId, byte[]? jwtBytes, HttpRequest request)
         {
             var accessToken = Encoding.UTF8.GetString(jwtBytes!);
             var tokenHandler = new JwtSecurityTokenHandler();

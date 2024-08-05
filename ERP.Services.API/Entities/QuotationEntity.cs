@@ -26,11 +26,11 @@ public class QuotationEntity
 
     [Column("sale_person_id")] public Guid? SalePersonId { get; set; }
 
-    public UserEntity SalePerson { get; set; }
+    public OrganizationUserEntity SalePerson { get; set; }
 
     [Column("issued_by")] public Guid? IssuedById { get; set; }
 
-    public UserEntity IssuedByUser { get; set; }
+    public OrganizationUserEntity IssuedByUser { get; set; }
 
 
     public List<QuotationProductEntity> Products { get; set; }
@@ -55,11 +55,25 @@ public class QuotationEntity
         EditTime += 1;
         QuotationDateTime = DateTime.UtcNow;
         Status = status;
+
+        if (status == "อนุมัติ")
+        {
+            IsApproved = true;
+        }
+        else
+        {
+            IsApproved = false;
+        }
     }
 
 
     public void Process()
     {
         Status = "Delete";
+    }
+
+    public void Update()
+    {
+        EditTime++;
     }
 }

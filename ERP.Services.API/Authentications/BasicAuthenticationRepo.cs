@@ -24,7 +24,7 @@ namespace ERP.Services.API.Authentications
             return null;
         }
 
-        public async Task<User>? Authenticate(string orgId, string user, string password, HttpRequest request)
+        public async Task<Models.Authentications.User>? Authenticate(string orgId, string user, string password, HttpRequest request)
         {
             var m = await VerifyKey(orgId, password);
             if (m == null)
@@ -32,7 +32,7 @@ namespace ERP.Services.API.Authentications
                 return null;
             }
 
-            var u = new User()
+            var u = new Models.Authentications.User()
             {
                 UserName = user,
                 Password = m.ApiKey,

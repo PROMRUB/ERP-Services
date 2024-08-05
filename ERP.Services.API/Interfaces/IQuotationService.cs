@@ -8,11 +8,11 @@ namespace ERP.Services.API.Interfaces;
 
 public interface IQuotationService
 {
-    public Task<QuotationResponse> GetQuotationById(string keyword);
-    public Task<QuotationResponse> Create(QuotationResource resource);
-    public Task<QuotationResponse> Update(Guid id, QuotationResource resource);
+    public Task<QuotationResource> GetQuotationById(string keyword);
+    public Task<QuotationResource> Create(QuotationResource resource);
+    public Task<QuotationResource> Update(Guid id, QuotationResource resource);
     public Task<List<QuotationStatus>> QuotationStatus();
-    public Task<QuotationResponse> UpdateStatus(Guid id, string status);
+    public Task<QuotationResource> UpdateStatus(Guid id, QuotationResource status);
     public Task Delete(Guid id);
     public Task<QuotationResponse> Calculate(List<QuotationProductResource> resource);
     public Task<List<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId);
@@ -21,5 +21,7 @@ public interface IQuotationService
         Guid paymentAccountId);
 
     public Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize);
-    public Task<QuotationResponse> GetById(Guid id);
+    public Task<QuotationResource> GetById(Guid id);
+    public Task<QuotationResource> ApproveSalePrice(Guid id);
+    public Task<QuotationResource> ApproveQuotation(Guid id);
 }

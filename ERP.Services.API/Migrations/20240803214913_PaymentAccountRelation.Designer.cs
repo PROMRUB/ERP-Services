@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240803214913_PaymentAccountRelation")]
+    partial class PaymentAccountRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -949,6 +952,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("issued_by");
 
+                    b.Property<Guid>("PaymentAccountEntityPaymentAccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("PaymentId")
                         .HasColumnType("uuid")
                         .HasColumnName("account_no");
@@ -990,6 +996,8 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("IssuedById");
+
+                    b.HasIndex("PaymentAccountEntityPaymentAccountId");
 
                     b.HasIndex("PaymentId");
 
@@ -1264,11 +1272,19 @@ namespace ERP.Services.API.Migrations
 
                     b.HasOne("ERP.Services.API.Entities.PaymentAccountEntity", "PaymentAccountEntity")
                         .WithMany()
+                        .HasForeignKey("PaymentAccountEntityPaymentAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ERP.Services.API.Entities.PaymentAccountEntity", "AccountEntity")
+                        .WithMany()
                         .HasForeignKey("PaymentId");
 
                     b.HasOne("ERP.Services.API.Entities.OrganizationUserEntity", "SalePerson")
                         .WithMany()
                         .HasForeignKey("SalePersonId");
+
+                    b.Navigation("AccountEntity");
 
                     b.Navigation("Customer");
 

@@ -24,5 +24,5 @@ public class QuotationResponse
     public decimal Amount { get; set; }
     public Guid AccountNo { get; set; }
     public string Remark { get; set; }
-        
+    public Guid? IssuedByUserId { get; set; }
 }

@@ -11,8 +11,8 @@ namespace ERP.Services.API.Authentications
 {
     public abstract class AuthenticationHandlerProxyBase : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        protected abstract Task<User>? AuthenticateBasic(string orgId, byte[]? jwtBytes, HttpRequest request);
-        protected abstract Task<User>? AuthenticateBearer(string orgId, byte[]? jwtBytes, HttpRequest request);
+        protected abstract Task<Models.Authentications.User>? AuthenticateBasic(string orgId, byte[]? jwtBytes, HttpRequest request);
+        protected abstract Task<Models.Authentications.User>? AuthenticateBearer(string orgId, byte[]? jwtBytes, HttpRequest request);
 
         protected AuthenticationHandlerProxyBase(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -35,7 +35,7 @@ namespace ERP.Services.API.Authentications
                 return AuthenticateResult.Fail($"Unknown scheme [{authHeader.Scheme}]");
             }
 
-            User? user = null;
+            Models.Authentications.User? user = null;
             try
             {
                 var orgId = ServiceUtils.GetOrgId(Request);

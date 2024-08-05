@@ -20,13 +20,13 @@ namespace ERP.Services.API.Authentications
             return await organizationService!.VerifyUserInOrganization(orgId, user);
         }
 
-        public async Task<User>? Authenticate(string orgId, string user, string password, HttpRequest request)
+        public async Task<Models.Authentications.User>? Authenticate(string orgId, string user, string password, HttpRequest request)
         {
             var verified = await VerifyUser(orgId, user)!;
             if (!verified)
                 throw new UnauthorizedAccessException("Cannot Access This Services");
 
-            var result = new User()
+            var result = new Models.Authentications.User()
             {
                 UserName = user,
                 Password = "",
