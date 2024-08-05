@@ -414,29 +414,6 @@ public class QuotationService
 
     public static async Task SendEmail()
     {
-        Configuration.Default.ApiKey.Add("api-key", "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");
-
-        var apiInstance = new TransactionalEmailsApi();
-            string SenderName = "Korn";
-            string SenderEmail = "kkunayothin@gmail.com";
-            SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-            string ToEmail = "kkunayothin@gmail.com";
-            string ToName = "Korn";
-            SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
-            List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
-            To.Add(smtpEmailTo);
-           
-            string TextContent = "Text";
-            string Subject = "My ERP";
-            
-            try
-            {
-                var sendSmtpEmail = new SendSmtpEmail(Email, To, null, null, null, TextContent, Subject);
-                CreateSmtpEmail result = apiInstance.SendTransacEmail(sendSmtpEmail);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+        
     }
 }
