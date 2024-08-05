@@ -73,21 +73,25 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy("GenericRolePolicy", policy => policy.AddRequirements(new GenericRbacRequirement()));
 });
 
-builder.Services.AddSwaggerGen(config =>
-{
-    config.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "Prom API", Version = "v1", Description = "Prom API Version 1", });
-
-    config.OperationFilter<SwaggerParameterFilters>();
-    config.DocumentFilter<SwaggerVersionMapping>();
-
-    config.DocInclusionPredicate((version, desc) =>
+    if (builder.Environment.IsDevelopment())
     {
-        if (!desc.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
-        var versions = methodInfo.DeclaringType!.GetCustomAttributes(true).OfType<ApiVersionAttribute>().SelectMany(attr => attr.Versions);
-        var maps = methodInfo.GetCustomAttributes(true).OfType<MapToApiVersionAttribute>().SelectMany(attr => attr.Versions).ToArray();
-        version = version.Replace("v", "");
-        return versions.Any(v => v.ToString() == version && maps.AsEnumerable().Any(v => v.ToString() == version));
-    });
+        builder.Services.AddSwaggerGen(config =>
+        {
+            config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
+            config.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "Prom API", Version = "v1", Description = "Prom API Version 1", });
+        
+            config.OperationFilter<SwaggerParameterFilters>();
+            config.DocumentFilter<SwaggerVersionMapping>();
+        
+            config.DocInclusionPredicate((version, desc) =>
+            {
+                if (!desc.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
+                var versions = methodInfo.DeclaringType!.GetCustomAttributes(true).OfType<ApiVersionAttribute>().SelectMany(attr => attr.Versions);
+                var maps = methodInfo.GetCustomAttributes(true).OfType<MapToApiVersionAttribute>().SelectMany(attr => attr.Versions).ToArray();
+                version = version.Replace("v", "");
+                return versions.Any(v => v.ToString() == version && maps.AsEnumerable().Any(v => v.ToString() == version));
+            });
+    }
 
     config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
