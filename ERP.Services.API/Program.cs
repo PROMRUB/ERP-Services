@@ -77,7 +77,6 @@ builder.Services.AddAuthorization(options => {
     {
         builder.Services.AddSwaggerGen(config =>
         {
-            config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
             config.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "Prom API", Version = "v1", Description = "Prom API Version 1", });
         
             config.OperationFilter<SwaggerParameterFilters>();
@@ -91,17 +90,17 @@ builder.Services.AddAuthorization(options => {
                 version = version.Replace("v", "");
                 return versions.Any(v => v.ToString() == version && maps.AsEnumerable().Any(v => v.ToString() == version));
             });
-    }
 
-    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter the Bearer token in the field",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-    });
 
-    config.AddSecurityRequirement(new OpenApiSecurityRequirement
+            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter the Bearer token in the field",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+
+            config.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -115,7 +114,8 @@ builder.Services.AddAuthorization(options => {
                         Array.Empty<string>()
                     }
                 });
-});
+        });
+}
 
 NativeInjections.RegisterServices(builder.Services);
 
@@ -139,7 +139,10 @@ app.UseCors(x => x
             .AllowAnyHeader());
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(config =>
+{
+    config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
+});
 
 app.UseHttpsRedirection();
 
