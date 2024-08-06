@@ -283,7 +283,7 @@ public class QuotationService
                 throw new KeyNotFoundException("product not exists");
             }
 
-            var discountPrice = (selected.MSRP * (product.Discount / 100) ?? 0);
+            var discountPrice = (selected.MSRP * (decimal?)(product.Discount / 100) ?? 0);
 
 
             price += (discountPrice * product.Quantity);

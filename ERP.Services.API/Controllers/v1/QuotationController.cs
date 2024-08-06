@@ -233,8 +233,9 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var document = new QuotationDocument();
-                
+                // var document = new QuotationDocument();
+                var model = InvoiceDocumentDataSource.GetInvoiceDetails();
+                var document = new QuotationDocument.InvoiceDocument(model);
                 
                 byte[] pdfBytes = document.GeneratePdf();
                 MemoryStream ms = new MemoryStream(pdfBytes);

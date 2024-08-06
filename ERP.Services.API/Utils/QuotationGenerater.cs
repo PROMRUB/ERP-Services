@@ -19,9 +19,11 @@ namespace ERP.Services.API.Utils
                     page.Margin(20);
 
                     page.Size(PageSizes.A4);
-                    
+
                     page.Header().Element(ComposeHeader);
-                    
+
+                    page.Content().Element(ComposeHeaderLine);
+
                     page.Footer().AlignCenter().Text(text =>
                     {
                         text.CurrentPageNumber();
@@ -29,296 +31,301 @@ namespace ERP.Services.API.Utils
                         text.TotalPages();
                     });
                 });
-        }
-        
-        void ComposeHeader(IContainer container)
-        {
-            container.Row(row =>
-            {
-                row.RelativeItem().Column(column =>
-                {
-                    column
-                        .Item()
-                        .Text($"บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด (สำน\u0e31กงานใหญ\u0e48) ")
-                        .FontSize(10)
-                        .Bold()
-                        .FontColor(Colors.Black);
 
-                    column.Item()
-                        .Text(text =>
+
+            void ComposeHeaderLine(IContainer container)
+            {
+               
+            }
+
+            void ComposeHeader(IContainer container)
+            {
+                container.Row(row =>
+                {
+                    row.RelativeItem().Column(column =>
                     {
-                        text.Span("34 ซอยรามคำแหง 78 ถนนรามคำแหง แขวงห\u0e31วหมาก เขตบางกะป\u0e34 กร\u0e38งเทพมหานคร 10240")
-                            .FontSize(6)
+                        column
+                            .Item()
+                            .Text(
+                                $"บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด (สำน\u0e31กงานใหญ\u0e48) ")
+                            .FontSize(10)
+                            .Bold()
+                            .FontColor(Colors.Black);
+
+                        column.Item()
+                            .Text(text =>
+                            {
+                                text.Span(
+                                        "34 ซอยรามคำแหง 78 ถนนรามคำแหง แขวงห\u0e31วหมาก เขตบางกะป\u0e34 กร\u0e38งเทพมหานคร 10240")
+                                    .FontSize(6)
+                                    ;
+                            });
+
+                        column.Item().Text(text =>
+                        {
+                            text.Span("โทร: 0 2735 4475 E-mail: admin@securesolutionsasia.com")
+                                .FontSize(6)
+                                ;
                             ;
+                        });
                     });
+                    row.ConstantItem(175).Image(LogoImage);
                     
-                    column.Item().Text(text =>
+                    // row.RelativeItem(row =>
+                    // {
+                    //     row.RelativeItem().Column(column =>
+                    //     {
+                    //         column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Medium);
+                    //     
+                    //         column.Item().Text(text =>
+                    //         {
+                    //             text.Span("โทร: 0 2735 4475 E-mail: admin@securesolutionsasia.com")
+                    //                 .FontSize(6)
+                    //                 ;
+                    //             ;
+                    //         });
+                    //     });
+                    // });
+                });
+
+            }
+        }
+
+        public class InvoiceDocument : IDocument
+        {
+            public static Image LogoImage { get; } = Image.FromFile("logo.jpg");
+
+            public InvoiceDocumentDataSource.InvoiceModel Model { get; }
+
+            public InvoiceDocument(InvoiceDocumentDataSource.InvoiceModel model)
+            {
+                Model = model;
+            }
+
+            public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+
+            public void Compose(IDocumentContainer container)
+            {
+                container
+                    .Page(page =>
                     {
-                        text.Span("โทร: 0 2735 4475 E-mail: admin@securesolutionsasia.com")
-                            .FontSize(6)
-                            ;;
-                    });
-                });
+                        page.Margin(20);
 
-                row.ConstantItem(175).Image(LogoImage);
-            });
-            
-            
-            container.Row(row =>
+                        page.Header().Element(ComposeHeader);
+                        page.Content().Element(ComposeContent);
+
+                        page.Footer().AlignCenter().Text(text =>
+                        {
+                            text.CurrentPageNumber();
+                            text.Span(" / ");
+                            text.TotalPages();
+                        });
+                    });
+            }
+
+            void ComposeHeader(IContainer container)
             {
-                row.RelativeItem().Column(column =>
+                container.Row(row =>
                 {
-                    column.Item().Text(text =>
+                    row.RelativeItem().Column(column =>
                     {
-                        text.Span("(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 0105551048682)")
-                            .FontSize(6);
+                        column
+                            .Item().Text($"Invoice #{Model.InvoiceNumber}")
+                            .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
+
+                        column.Item().Text(text =>
+                        {
+                            text.Span("Issue date: ").SemiBold();
+                            text.Span($"{Model.IssueDate:d}");
+                        });
                     });
+
+                    row.ConstantItem(175).Image(LogoImage);
                 });
-            });
-            
-            
-        }
+            }
 
-    }
-
-    public class InvoiceDocument : IDocument
-    {
-        public static Image LogoImage { get; } = Image.FromFile("logo.jpg");
-        
-        public InvoiceDocumentDataSource.InvoiceModel Model { get; }
-
-        public InvoiceDocument(InvoiceDocumentDataSource.InvoiceModel model)
-        {
-            Model = model;
-        }
-
-        public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
-
-        public void Compose(IDocumentContainer container)
-        {
-            container
-                .Page(page =>
+            void ComposeContent(IContainer container)
+            {
+                container.PaddingVertical(40).Column(column =>
                 {
-                    page.Margin(20);
-                    
-                    page.Header().Element(ComposeHeader);
-                    page.Content().Element(ComposeContent);
-                    
-                    page.Footer().AlignCenter().Text(text =>
+                    column.Spacing(20);
+
+                    column.Item().Row(row =>
                     {
-                        text.CurrentPageNumber();
-                        text.Span(" / ");
-                        text.TotalPages();
+                        row.RelativeItem().Component(new AddressComponent("From", Model.SellerAddress));
+                        row.ConstantItem(50);
+                        row.RelativeItem().Component(new AddressComponent("For", Model.CustomerAddress));
                     });
+
+                    column.Item().Element(ComposeTable);
+
+                    var totalPrice = Model.Items.Sum(x => x.Price * x.Quantity);
+                    column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:C}").SemiBold();
+
+                    if (!string.IsNullOrWhiteSpace(Model.Comments))
+                        column.Item().PaddingTop(25).Element(ComposeComments);
                 });
-        }
+            }
 
-        void ComposeHeader(IContainer container)
-        {
-            container.Row(row =>
+            void ComposeTable(IContainer container)
             {
-                row.RelativeItem().Column(column =>
-                {
-                    column
-                        .Item().Text($"Invoice #{Model.InvoiceNumber}")
-                        .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
+                var headerStyle = TextStyle.Default.SemiBold();
 
-                    column.Item().Text(text =>
+                container.Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
                     {
-                        text.Span("Issue date: ").SemiBold();
-                        text.Span($"{Model.IssueDate:d}");
+                        columns.ConstantColumn(25);
+                        columns.RelativeColumn(3);
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
+                        columns.RelativeColumn();
                     });
+
+                    table.Header(header =>
+                    {
+                        header.Cell().Text("#");
+                        header.Cell().Text("Product").Style(headerStyle);
+                        header.Cell().AlignRight().Text("Unit price").Style(headerStyle);
+                        header.Cell().AlignRight().Text("Quantity").Style(headerStyle);
+                        header.Cell().AlignRight().Text("Total").Style(headerStyle);
+
+                        header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                    });
+
+                    foreach (var item in Model.Items)
+                    {
+                        var index = Model.Items.IndexOf(item) + 1;
+
+                        table.Cell().Element(CellStyle).Text($"{index}");
+                        table.Cell().Element(CellStyle).Text(item.Name);
+                        table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price:C}");
+                        table.Cell().Element(CellStyle).AlignRight().Text($"{item.Quantity}");
+                        table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price * item.Quantity:C}");
+
+                        static IContainer CellStyle(IContainer container) => container.BorderBottom(1)
+                            .BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                    }
                 });
+            }
 
-                row.ConstantItem(175).Image(LogoImage);
-
-            
-            });
-            
-            
-
-        }
-
-        void ComposeContent(IContainer container)
-        {
-            container.PaddingVertical(40).Column(column => 
+            void ComposeComments(IContainer container)
             {
-                column.Spacing(20);
-                
-                column.Item().Row(row =>
+                container.ShowEntire().Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
                 {
-                    row.RelativeItem().Component(new AddressComponent("From", Model.SellerAddress));
-                    row.ConstantItem(50);
-                    row.RelativeItem().Component(new AddressComponent("For", Model.CustomerAddress));
+                    column.Spacing(5);
+                    column.Item().Text("Comments").FontSize(14).SemiBold();
+                    column.Item().Text(Model.Comments);
                 });
-
-                column.Item().Element(ComposeTable);
-
-                var totalPrice = Model.Items.Sum(x => x.Price * x.Quantity);
-                column.Item().PaddingRight(5).AlignRight().Text($"Grand total: {totalPrice:C}").SemiBold();
-
-                if (!string.IsNullOrWhiteSpace(Model.Comments))
-                    column.Item().PaddingTop(25).Element(ComposeComments);
-            });
+            }
         }
 
-        void ComposeTable(IContainer container)
+        public class AddressComponent : IComponent
         {
-            var headerStyle = TextStyle.Default.SemiBold();
-            
-            container.Table(table =>
+            private string Title { get; }
+            private InvoiceDocumentDataSource.InvoiceAddress Address { get; }
+
+            public AddressComponent(string title, InvoiceDocumentDataSource.InvoiceAddress address)
             {
-                table.ColumnsDefinition(columns =>
+                Title = title;
+                Address = address;
+            }
+
+            public void Compose(IContainer container)
+            {
+                container.ShowEntire().Column(column =>
                 {
-                    columns.ConstantColumn(25);
-                    columns.RelativeColumn(3);
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
-                    columns.RelativeColumn();
+                    column.Spacing(2);
+
+                    column.Item().Text(Title).SemiBold();
+                    column.Item().PaddingBottom(5).LineHorizontal(1);
+
+                    column.Item().Text(Address.CompanyName);
+                    column.Item().Text(Address.Street);
+                    column.Item().Text($"{Address.City}, {Address.State}");
+                    column.Item().Text(Address.Email);
+                    column.Item().Text(Address.Phone);
                 });
-                
-                table.Header(header =>
-                {
-                    header.Cell().Text("#");
-                    header.Cell().Text("Product").Style(headerStyle);
-                    header.Cell().AlignRight().Text("Unit price").Style(headerStyle);
-                    header.Cell().AlignRight().Text("Quantity").Style(headerStyle);
-                    header.Cell().AlignRight().Text("Total").Style(headerStyle);
-                    
-                    header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
-                });
-                
-                foreach (var item in Model.Items)
-                {
-                    var index = Model.Items.IndexOf(item) + 1;
-
-                    table.Cell().Element(CellStyle).Text($"{index}");
-                    table.Cell().Element(CellStyle).Text(item.Name);
-                    table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price:C}");
-                    table.Cell().Element(CellStyle).AlignRight().Text($"{item.Quantity}");
-                    table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price * item.Quantity:C}");
-                    
-                    static IContainer CellStyle(IContainer container) => container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                }
-            });
+            }
         }
+    }
 
-        void ComposeComments(IContainer container)
+    public static class InvoiceDocumentDataSource
+    {
+        private static Random Random = new Random();
+
+        public static InvoiceModel GetInvoiceDetails()
         {
-            container.ShowEntire().Background(Colors.Grey.Lighten3).Padding(10).Column(column => 
+            var items = Enumerable
+                .Range(1, 25)
+                .Select(_ => GenerateRandomOrderItem())
+                .ToList();
+
+            return new InvoiceModel
             {
-                column.Spacing(5);
-                column.Item().Text("Comments").FontSize(14).SemiBold();
-                column.Item().Text(Model.Comments);
-            });
-        }
-    }
-    
-    public class AddressComponent : IComponent
-    {
-        private string Title { get; }
-        private InvoiceDocumentDataSource.InvoiceAddress Address { get; }
+                InvoiceNumber = Random.Next(1_000, 10_000),
+                IssueDate = DateTime.Now,
+                DueDate = DateTime.Now + TimeSpan.FromDays(14),
 
-        public AddressComponent(string title, InvoiceDocumentDataSource.InvoiceAddress address)
-        {
-            Title = title;
-            Address = address;
+                SellerAddress = GenerateRandomAddress(),
+                CustomerAddress = GenerateRandomAddress(),
+
+                Items = items,
+                Comments = Placeholders.Paragraph()
+            };
         }
-        
-        public void Compose(IContainer container)
+
+        private static OrderItem GenerateRandomOrderItem()
         {
-            container.ShowEntire().Column(column =>
+            return new OrderItem
             {
-                column.Spacing(2);
-
-                column.Item().Text(Title).SemiBold();
-                column.Item().PaddingBottom(5).LineHorizontal(1); 
-                
-                column.Item().Text(Address.CompanyName);
-                column.Item().Text(Address.Street);
-                column.Item().Text($"{Address.City}, {Address.State}");
-                column.Item().Text(Address.Email);
-                column.Item().Text(Address.Phone);
-            });
+                Name = Placeholders.Label(),
+                Price = (decimal)Math.Round(Random.NextDouble() * 100, 2),
+                Quantity = Random.Next(1, 10)
+            };
         }
-    }
-}
 
-public static class InvoiceDocumentDataSource
-{
-    private static Random Random = new Random();
-        
-    public static InvoiceModel GetInvoiceDetails()
-    {
-        var items = Enumerable
-            .Range(1, 25)
-            .Select(_ => GenerateRandomOrderItem())
-            .ToList();
-            
-        return new InvoiceModel
+        private static InvoiceAddress GenerateRandomAddress()
         {
-            InvoiceNumber = Random.Next(1_000, 10_000),
-            IssueDate = DateTime.Now,
-            DueDate = DateTime.Now + TimeSpan.FromDays(14),
+            return new InvoiceAddress
+            {
+                CompanyName = Placeholders.Name(),
+                Street = Placeholders.Label(),
+                City = Placeholders.Label(),
+                State = Placeholders.Label(),
+                Email = Placeholders.Email(),
+                Phone = Placeholders.PhoneNumber()
+            };
+        }
 
-            SellerAddress = GenerateRandomAddress(),
-            CustomerAddress = GenerateRandomAddress(),
-                
-            Items = items,
-            Comments = Placeholders.Paragraph()
-        };
-    }
-
-    private static OrderItem GenerateRandomOrderItem()
-    {
-        return new OrderItem
+        public class InvoiceModel
         {
-            Name = Placeholders.Label(),
-            Price = (decimal) Math.Round(Random.NextDouble() * 100, 2),
-            Quantity = Random.Next(1, 10)
-        };
-    }
+            public int InvoiceNumber { get; set; }
+            public DateTime IssueDate { get; set; }
+            public DateTime DueDate { get; set; }
 
-    private static InvoiceAddress GenerateRandomAddress()
-    {
-        return new InvoiceAddress
+            public InvoiceAddress SellerAddress { get; set; }
+            public InvoiceAddress CustomerAddress { get; set; }
+
+            public List<OrderItem> Items { get; set; }
+            public string Comments { get; set; }
+        }
+
+        public class OrderItem
         {
-            CompanyName = Placeholders.Name(),
-            Street = Placeholders.Label(),
-            City = Placeholders.Label(),
-            State = Placeholders.Label(),
-            Email = Placeholders.Email(),
-            Phone = Placeholders.PhoneNumber() 
-        };
-    }
-    
-    public class InvoiceModel
-    {
-        public int InvoiceNumber { get; set; }
-        public DateTime IssueDate { get; set; }
-        public DateTime DueDate { get; set; }
-        
-        public InvoiceAddress SellerAddress { get; set; }
-        public InvoiceAddress CustomerAddress { get; set; }
-        
-        public List<OrderItem> Items { get; set; }
-        public string Comments { get; set; }
-    }
-    
-    public class OrderItem
-    {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public int Quantity { get; set; }
-    }
+            public string Name { get; set; }
+            public decimal Price { get; set; }
+            public int Quantity { get; set; }
+        }
 
-    public class InvoiceAddress
-    {
-        public string CompanyName { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public class InvoiceAddress
+        {
+            public string CompanyName { get; set; }
+            public string Street { get; set; }
+            public string City { get; set; }
+            public string State { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+        }
     }
 }
