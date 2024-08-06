@@ -125,7 +125,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
     //
     // var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-    // service.Seed();
+    // service.Seed();git logๆ
 }
 
 
