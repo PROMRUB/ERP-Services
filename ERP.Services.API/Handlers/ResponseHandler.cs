@@ -40,6 +40,9 @@ namespace ERP.Services.API.Handlers
                 case "9500":
                     message = $"Invalid apikey provided";
                     break;
+                default:
+                    message = header;
+                    break;
             }
             return new StatusResponseModel { Code = code, Message = message };
         }

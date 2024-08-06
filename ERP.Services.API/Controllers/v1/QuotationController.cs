@@ -61,7 +61,7 @@ namespace ERP.Services.API.Controllers.v1
             }
             catch (Exception ex)
             {
-                return Ok(ResponseHandler.Response(ex.Message, null));
+                return Ok(ResponseHandler.Response("message : " + ex.Message, "inner Exception: " + ex.InnerException?.Message));
             }
         }
         
