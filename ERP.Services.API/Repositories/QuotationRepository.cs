@@ -19,9 +19,11 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
     {
         return _context.Quotation
             .Include(x => x.Products)
+            .ThenInclude(x => x.Product)
             .Include(x => x.Projects)
+            .ThenInclude(x => x.Project)
             .Include(x => x.SalePerson)
-            .Include(x => x.Customer)
+            .Include(x => x.IssuedByUser)
             .Include(x => x.Customer)
             .Include(x => x.CustomerContact);
     }

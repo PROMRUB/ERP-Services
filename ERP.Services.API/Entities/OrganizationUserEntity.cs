@@ -41,5 +41,11 @@ namespace ERP.Services.API.Entities
 
         [Column("created_date")]
         public DateTime? CreatedDate { get; set; }
+
+        public string DisplayNameTH()
+        {
+            return $"{FirstNameTh} {LastnameTh}";
+        }
+        
     }
 }

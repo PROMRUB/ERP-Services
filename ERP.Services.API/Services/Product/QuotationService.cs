@@ -207,6 +207,12 @@ public class QuotationService
 
         await quotationRepository.Context()!.SaveChangesAsync();
 
+        if (quotation.Status == "อนุมัติ")
+        {
+            await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
+                quotation.SalePerson.email);
+        }
+
         return MapEntityToResponse(quotation);
     }
 
@@ -402,15 +408,15 @@ public class QuotationService
 
     public async Task<QuotationResource> ApproveSalePrice(Guid id)
     {
-        await SendEmail();
-        // var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
-        //
-        // if (quotation == null)
-        // {
-        //     throw new KeyNotFoundException("id not exists");
-        // }
-        //
-        // await SendApproveSalePrice(quotation);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+
+        if (quotation == null)
+        {
+            throw new KeyNotFoundException("id not exists");
+        }
+
+        await SendApproveSalePrice(quotation, "korn", "kkunayothin@gmail.com");
+
 
         return null;
     }
@@ -424,43 +430,113 @@ public class QuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        await SendApproveQuotation(quotation,"");
+        await SendApproveQuotation(quotation, "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c",
+            "amornrat.t@securesolutionsasia.com");
 
         return null;
     }
 
-    private async Task SendApproveQuotation(QuotationEntity quotation,string managerName)
+    public async Task<QuotationDocument> GeneratePDF(Guid id)
     {
-      
-        var apiInstance = new TransactionalEmailsApi();
-        string SenderName = "Admin";
-        string SenderEmail = "admin@prom.co.th";
-        
-        SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
+        if (quotation == null)
+        {
+            throw new KeyNotFoundException("id not exists");
+        }
+
+        return new QuotationDocument(quotation);
     }
 
-    private async Task SendApproveSalePrice(QuotationEntity quotation,string managerName)
+    private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
         Configuration.Default.ApiKey.Add("api-key",
-            "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");
+            Environment.GetEnvironmentVariable("ERP_EMAIL"));
+
+        var apiInstance = new TransactionalEmailsApi();
+        string SenderName = "PROM ERP";
+        string SenderEmail = "e-service@prom.co.th";
+        SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
+        string ToEmail = managerEmail;
+        string ToName = managerName;
+        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
+        List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
+        To.Add(smtpEmailTo);
+
+        string HtmlContent =
+            $"<h3 >ส\u0e48งเม\u0e37\u0e48อ: Sales ต\u0e49องการขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา</h3><br/>\n" +
+            $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา<br/>" +
+            $"เร\u0e35ยน {managerName}</br>" +
+            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {quotation.QuotationNo ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
+            $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
+            $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
+            $"{quotation.IssuedByUser.DisplayNameTH()}<br/>";
+        string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {quotation.QuotationNo ?? "-"}";
+
+        try
+        {
+            var sendSmtpEmail = new SendSmtpEmail(Email, To, null, null, HtmlContent, null, Subject);
+            CreateSmtpEmail result = apiInstance.SendTransacEmail(sendSmtpEmail);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
+    private async Task ManagerReplyApproveQuotation(QuotationEntity quotation, string saleName, string saleEmail)
+    {
+        var apiInstance = new TransactionalEmailsApi();
+        string senderName = "PROM ERP";
+        string senderEmail = "e-service@prom.co.th";
+
+        SendSmtpEmailSender Email = new SendSmtpEmailSender(senderName, senderEmail);
+
+        string toEmail = saleName;
+        string toName = saleEmail;
+        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(toEmail, toName);
+
+        List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
+        To.Add(smtpEmailTo);
+
+        string htmlContent =
+            $"ตามท\u0e35\u0e48ได\u0e49ม\u0e35การขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคาเลขท\u0e35\u0e48: {quotation.QuotationNo ?? ""} ขณะน\u0e35\u0e49ใบเสนอราคาด\u0e31งกล\u0e48าวได\u0e49ถ\u0e39กอน\u0e38ม\u0e31ต\u0e34เร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งแจ\u0e49งกล\u0e31บมาเพ\u0e37\u0e48อให\u0e49ดำเน\u0e34นการตามข\u0e31\u0e49นตอนต\u0e48างๆต\u0e48อไป";
+        string Subject = @$"อนุมัติใช้ใบเสนอราคา";
+
+        try
+        {
+            var sendSmtpEmail = new SendSmtpEmail(Email, To, null, null, htmlContent, null, Subject);
+            CreateSmtpEmail result = apiInstance.SendTransacEmail(sendSmtpEmail);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
+    private async Task SendApproveSalePrice(QuotationEntity quotation, string managerName, string managerEmail)
+    {
+        Configuration.Default.ApiKey.Add("api-key",
+            Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
         var apiInstance = new TransactionalEmailsApi();
         string senderName = "Admin";
         string senderEmail = "admin@prom.co.th";
-        
+
         SendSmtpEmailSender Email = new SendSmtpEmailSender(senderName, senderEmail);
 
         string toEmail = quotation.CustomerContact!.Email!;
         string toName = quotation.CustomerContact!.DisplayName()!;
         SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(toEmail, toName);
-        
+
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
         To.Add(smtpEmailTo);
-        
+
         string htmlContent = "Text";
         string Subject = "My ERP";
-        
+
         try
         {
             var sendSmtpEmail = new SendSmtpEmail(Email, To, null, null, htmlContent, null, Subject);
@@ -474,10 +550,10 @@ public class QuotationService
     }
 
 
-    public static async Task SendEmail()
+    public static async Task SendEmail(QuotationEntity entity)
     {
         Configuration.Default.ApiKey.Add("api-key",
-            "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");
+            Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
@@ -496,8 +572,8 @@ public class QuotationService
                              $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: QTYYYYMM-9999 ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
                              $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
                              $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
-                             $"Full Name<br/>";
-        string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ XXX";
+                             $"{entity.IssuedByUser.DisplayNameTH()}<br/>";
+        string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {entity.QuotationNo ?? "-"}";
 
         try
         {

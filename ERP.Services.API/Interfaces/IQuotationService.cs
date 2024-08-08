@@ -24,4 +24,5 @@ public interface IQuotationService
     public Task<QuotationResource> GetById(Guid id);
     public Task<QuotationResource> ApproveSalePrice(Guid id);
     public Task<QuotationResource> ApproveQuotation(Guid id);
+    public Task<QuotationDocument> GeneratePDF(Guid id);
 }

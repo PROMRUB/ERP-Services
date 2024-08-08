@@ -35,9 +35,12 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
 
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ERP_EMAIL")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "ERP_EMAIL"));
+
 var log = new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
+    .WriteTo.Console()
+    .CreateLogger();
 Log.Logger = log;
 
 var cfg = builder.Configuration;
@@ -49,12 +52,22 @@ cfg["PostgreSQL:Host"] = Environment.GetEnvironmentVariable("PostgreSQL_Host")!;
 cfg["PostgreSQL:Database"] = Environment.GetEnvironmentVariable("PostgreSQL_Database")!;
 cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
 cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
+cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
 
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-var connStr = $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
-builder.Services.AddDbContext<PromDbContext>(options => options.UseNpgsql(connStr));
+var connStr =
+    $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
+builder.Services.AddDbContext<PromDbContext>(
+    options =>
+    {
+        options.UseNpgsql(connStr);
+        options.UseTriggers(
+            triggerOptions => { triggerOptions.AddTrigger<QuotationNoTrigger>(); }
+        );
+    }
+);
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -65,7 +78,8 @@ builder.Services.AddApiVersioning();
 builder.Services.AddAuthentication("BasicOrBearer")
     .AddScheme<AuthenticationSchemeOptions, AuthenticationHandlerProxy>("BasicOrBearer", null);
 
-builder.Services.AddAuthorization(options => {
+builder.Services.AddAuthorization(options =>
+{
     var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder("BasicOrBearer");
     defaultAuthorizationPolicyBuilder = defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
     options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
@@ -73,52 +87,55 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy("GenericRolePolicy", policy => policy.AddRequirements(new GenericRbacRequirement()));
 });
 
-    if (builder.Environment.IsDevelopment())
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSwaggerGen(config =>
     {
-        builder.Services.AddSwaggerGen(config =>
+        config.SwaggerDoc("v1",
+            new Microsoft.OpenApi.Models.OpenApiInfo()
+                { Title = "Prom API", Version = "v1", Description = "Prom API Version 1", });
+
+        config.OperationFilter<SwaggerParameterFilters>();
+        config.DocumentFilter<SwaggerVersionMapping>();
+
+        config.DocInclusionPredicate((version, desc) =>
         {
-            config.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "Prom API", Version = "v1", Description = "Prom API Version 1", });
-        
-            config.OperationFilter<SwaggerParameterFilters>();
-            config.DocumentFilter<SwaggerVersionMapping>();
-        
-            config.DocInclusionPredicate((version, desc) =>
-            {
-                if (!desc.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
-                var versions = methodInfo.DeclaringType!.GetCustomAttributes(true).OfType<ApiVersionAttribute>().SelectMany(attr => attr.Versions);
-                var maps = methodInfo.GetCustomAttributes(true).OfType<MapToApiVersionAttribute>().SelectMany(attr => attr.Versions).ToArray();
-                version = version.Replace("v", "");
-                return versions.Any(v => v.ToString() == version && maps.AsEnumerable().Any(v => v.ToString() == version));
-            });
-
-
-            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter the Bearer token in the field",
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
-            });
-
-            config.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
+            if (!desc.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
+            var versions = methodInfo.DeclaringType!.GetCustomAttributes(true).OfType<ApiVersionAttribute>()
+                .SelectMany(attr => attr.Versions);
+            var maps = methodInfo.GetCustomAttributes(true).OfType<MapToApiVersionAttribute>()
+                .SelectMany(attr => attr.Versions).ToArray();
+            version = version.Replace("v", "");
+            return versions.Any(v => v.ToString() == version && maps.AsEnumerable().Any(v => v.ToString() == version));
         });
+
+
+        config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter the Bearer token in the field",
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey
+        });
+
+        config.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
 }
 
 NativeInjections.RegisterServices(builder.Services);
-
 
 
 var app = builder.Build();
@@ -126,7 +143,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<PromDbContext>();
-    dbContext.Database.Migrate();
+    // dbContext.Database.Migrate();
 
     //var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     //service.Seed();
@@ -134,15 +151,16 @@ using (var scope = app.Services.CreateScope())
 
 
 app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 app.UseSwagger();
 app.UseSwaggerUI(config =>
-{
-    config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
-});
+    {
+        // config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
+    }
+    );
 
 app.UseHttpsRedirection();
 

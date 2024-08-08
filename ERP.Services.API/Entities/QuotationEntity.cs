@@ -48,7 +48,10 @@ public class QuotationEntity
     [Column("status")] public string Status { get; set; }
     [Column("business_id")] public Guid BusinessId { get; set; }
     [Column("remark")] public string Remark { get; set; }
-    
+    [Column("month")] public int Month { get; set; }
+    [Column("year")] public int Year { get; set; }
+    [Column("running")] public int Running { get; set; }
+
 
     public void SubmitStatus(string status)
     {

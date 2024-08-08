@@ -218,7 +218,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                // var result = await service.ApproveQuotation(id);
+                var result = await service.ApproveQuotation(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -233,14 +233,11 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                // var document = new QuotationDocument();
-                var model = InvoiceDocumentDataSource.GetInvoiceDetails();
-                var document = new QuotationDocument.InvoiceDocument(model);
+                QuotationDocument document = await service.GeneratePDF(id);
                 
                 byte[] pdfBytes = document.GeneratePdf();
                 MemoryStream ms = new MemoryStream(pdfBytes);
                 return new FileStreamResult(ms, "application/pdf");
-                // var result = await service.Pdf(id);
             }
             catch (Exception ex)
             {
