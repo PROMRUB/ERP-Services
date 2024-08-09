@@ -12,8 +12,6 @@
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ERP.Services.API/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Properties/launchSettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
