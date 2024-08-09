@@ -9,7 +9,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="" />
+    <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Utils/QuotationGenerater.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Utils/QuotationGenerater.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,8 +23,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/178aecdd59619631ddc75757dbe859adfa94ecc8356c593dbb137a81b49268/PageExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1af6ffa8cee75f0266ceb188fc7b4dd49b4673386a5681842e9a8867259ed52/ISystemClock.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/393e5c61f45111b96c555e0fc4998665295af303db45491f25c21c20739d53/RelationalDatabaseFacadeExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6282eddf0cbff177221e9c5ab044b50181e477485cb393e47c56c2e99427/Color.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/93598dfc9d24c35f4ff14fb8454143cba8517549b4bed1c795a76343ca333c1b/GenerateExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9c9b30526ff8fe363be59b87459d62a356917d70568f2f95d96618c3bae909e/SmtpClient.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d47d5d45a93739f4a2e3857535f6d33fbf3ac96b2f0eb1a8629af5c5a1fc9/AuthenticationHandler.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -39,7 +48,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "Rebasing develop",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -132,5 +141,50 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/ERP.Services.API/PromServiceDbContext/QuottionNoTrigger.cs</url>
+          <line>10</line>
+          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/PromServiceDbContext/QuottionNoTrigger.cs" initialLine="10" containingFunctionPresentation="Method 'BeforeSave'">
+            <startOffsets>
+              <option value="389" />
+            </startOffsets>
+            <endOffsets>
+              <option value="390" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/ERP.Services.API/Authentications/BearerAuthenticationRepo.cs</url>
+          <line>23</line>
+          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Authentications/BearerAuthenticationRepo.cs" initialLine="23" containingFunctionPresentation="Method 'Authenticate'">
+            <startOffsets>
+              <option value="920" />
+            </startOffsets>
+            <endOffsets>
+              <option value="921" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/ERP.Services.API/Authentications/AuthenticationHandlerProxy.cs</url>
+          <line>48</line>
+          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Authentications/AuthenticationHandlerProxy.cs" initialLine="48" containingFunctionPresentation="Method 'AuthenticateBearer'">
+            <startOffsets>
+              <option value="1865" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1866" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
