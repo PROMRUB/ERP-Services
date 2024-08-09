@@ -215,12 +215,12 @@ namespace ERP.Services.API.Controllers.v1
 
         [HttpPost("approve_quotation/{id:guid}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> ApproveQuotation(Guid id,[FromBody] ApproveStatus resource)
+        public async Task<IActionResult> ApproveQuotation(Guid id)
         {
             try
             {
                 var result = await service.ApproveQuotation(id);
-                return Ok();
+                return Ok(result);
             }
             catch (Exception ex)
             {
