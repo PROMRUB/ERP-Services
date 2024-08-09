@@ -17,7 +17,7 @@ RUN dotnet build "./ERP.Services.API.csproj" -c $BUILD_CONFIGURATION -o /app/bui
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./ERP.Services.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
+COPY logo.jpg logo.jpg
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
