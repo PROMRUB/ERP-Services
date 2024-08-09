@@ -1,4 +1,5 @@
-﻿using ERP.Services.API.Models.Authentications;
+﻿using System.Diagnostics.Contracts;
+using ERP.Services.API.Models.Authentications;
 using ERP.Services.API.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -6,6 +7,7 @@ using Serilog;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ERP.Services.API.Authentications
 {
@@ -21,6 +23,7 @@ namespace ERP.Services.API.Authentications
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
+        
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {

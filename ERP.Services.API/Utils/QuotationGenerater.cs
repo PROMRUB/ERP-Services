@@ -91,7 +91,7 @@ namespace ERP.Services.API.Utils
                     });
                     row.RelativeItem().Column(column =>
                     {
-                        column.Item().Image(LogoImage);
+                        // column.Item().Image(LogoImage);
                         column.Item().AlignRight().Text(text =>
                         {
                             text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {entity.Customer.TaxId})")

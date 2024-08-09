@@ -4,6 +4,7 @@ using ERP.Services.API.Models.RequestModels.Quotation;
 using ERP.Services.API.Models.ResponseModels.PaymentAccount;
 using ERP.Services.API.Models.ResponseModels.Quotation;
 using ERP.Services.API.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -227,7 +228,10 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        [HttpGet("pdf/{id:guid}")]
+      
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("pdf/{id:guid}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> Pdf(Guid id)
         {
@@ -241,7 +245,7 @@ namespace ERP.Services.API.Controllers.v1
             }
             catch (Exception ex)
             {
-                return Ok(ResponseHandler.Response(ex.Message, null));
+                return Ok(ResponseHandler.Response(ex.Message + "/// " +ex.InnerException.Message, null));
             }
         }
     }
