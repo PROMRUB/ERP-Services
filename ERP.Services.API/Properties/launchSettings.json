@@ -7,7 +7,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "IsDev": "true",
-        "PostgreSQL_Host": "scaleup.cq959xqsa8na.ap-southeast-1.rds.amazonaws.com",
         "Key": "SolutionKP"
       },
       "dotnetRunMessages": true,

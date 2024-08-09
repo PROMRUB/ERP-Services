@@ -27,5 +27,5 @@ RUN dotnet publish "./ERP.Services.API.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY ./ERP.Services.API/logo.jpg /app/pubish/logo.jpg
+COPY ./ERP.Services.API/logo.jpg /app/logo.jpg
 ENTRYPOINT ["dotnet", "ERP.Services.API.dll"]
