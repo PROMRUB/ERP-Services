@@ -20,30 +20,15 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ERP.Services.API.Services.Product;
 
-public class QuotationService : IQuotationService
-{
-    private readonly IMapper _mapper;
-    private readonly IQuotationRepository _quotationRepository;
-    private readonly IProductRepository _productRepository;
-    private readonly IOrganizationRepository _organizationRepository;
-    private readonly IPaymentAccountRepository _paymentAccountRepository;
-
-    public QuotationService(IMapper mapper, IQuotationRepository quotationRepository, IProductRepository productRepository,
+public class QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
+        IProductRepository productRepository,
         IOrganizationRepository organizationRepository,
         IPaymentAccountRepository paymentAccountRepository)
-    {
-        _mapper = mapper;
-        _quotationRepository = quotationRepository;
-        _productRepository = productRepository;
-        _organizationRepository = organizationRepository;
-        _paymentAccountRepository = paymentAccountRepository;
-        Configuration.Default.ApiKey.Add("api-key",
-            Environment.GetEnvironmentVariable("ERP_EMAIL"));
-    }
-
+    : IQuotationService
+{
     public async Task<QuotationResource> GetQuotationById(string keyword)
     {
-        var query = _quotationRepository.GetQuotationQuery()
+        var query = quotationRepository.GetQuotationQuery()
             .Where(x => !string.IsNullOrWhiteSpace(x.QuotationNo) && x.QuotationNo.Contains(keyword));
 
         var quotation = await query.FirstOrDefaultAsync();
@@ -163,11 +148,11 @@ public class QuotationService : IQuotationService
             quotation.Vat = result.Vat;
             quotation.Amount = result.Amount;
 
-            _quotationRepository.Add(quotation);
+            quotationRepository.Add(quotation);
 
             try
             {
-                await _quotationRepository.Context().SaveChangesAsync();
+                await quotationRepository.Context().SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -175,7 +160,7 @@ public class QuotationService : IQuotationService
                 throw;
             }
 
-            var entity = await _quotationRepository.GetQuotationQuery()
+            var entity = await quotationRepository.GetQuotationQuery()
                 .FirstOrDefaultAsync(x => x.QuotationId == quotation.QuotationId);
 
             if (entity == null)
@@ -196,7 +181,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> Update(Guid id, QuotationResource resource)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -215,14 +200,14 @@ public class QuotationService : IQuotationService
 
         quotation.SubmitStatus(resource.Status);
 
-        _quotationRepository.DeleteProduct(quotation.Products);
-        _quotationRepository.DeleteProject(quotation.Projects);
+        quotationRepository.DeleteProduct(quotation.Products);
+        quotationRepository.DeleteProject(quotation.Projects);
 
         quotation.Products = MutateResourceProduct(resource.Products);
         quotation.Projects = MutateResourceProject(resource.Projects);
         quotation.Update();
 
-        await _quotationRepository.Context()!.SaveChangesAsync();
+        await quotationRepository.Context()!.SaveChangesAsync();
 
         if (quotation.Status == "อนุมัติ")
         {
@@ -254,7 +239,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> UpdateStatus(Guid id, QuotationResource status)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -263,7 +248,7 @@ public class QuotationService : IQuotationService
 
         quotation.SubmitStatus(status.Status);
 
-        await _quotationRepository.Context()!.SaveChangesAsync();
+        await quotationRepository.Context()!.SaveChangesAsync();
 
         return MapEntityToResponse(quotation);
     }
@@ -271,7 +256,7 @@ public class QuotationService : IQuotationService
 
     public async Task Process(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -280,12 +265,12 @@ public class QuotationService : IQuotationService
 
         quotation.Process();
 
-        await _quotationRepository.Context()!.SaveChangesAsync();
+        await quotationRepository.Context()!.SaveChangesAsync();
     }
 
     public async Task Delete(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -294,7 +279,7 @@ public class QuotationService : IQuotationService
 
         quotation.Process();
 
-        await _quotationRepository.Context()!.SaveChangesAsync();
+        await quotationRepository.Context()!.SaveChangesAsync();
     }
 
     public async Task<QuotationResponse> Calculate(List<QuotationProductResource> resource)
@@ -307,7 +292,7 @@ public class QuotationService : IQuotationService
 
         foreach (var product in products)
         {
-            var selected = await _productRepository.GetProductListQueryable()
+            var selected = await productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
 
             if (selected == null)
@@ -337,9 +322,9 @@ public class QuotationService : IQuotationService
 
     public async Task<List<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId)
     {
-        _organizationRepository.SetCustomOrgId(orgId);
-        var organization = await _organizationRepository.GetOrganization();
-        var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+        organizationRepository.SetCustomOrgId(orgId);
+        var organization = await organizationRepository.GetOrganization();
+        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
             .OrderBy(x => x.AccountBank).ToListAsync();
         return result.Select(x => new PaymentAccountResponse
@@ -360,11 +345,11 @@ public class QuotationService : IQuotationService
     public async Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId,
         Guid paymentAccountId)
     {
-        _organizationRepository.SetCustomOrgId(orgId);
-        var organization = await _organizationRepository.GetOrganization();
-        var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+        organizationRepository.SetCustomOrgId(orgId);
+        var organization = await organizationRepository.GetOrganization();
+        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.PaymentAccountId == paymentAccountId).FirstOrDefaultAsync();
-        return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
+        return mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
     public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize)
@@ -374,7 +359,7 @@ public class QuotationService : IQuotationService
             keyword = keyword.ToLower();
         }
 
-        var query = _quotationRepository.GetQuotationQuery()
+        var query = quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
@@ -422,7 +407,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> GetById(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -434,7 +419,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> ApproveSalePrice(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -449,7 +434,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> ApproveQuotation(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -475,7 +460,7 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationDocument> GeneratePDF(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {

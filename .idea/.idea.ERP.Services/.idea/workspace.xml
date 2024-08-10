@@ -10,6 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,6 +22,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/08379906ca8b4db5aca88e6ebdbd9b74138e00/74/e905ddb6/Configuration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/178aecdd59619631ddc75757dbe859adfa94ecc8356c593dbb137a81b49268/PageExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1af6ffa8cee75f0266ceb188fc7b4dd49b4673386a5681842e9a8867259ed52/ISystemClock.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/393e5c61f45111b96c555e0fc4998665295af303db45491f25c21c20739d53/RelationalDatabaseFacadeExtensions.cs" root0="SKIP_HIGHLIGHTING" />

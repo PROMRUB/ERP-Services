@@ -14,6 +14,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using ERP.Services.API.Services.Email;
+using sib_api_v3_sdk.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,9 @@ cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
 cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
 cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
 
-
+ 
+Configuration.Default.ApiKey.Add("api-key",
+    Environment.GetEnvironmentVariable("ERP_EMAIL"));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var connStr =
