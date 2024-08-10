@@ -204,7 +204,7 @@ namespace ERP.Services.API.Controllers.v1
             {
                 var result = await service.ApproveSalePrice(id);
 
-                return Ok();
+                return Ok(ResponseHandler.Response("1000", null, result));
                 // return Ok(result);
             }
             catch (Exception ex)
@@ -220,7 +220,7 @@ namespace ERP.Services.API.Controllers.v1
             try
             {
                 var result = await service.ApproveQuotation(id);
-                return Ok(result);
+                return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
             {
