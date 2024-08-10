@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
@@ -430,8 +431,10 @@ public class QuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        await SendApproveQuotation(quotation, "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c",
-            "amornrat.t@securesolutionsasia.com");
+        var name = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
+        var email = "kkunayothin@gmail.com";
+        await SendApproveQuotation(quotation,name ,email
+            );
 
         return null;
     }
@@ -452,6 +455,16 @@ public class QuotationService
     {
         Configuration.Default.ApiKey.Add("api-key",
             Environment.GetEnvironmentVariable("ERP_EMAIL"));
+        
+        foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
+        {
+            var variableKey = (string)environmentVariable.Key;
+            var value = (string?)environmentVariable.Value;
+
+            Console.WriteLine("=====");
+            Console.WriteLine(variableKey);
+            Console.WriteLine(value);
+        }
 
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
