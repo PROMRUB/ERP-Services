@@ -226,8 +226,17 @@ public class QuotationService : IQuotationService
 
         if (quotation.Status == "อนุมัติ")
         {
-            await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
-                quotation.SalePerson.email);
+            try
+            {
+                await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
+                    quotation.SalePerson.email);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw e;
+            }
+          
         }
 
         return MapEntityToResponse(quotation);
@@ -449,8 +458,17 @@ public class QuotationService : IQuotationService
 
         var name = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
         var email = "kkunayothin@gmail.com";
-        await SendApproveQuotation(quotation,name ,email
+        try
+        {
+            await SendApproveQuotation(quotation,name ,email
             );
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw e;
+        }
+      
 
         return null;
     }
@@ -469,18 +487,6 @@ public class QuotationService : IQuotationService
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
-       
-        
-        foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
-        {
-            var variableKey = (string)environmentVariable.Key;
-            var value = (string?)environmentVariable.Value;
-
-            Console.WriteLine("=====");
-            Console.WriteLine(variableKey);
-            Console.WriteLine(value);
-        }
-
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
