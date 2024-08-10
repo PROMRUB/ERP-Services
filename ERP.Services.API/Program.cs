@@ -92,8 +92,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("GenericRolePolicy", policy => policy.AddRequirements(new GenericRbacRequirement()));
 });
 
-// if (builder.Environment.IsDevelopment())
-// {
+if (builder.Environment.IsDevelopment())
+{
     builder.Services.AddSwaggerGen(config =>
     {
         config.SwaggerDoc("v1",
@@ -138,7 +138,7 @@ builder.Services.AddAuthorization(options =>
             }
         });
     });
-// }
+}
 
 NativeInjections.RegisterServices(builder.Services);
 
@@ -148,7 +148,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<PromDbContext>();
-    // dbContext.Database.Migrate();
+    dbContext.Database.Migrate();
 
     //var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     //service.Seed();
@@ -167,7 +167,7 @@ app.UseSwaggerUI(config =>
     }
     );
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

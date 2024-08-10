@@ -318,7 +318,7 @@ public class QuotationService : IQuotationService
         //     }
         // }
 
-        price = (decimal)products.Sum(x => x.Amount);
+        price = (decimal)products.Sum(x => x.Amount * x.Quantity);
 
         amount = price * (decimal)1.07;
         vat = amount - price;
