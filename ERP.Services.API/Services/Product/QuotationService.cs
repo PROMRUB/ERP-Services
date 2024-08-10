@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
@@ -12,7 +7,6 @@ using ERP.Services.API.Models.ResponseModels.PaymentAccount;
 using ERP.Services.API.Models.ResponseModels.Quotation;
 using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Client;
 using sib_api_v3_sdk.Model;
@@ -40,8 +34,6 @@ public class QuotationService : IQuotationService
             _productRepository = productRepository;
             _organizationRepository = organizationRepository;
             _paymentAccountRepository = paymentAccountRepository;
-
-           
         }
         catch (Exception e)
         {
@@ -69,6 +61,7 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
+            Amount = x.Amount,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
             Discount = Convert.ToInt32(x.Discount)
@@ -119,6 +112,7 @@ public class QuotationService : IQuotationService
     {
         var products = resources.Select((x, i) => new QuotationProductEntity
         {
+            Amount = x.Amount,
             ProductId = x.ProductId,
             Discount = x.Discount,
             Quantity = x.Quantity,
@@ -245,7 +239,6 @@ public class QuotationService : IQuotationService
                 Console.WriteLine(e.Message);
                 throw e;
             }
-          
         }
 
         return MapEntityToResponse(quotation);
@@ -314,21 +307,18 @@ public class QuotationService : IQuotationService
 
         var products = MutateResourceProduct(resource);
 
-        foreach (var product in products)
-        {
-            var selected = await _productRepository.GetProductListQueryable()
-                .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+        // foreach (var product in products)
+        // {
+        //     var selected = await _productRepository.GetProductListQueryable()
+        //         .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+        //
+        //     if (selected == null)
+        //     {
+        //         throw new KeyNotFoundException("product not exists");
+        //     }
+        // }
 
-            if (selected == null)
-            {
-                throw new KeyNotFoundException("product not exists");
-            }
-
-            var discountPrice = (selected.MSRP * (decimal?)(product.Discount / 100) ?? 0);
-
-
-            price += (discountPrice * product.Quantity);
-        }
+        price = (decimal)products.Sum(x => x.Amount);
 
         amount = price * (decimal)1.07;
         vat = amount - price;
@@ -388,8 +378,10 @@ public class QuotationService : IQuotationService
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) ||
-                                x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
-                )
+                                x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
+                            (string.IsNullOrWhiteSpace(keyword) ||
+                             x.QuotationNo.Contains(keyword)))
+                .OrderBy(x => x.QuotationDateTime)
             ;
 
 
@@ -450,7 +442,10 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        await SendApproveSalePrice(quotation, "korn", "kkunayothin@gmail.com");
+        var name = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
+        var email = "kkunayothin@gmail.com";
+
+        await SendApproveSalePrice(quotation, name, email);
 
 
         return null;
@@ -469,7 +464,7 @@ public class QuotationService : IQuotationService
         var email = "kkunayothin@gmail.com";
         try
         {
-            await SendApproveQuotation(quotation,name ,email
+            await SendApproveQuotation(quotation, name, email
             );
         }
         catch (Exception e)
@@ -477,7 +472,7 @@ public class QuotationService : IQuotationService
             Console.WriteLine(e.Message);
             throw e;
         }
-      
+
 
         return null;
     }
@@ -496,7 +491,6 @@ public class QuotationService : IQuotationService
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
-      
         Console.WriteLine("Environment.GetEnvironmentVariable(\"ERP_EMAIL\")");
         Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
@@ -534,7 +528,6 @@ public class QuotationService : IQuotationService
 
     private async Task ManagerReplyApproveQuotation(QuotationEntity quotation, string saleName, string saleEmail)
     {
-        
         Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
         var apiInstance = new TransactionalEmailsApi();
@@ -568,8 +561,6 @@ public class QuotationService : IQuotationService
 
     private async Task SendApproveSalePrice(QuotationEntity quotation, string managerName, string managerEmail)
     {
-
-
         var apiInstance = new TransactionalEmailsApi();
         string senderName = "Admin";
         string senderEmail = "admin@prom.co.th";
@@ -603,7 +594,7 @@ public class QuotationService : IQuotationService
     {
         Configuration.Default.ApiKey.Add("api-key",
             Environment.GetEnvironmentVariable("ERP_EMAIL"));
-        
+
         Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
         var apiInstance = new TransactionalEmailsApi();

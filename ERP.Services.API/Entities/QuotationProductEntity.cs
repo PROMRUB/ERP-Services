@@ -15,7 +15,7 @@ public class QuotationProductEntity
 
     [Column("quantity")] public int Quantity { get; set; }
 
-    [Column("price")] public int Price { get; set; }
+    [Column("price")] public float Price { get; set; }
     [Column("order")] public int Order { get; set; }
     [Column("amount")] public float Amount { get; set; }
     [Column("discount")] public float Discount { get; set; }

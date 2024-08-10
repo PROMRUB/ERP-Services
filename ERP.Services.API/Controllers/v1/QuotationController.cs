@@ -205,7 +205,6 @@ namespace ERP.Services.API.Controllers.v1
                 var result = await service.ApproveSalePrice(id);
 
                 return Ok(ResponseHandler.Response("1000", null, result));
-                // return Ok(result);
             }
             catch (Exception ex)
             {

@@ -20,7 +20,7 @@ public class QuotationNoTrigger(PromDbContext dbContext) : IBeforeSaveTrigger<Qu
 
             var date = runner == null ? 1.ToString("D4") : runner.Running.ToString("D4");
 
-            context.Entity.Running = context.Entity.Running++;
+            context.Entity.Running += 1;
             context.Entity.QuotationNo = formater + date;
         }
 
