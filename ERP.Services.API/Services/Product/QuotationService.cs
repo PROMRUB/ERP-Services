@@ -20,15 +20,39 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ERP.Services.API.Services.Product;
 
-public class QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
+public class QuotationService : IQuotationService
+{
+    private readonly IMapper _mapper;
+    private readonly IQuotationRepository _quotationRepository;
+    private readonly IProductRepository _productRepository;
+    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IPaymentAccountRepository _paymentAccountRepository;
+
+    public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
         IProductRepository productRepository,
         IOrganizationRepository organizationRepository,
         IPaymentAccountRepository paymentAccountRepository)
-    : IQuotationService
-{
+    {
+        try
+        {
+            _mapper = mapper;
+            _quotationRepository = quotationRepository;
+            _productRepository = productRepository;
+            _organizationRepository = organizationRepository;
+            _paymentAccountRepository = paymentAccountRepository;
+
+           
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("=====");
+            Console.WriteLine(e.Message);
+        }
+    }
+
     public async Task<QuotationResource> GetQuotationById(string keyword)
     {
-        var query = quotationRepository.GetQuotationQuery()
+        var query = _quotationRepository.GetQuotationQuery()
             .Where(x => !string.IsNullOrWhiteSpace(x.QuotationNo) && x.QuotationNo.Contains(keyword));
 
         var quotation = await query.FirstOrDefaultAsync();
@@ -148,11 +172,11 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
             quotation.Vat = result.Vat;
             quotation.Amount = result.Amount;
 
-            quotationRepository.Add(quotation);
+            _quotationRepository.Add(quotation);
 
             try
             {
-                await quotationRepository.Context().SaveChangesAsync();
+                await _quotationRepository.Context().SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -160,7 +184,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
                 throw;
             }
 
-            var entity = await quotationRepository.GetQuotationQuery()
+            var entity = await _quotationRepository.GetQuotationQuery()
                 .FirstOrDefaultAsync(x => x.QuotationId == quotation.QuotationId);
 
             if (entity == null)
@@ -181,7 +205,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationResource> Update(Guid id, QuotationResource resource)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -200,14 +224,14 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
         quotation.SubmitStatus(resource.Status);
 
-        quotationRepository.DeleteProduct(quotation.Products);
-        quotationRepository.DeleteProject(quotation.Projects);
+        _quotationRepository.DeleteProduct(quotation.Products);
+        _quotationRepository.DeleteProject(quotation.Projects);
 
         quotation.Products = MutateResourceProduct(resource.Products);
         quotation.Projects = MutateResourceProject(resource.Projects);
         quotation.Update();
 
-        await quotationRepository.Context()!.SaveChangesAsync();
+        await _quotationRepository.Context()!.SaveChangesAsync();
 
         if (quotation.Status == "อนุมัติ")
         {
@@ -239,7 +263,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationResource> UpdateStatus(Guid id, QuotationResource status)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -248,7 +272,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
         quotation.SubmitStatus(status.Status);
 
-        await quotationRepository.Context()!.SaveChangesAsync();
+        await _quotationRepository.Context()!.SaveChangesAsync();
 
         return MapEntityToResponse(quotation);
     }
@@ -256,7 +280,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task Process(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -265,12 +289,12 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
         quotation.Process();
 
-        await quotationRepository.Context()!.SaveChangesAsync();
+        await _quotationRepository.Context()!.SaveChangesAsync();
     }
 
     public async Task Delete(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -279,7 +303,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
         quotation.Process();
 
-        await quotationRepository.Context()!.SaveChangesAsync();
+        await _quotationRepository.Context()!.SaveChangesAsync();
     }
 
     public async Task<QuotationResponse> Calculate(List<QuotationProductResource> resource)
@@ -292,7 +316,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
         foreach (var product in products)
         {
-            var selected = await productRepository.GetProductListQueryable()
+            var selected = await _productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
 
             if (selected == null)
@@ -322,9 +346,9 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<List<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId)
     {
-        organizationRepository.SetCustomOrgId(orgId);
-        var organization = await organizationRepository.GetOrganization();
-        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+        _organizationRepository.SetCustomOrgId(orgId);
+        var organization = await _organizationRepository.GetOrganization();
+        var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
             .OrderBy(x => x.AccountBank).ToListAsync();
         return result.Select(x => new PaymentAccountResponse
@@ -345,11 +369,11 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
     public async Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId,
         Guid paymentAccountId)
     {
-        organizationRepository.SetCustomOrgId(orgId);
-        var organization = await organizationRepository.GetOrganization();
-        var result = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+        _organizationRepository.SetCustomOrgId(orgId);
+        var organization = await _organizationRepository.GetOrganization();
+        var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.PaymentAccountId == paymentAccountId).FirstOrDefaultAsync();
-        return mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
+        return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
     public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize)
@@ -359,7 +383,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
             keyword = keyword.ToLower();
         }
 
-        var query = quotationRepository.GetQuotationQuery()
+        var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
@@ -407,7 +431,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationResource> GetById(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -419,7 +443,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationResource> ApproveSalePrice(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -434,7 +458,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationResource> ApproveQuotation(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -460,7 +484,7 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public async Task<QuotationDocument> GeneratePDF(Guid id)
     {
-        var quotation = await quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {
@@ -472,6 +496,10 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
+      
+        Console.WriteLine("Environment.GetEnvironmentVariable(\"ERP_EMAIL\")");
+        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
+
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
@@ -506,6 +534,9 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     private async Task ManagerReplyApproveQuotation(QuotationEntity quotation, string saleName, string saleEmail)
     {
+        
+        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
+
         var apiInstance = new TransactionalEmailsApi();
         string senderName = "PROM ERP";
         string senderEmail = "e-service@prom.co.th";
@@ -570,7 +601,10 @@ public class QuotationService(IMapper mapper, IQuotationRepository quotationRepo
 
     public static async Task SendEmail(QuotationEntity entity)
     {
-   
+        Configuration.Default.ApiKey.Add("api-key",
+            Environment.GetEnvironmentVariable("ERP_EMAIL"));
+        
+        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";

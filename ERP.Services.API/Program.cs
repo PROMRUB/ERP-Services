@@ -58,6 +58,8 @@ cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
  
 Configuration.Default.ApiKey.Add("api-key",
     Environment.GetEnvironmentVariable("ERP_EMAIL"));
+
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var connStr =
@@ -90,8 +92,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("GenericRolePolicy", policy => policy.AddRequirements(new GenericRbacRequirement()));
 });
 
-if (builder.Environment.IsDevelopment())
-{
+// if (builder.Environment.IsDevelopment())
+// {
     builder.Services.AddSwaggerGen(config =>
     {
         config.SwaggerDoc("v1",
@@ -136,7 +138,7 @@ if (builder.Environment.IsDevelopment())
             }
         });
     });
-}
+// }
 
 NativeInjections.RegisterServices(builder.Services);
 
@@ -165,7 +167,7 @@ app.UseSwaggerUI(config =>
     }
     );
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
