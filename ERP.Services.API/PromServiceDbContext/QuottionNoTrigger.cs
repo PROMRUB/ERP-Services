@@ -18,7 +18,7 @@ public class QuotationNoTrigger(PromDbContext dbContext) : IBeforeSaveTrigger<Qu
                     x => x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year);
 
 
-            var date = runner == null ? 1.ToString("D4") : runner.Running.ToString("D4");
+            var date = runner == null ? 1.ToString("D4") : (runner.Running + 1).ToString("D4");
 
             context.Entity.Running += 1;
             context.Entity.QuotationNo = formater + date;

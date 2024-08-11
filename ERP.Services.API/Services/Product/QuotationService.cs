@@ -90,7 +90,7 @@ public class QuotationService : IQuotationService
             {
                 QuotationId = quotation.QuotationId.Value,
                 QuotationNo = quotation.QuotationNo,
-                QuotationDateeTime = quotation.QuotationDateTime.ToString("dd-MM-yyyy"),
+                QuotationDateTime = quotation.QuotationDateTime.ToString("dd-MM-yyyy"),
                 EditTime = quotation.EditTime,
                 CustomerId = quotation.CustomerId,
                 ContactPersonId = quotation.CustomerContactId,
@@ -169,9 +169,13 @@ public class QuotationService : IQuotationService
 
             var result = await this.Calculate(resource.Products);
 
+
             quotation.Price = result.Price;
             quotation.Vat = result.Vat;
             quotation.Amount = result.Amount;
+            quotation.AmountBeforeVat = result.AmountBeforeVat;
+            quotation.SumOfDiscount = result.SumOfDiscount;
+            quotation.RealPriceMsrp = result.RealPriceMsrp;
 
             _quotationRepository.Add(quotation);
 
@@ -230,6 +234,16 @@ public class QuotationService : IQuotationService
 
         quotation.Products = MutateResourceProduct(resource.Products);
         quotation.Projects = MutateResourceProject(resource.Projects);
+        
+        
+        var result = await this.Calculate(resource.Products);
+
+        quotation.Price = result.Price;
+        quotation.Vat = result.Vat;
+        quotation.Amount = result.Amount;
+        quotation.AmountBeforeVat = result.AmountBeforeVat;
+        quotation.SumOfDiscount = result.SumOfDiscount;
+        quotation.RealPriceMsrp = result.RealPriceMsrp;
         quotation.Update();
 
         await _quotationRepository.Context()!.SaveChangesAsync();
@@ -311,19 +325,27 @@ public class QuotationService : IQuotationService
         decimal amount;
         decimal vat;
         decimal price = 0;
+        decimal realPriceMsrp = 0;
+        decimal sumOfDiscount = 0;
+        decimal amountBeforeVat = 0;
 
         var products = MutateResourceProduct(resource);
 
-        // foreach (var product in products)
-        // {
-        //     var selected = await _productRepository.GetProductListQueryable()
-        //         .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
-        //
-        //     if (selected == null)
-        //     {
-        //         throw new KeyNotFoundException("product not exists");
-        //     }
-        // }
+        foreach (var product in products)
+        {
+            var selected = await _productRepository.GetProductListQueryable()
+                .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+        
+            if (selected == null)
+            {
+                throw new KeyNotFoundException("product not exists");
+            }
+
+            realPriceMsrp += (decimal)selected.MSRP * product.Quantity;
+        }
+
+        sumOfDiscount = products.Sum(x => (decimal)x.Discount);
+        amountBeforeVat = realPriceMsrp + sumOfDiscount;
 
         price = (decimal)products.Sum(x => x.Amount * x.Quantity);
 
@@ -335,7 +357,10 @@ public class QuotationService : IQuotationService
         {
             Amount = amount,
             Vat = vat,
-            Price = price
+            Price = price,
+            AmountBeforeVat = amountBeforeVat,
+            SumOfDiscount = sumOfDiscount,
+            RealPriceMsrp = realPriceMsrp
         };
 
         return response;
@@ -415,9 +440,9 @@ public class QuotationService : IQuotationService
                 Status = x.Status,
                 Products = null,
                 Projects = null,
-                Price = x.Price,
-                Vat = x.Vat,
-                Amount = x.Amount,
+                Price = x.RealPriceMsrp,
+                Vat = x.SumOfDiscount,
+                Amount = x.AmountBeforeVat,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
             })
@@ -493,7 +518,6 @@ public class QuotationService : IQuotationService
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
-     
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";

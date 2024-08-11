@@ -25,4 +25,8 @@ public class QuotationResponse
     public Guid AccountNo { get; set; }
     public string Remark { get; set; }
     public Guid? IssuedByUserId { get; set; }
+
+    public decimal RealPriceMsrp { get; set; }
+    public decimal SumOfDiscount { get; set; }
+    public decimal AmountBeforeVat { get; set; }
 }
