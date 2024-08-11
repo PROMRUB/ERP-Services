@@ -342,9 +342,13 @@ public class QuotationService : IQuotationService
             }
 
             realPriceMsrp += (decimal)selected.MSRP * product.Quantity;
+
+            if (product.Discount > 0)
+            {
+                sumOfDiscount += (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
+            }
         }
 
-        sumOfDiscount = products.Sum(x => (decimal)x.Discount);
         amountBeforeVat = realPriceMsrp + sumOfDiscount;
 
         price = (decimal)products.Sum(x => x.Amount * x.Quantity);
