@@ -89,6 +89,9 @@ public class QuotationService : IQuotationService
             var response = new QuotationResource
             {
                 QuotationId = quotation.QuotationId.Value,
+                QuotationNo = quotation.QuotationNo,
+                QuotationDateeTime = quotation.QuotationDateTime.ToString("dd-MM-yyyy"),
+                EditTime = quotation.EditTime,
                 CustomerId = quotation.CustomerId,
                 ContactPersonId = quotation.CustomerContactId,
                 SalesPersonId = quotation.SalePersonId,
