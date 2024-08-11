@@ -22,6 +22,8 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
             .ThenInclude(x => x.Product)
             .Include(x => x.Projects)
             .ThenInclude(x => x.Project)
+            .Include(x => x.Projects)
+            .ThenInclude(x => x.PaymentCondition)
             .Include(x => x.SalePerson)
             .Include(x => x.IssuedByUser)
             .Include(x => x.Customer)

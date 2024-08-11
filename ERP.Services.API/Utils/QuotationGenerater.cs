@@ -269,7 +269,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Projects.FirstOrDefault()?.PaymentConditionId}")
+                            text.Span($"{entity.Projects.FirstOrDefault()?.PaymentCondition.ConditionDescription}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
@@ -342,7 +342,7 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt").FontSize(6);
                         table.Cell().Element(CellStyle).Text(product.Product.ProductCustomId)
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.ProductName)
+                        table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text("E.A")
                                 .FontFamily("Prompt").FontSize(8);
@@ -415,7 +415,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Price}")
+                            text.Span($"{entity.Price:#,###:##}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -423,7 +423,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Price - entity.Amount}")
+                            text.Span($"{entity.SumOfDiscount:#,###:##}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -431,7 +431,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Amount}")
+                            text.Span($"{entity.AmountBeforeVat:#,###:##}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -439,7 +439,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Vat}")
+                            text.Span($"{entity.Vat:#,###:##}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -447,7 +447,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Amount + entity.Vat}")
+                            text.Span($"{(entity.Amount + entity.Vat):#,###:##}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)

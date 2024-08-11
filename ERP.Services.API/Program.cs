@@ -19,24 +19,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsDev")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "IsDev"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Host")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Host"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Database")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Database"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_User"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ERP_EMAIL")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "ERP_EMAIL"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsDev")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "IsDev"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Host")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Host"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Database")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Database"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_User"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ERP_EMAIL")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "ERP_EMAIL"));
 
 var log = new LoggerConfiguration()
     .WriteTo.Console()
@@ -62,8 +62,7 @@ Configuration.Default.ApiKey.Add("api-key",
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var connStr =
-    $"Host=119.13.29.117;Port=2022; Database=erp; Username=postgres; Password=yoouhCyodbow-jg0up";
-    // $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
+    $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
 builder.Services.AddDbContext<PromDbContext>(
     options =>
     {
