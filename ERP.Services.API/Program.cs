@@ -13,7 +13,6 @@ using QuestPDF.Infrastructure;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
-using ERP.Services.API.Services.Email;
 using sib_api_v3_sdk.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -167,7 +166,7 @@ app.UseSwaggerUI(config =>
     }
     );
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
