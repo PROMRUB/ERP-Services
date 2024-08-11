@@ -25,4 +25,5 @@ COPY --from=publish /app/publish .
 COPY ./ERP.Services.API/logo.jpg /app/logo.jpg
 COPY ./ERP.Services.API/logo.jpg  logo.jpg
 COPY ./ERP.Services.API/logo.jpg /app/publish/logo.jpg
+ADD ERP.Services.API/Fonts/Prompt.ttf /app/Fonts/
 ENTRYPOINT ["dotnet", "ERP.Services.API.dll"]

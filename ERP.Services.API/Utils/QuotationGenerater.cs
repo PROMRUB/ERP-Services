@@ -1,5 +1,6 @@
 using System.Drawing;
 using ERP.Services.API.Entities;
+using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -18,12 +19,12 @@ namespace ERP.Services.API.Utils
 
         public void Compose(IDocumentContainer container)
         {
+            FontManager.RegisterFont(File.OpenRead(Path.Combine("Fonts", "Prompt.ttf")));
             container
                 .Page(page =>
                 {
                     page.Margin(20);
                     page.Size(PageSizes.A4);
-
                     page.Header().Element(ComposeHeader);
 
                     page.Content().Element(ComposeContent);
@@ -42,6 +43,7 @@ namespace ERP.Services.API.Utils
                             .Item()
                             .Text(
                                 $"Hotline: 08 3096 5557/ 08 3096 5558/ 09 5785 2021")
+                            .FontFamily("Prompt")
                             .FontSize(6)
                             .Bold()
                             .FontColor(Colors.Black);
@@ -49,9 +51,12 @@ namespace ERP.Services.API.Utils
 
                     row.RelativeItem().AlignRight().Text(text =>
                     {
-                        text.CurrentPageNumber();
-                        text.Span(" / ");
-                        text.TotalPages();
+                        text.CurrentPageNumber()
+                            .FontFamily("Prompt");
+                        text.Span(" / ")
+                            .FontFamily("Prompt");
+                        text.TotalPages()
+                            .FontFamily("Prompt");
                     });
                 });
             }
@@ -66,6 +71,7 @@ namespace ERP.Services.API.Utils
                             .Item()
                             .Text(
                                 $"{entity.Customer.DisplayName}")
+                            .FontFamily("Prompt")
                             .FontSize(10)
                             .Bold()
                             .FontColor(Colors.Black);
@@ -77,6 +83,7 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span(
                                         $"{entity.Customer.Address()}")
+                                    .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
                             });
@@ -84,6 +91,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Text(text =>
                         {
                             text.Span($"โทร: {entity.CustomerContact.TelNo} E-mail: {entity.CustomerContact.Email}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 ;
                             ;
@@ -95,6 +103,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Text(text =>
                         {
                             text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {entity.Customer.TaxId})")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black);
                             ;
@@ -141,6 +150,7 @@ namespace ERP.Services.API.Utils
                             column.Item().AlignRight().Text(text =>
                             {
                                 text.Span("ใบเสนอราคา / QUOTATION")
+                                    .FontFamily("Prompt")
                                     .FontSize(10)
                                     .FontColor(Colors.Blue.Darken4);
                                 ;
@@ -155,7 +165,9 @@ namespace ERP.Services.API.Utils
                         {
                             column.Item().Text(text =>
                             {
-                                text.Span("เร\u0e35ยน/ATTN:").FontSize(10)
+                                text.Span("เร\u0e35ยน/ATTN:")
+                                    .FontFamily("Prompt")
+                                    .FontSize(10)
                                     .Bold()
                                     .FontColor(Colors.Black);
                                 column.Spacing(5);
@@ -163,12 +175,15 @@ namespace ERP.Services.API.Utils
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                    $"{entity.CustomerContact.DisplayName()}").FontSize(6);
+                                    $"{entity.CustomerContact.DisplayName()}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
                                         $"{entity.Customer.Address()}")
+                                    .FontFamily("Prompt")
                                     .FontSize(6);
                             });
                         });
@@ -179,14 +194,18 @@ namespace ERP.Services.API.Utils
                         {
                             column.Item().AlignRight().Text(text =>
                             {
-                                text.Span($"เลขท\u0e35\u0e48: {entity.QuotationNo ?? ""}").FontSize(10)
+                                text.Span($"เลขท\u0e35\u0e48: {entity.QuotationNo ?? ""}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(10)
                                     .Bold()
                                     .FontColor(Colors.Black);
                                 column.Spacing(5);
                             });
                             column.Item().AlignRight().Text(text =>
                             {
-                                text.Span($"ว\u0e31นท\u0e35\u0e48: {entity.QuotationDateTime:dd-MM-yyyy}").FontSize(10)
+                                text.Span($"ว\u0e31นท\u0e35\u0e48: {entity.QuotationDateTime:dd-MM-yyyy}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(10)
                                     .FontColor(Colors.Black);
                             });
                         });
@@ -204,6 +223,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
                             text.Span("กำหนดส\u0e48งส\u0e34นค\u0e49า (DELIVERY DATE)")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)
                                 ;
@@ -215,6 +235,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
                             text.Span("การร\u0e31บประก\u0e31น (WARRANTY)")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)
                                 ;
@@ -234,6 +255,7 @@ namespace ERP.Services.API.Utils
                         {
                             text.Span(
                                     $"บร\u0e34ษ\u0e31ทฯม\u0e35ความย\u0e34นด\u0e35เสนอราคาเพ\u0e37\u0e48อให\u0e49ท\u0e48านพ\u0e34จารณาด\u0e31งน\u0e35\u0e49 / We are pleased to submit you our quotation as follows")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
@@ -248,6 +270,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Projects.FirstOrDefault()?.PaymentConditionId}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
@@ -259,6 +282,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Projects.FirstOrDefault()?.Warranty}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
@@ -291,14 +315,21 @@ namespace ERP.Services.API.Utils
                         header.Cell().ColumnSpan(7).PaddingTop(5).PaddingBottom(5).BorderBottom(2)
                             .BorderColor(Colors.Blue.Darken4);
 
-                        header.Cell().Text("#");
-                        header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)").Style(headerStyle);
+                        header.Cell().Text("#")
+                                .FontFamily("Prompt");
+                        header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)").Style(headerStyle)
+                                .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("รายการส\u0e34นค\u0e49า\n(PRODUCT DESCRIPTION)")
+                                .FontFamily("Prompt")
                             .Style(headerStyle);
-                        header.Cell().AlignCenter().Text("หน\u0e48วย\n(UNIT)").Style(headerStyle);
-                        header.Cell().AlignCenter().Text("จำนวน\n(QTY.)").Style(headerStyle);
-                        header.Cell().AlignCenter().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)").Style(headerStyle);
-                        header.Cell().AlignCenter().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle);
+                        header.Cell().AlignCenter().Text("หน\u0e48วย\n(UNIT)").Style(headerStyle)
+                                .FontFamily("Prompt");
+                        header.Cell().AlignCenter().Text("จำนวน\n(QTY.)").Style(headerStyle)
+                                .FontFamily("Prompt");
+                        header.Cell().AlignCenter().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)").Style(headerStyle)
+                                .FontFamily("Prompt");
+                        header.Cell().AlignCenter().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle)
+                                .FontFamily("Prompt");
 
 
                         header.Cell().ColumnSpan(7).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Blue.Darken4);
@@ -307,13 +338,20 @@ namespace ERP.Services.API.Utils
                     var i = 1;
                     foreach (var product in entity.Products)
                     {
-                        table.Cell().Element(CellStyle).Text(i++).FontSize(6);
-                        table.Cell().Element(CellStyle).Text(product.Product.ProductCustomId).FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.ProductName).FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Price).FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity).FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice).FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount).FontSize(8);
+                        table.Cell().Element(CellStyle).Text(i++)
+                                .FontFamily("Prompt").FontSize(6);
+                        table.Cell().Element(CellStyle).Text(product.Product.ProductCustomId)
+                                .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.ProductName)
+                                .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Price)
+                                .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity)
+                                .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice)
+                                .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount)
+                                .FontFamily("Prompt").FontSize(8);
 
                         static IContainer CellStyle(IContainer container) => container
                             .PaddingVertical(5);
@@ -334,6 +372,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"รวมเง\u0e34น (TOTAL)")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -341,6 +380,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"ส\u0e48วนลด (DISCOUNT)")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -348,6 +388,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"ม\u0e39ลค\u0e48าส\u0e34นค\u0e49า/บร\u0e34การ (SUB TOTAL)")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -355,6 +396,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -362,6 +404,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"รวมท\u0e31\u0e49งหมด (GRAND TOTAL)")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -373,6 +416,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Price}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -380,6 +424,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Price - entity.Amount}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -387,6 +432,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Amount}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -394,6 +440,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Vat}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -401,6 +448,7 @@ namespace ERP.Services.API.Utils
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Amount + entity.Vat}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
@@ -418,6 +466,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).Text(text =>
                         {
                             text.Span($"KBANK (พ\u0e31ฒนาการ 29)")
+                                .FontFamily("Prompt")
                                 .FontSize(10)
                                 .FontColor(Colors.White)
                                 ;
@@ -426,6 +475,7 @@ namespace ERP.Services.API.Utils
                         {
                             text.Span(
                                     $"บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.White)
                                 ;
@@ -433,6 +483,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).Text(text =>
                         {
                             text.Span($"บ\u0e31ญช\u0e35: กระแสรายว\u0e31น เลขท\u0e35\u0e48: 727-1-02814-2")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.White)
                                 ;
@@ -458,6 +509,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).Text(text =>
                         {
                             text.Span($"ส\u0e31\u0e48งซ\u0e37\u0e49อโดย / ORDERED by")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
@@ -467,6 +519,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.SalePerson.DisplayNameTH()}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
@@ -485,6 +538,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.SalePerson.TelNo}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
@@ -494,6 +548,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.SalePerson.email}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
@@ -509,6 +564,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).Text(text =>
                         {
                             text.Span($"จ\u0e31ดทำโดย / ARRANGED by")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
@@ -518,6 +574,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.IssuedByUser.DisplayNameTH()}")
+                                .FontFamily("Prompt")
                                 .FontSize(8)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
@@ -536,6 +593,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.IssuedByUser.TelNo}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
@@ -545,6 +603,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
                             text.Span($"{entity.IssuedByUser.email}")
+                                .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
