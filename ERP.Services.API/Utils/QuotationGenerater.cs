@@ -344,7 +344,7 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.Product.ProductName)
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Price)
+                        table.Cell().Element(CellStyle).AlignRight().Text("E.A")
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity)
                                 .FontFamily("Prompt").FontSize(8);
