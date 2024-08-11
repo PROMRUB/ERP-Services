@@ -155,7 +155,9 @@ public class QuotationService : IQuotationService
                 Remark = resource.Remark,
                 BusinessId = resource.BusinessId,
                 Status = resource.Status,
-                PaymentId = resource.PaymentAccountId
+                PaymentId = resource.PaymentAccountId,
+                Month = DateTime.Now.Month,
+                Year = DateTime.UtcNow.Year
             };
 
             quotation.SubmitStatus(resource.Status);
@@ -383,7 +385,7 @@ public class QuotationService : IQuotationService
                                 x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
                             (string.IsNullOrWhiteSpace(keyword) ||
                              x.QuotationNo.Contains(keyword)))
-                .OrderBy(x => x.QuotationDateTime)
+                .OrderByDescending(x => x.QuotationDateTime)
             ;
 
 

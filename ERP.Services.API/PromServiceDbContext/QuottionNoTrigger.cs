@@ -11,7 +11,7 @@ public class QuotationNoTrigger(PromDbContext dbContext) : IBeforeSaveTrigger<Qu
     {
         if (context.ChangeType == ChangeType.Added)
         {
-            var formater = $"QT-{DateTime.Now.ToString("yyyyMM")}";
+            var formater = $"QT{DateTime.Now.ToString("yyyyMM")}-";
 
             var runner =
                 dbContext.Quotation.FirstOrDefault(
