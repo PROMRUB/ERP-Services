@@ -17,5 +17,5 @@ public class QuotationResource
     public Guid? PaymentAccountId { get; set; }
     public string? QuotationNo { get; set; }
     public int EditTime { get; set; }
-    public string QuotationDateTime { get; set; }
+    public string? QuotationDateTime { get; set; }
 }
