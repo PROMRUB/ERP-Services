@@ -21,6 +21,8 @@ public class QuotationService : IQuotationService
     private readonly IProductRepository _productRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IPaymentAccountRepository _paymentAccountRepository;
+    public string Email { get; set; } = "bancherd@cybertracx.com";
+    public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
         IProductRepository productRepository,
@@ -442,10 +444,7 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        var name = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
-        var email = "kkunayothin@gmail.com";
-
-        await SendApproveSalePrice(quotation, name, email);
+        await SendApproveSalePrice(quotation, Name, Email);
 
 
         return null;
@@ -460,11 +459,9 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        var name = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
-        var email = "kkunayothin@gmail.com";
         try
         {
-            await SendApproveQuotation(quotation, name, email
+            await SendApproveQuotation(quotation, Name, Email
             );
         }
         catch (Exception e)
@@ -491,9 +488,7 @@ public class QuotationService : IQuotationService
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
     {
-        Console.WriteLine("Environment.GetEnvironmentVariable(\"ERP_EMAIL\")");
-        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
-
+     
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
@@ -528,8 +523,6 @@ public class QuotationService : IQuotationService
 
     private async Task ManagerReplyApproveQuotation(QuotationEntity quotation, string saleName, string saleEmail)
     {
-        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
-
         var apiInstance = new TransactionalEmailsApi();
         string senderName = "PROM ERP";
         string senderEmail = "e-service@prom.co.th";
