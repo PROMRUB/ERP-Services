@@ -21,7 +21,7 @@ public class QuotationService : IQuotationService
     private readonly IProductRepository _productRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IPaymentAccountRepository _paymentAccountRepository;
-    public string Email { get; set; } = "kunayothinkorn@gmail.com";
+    public string Email { get; set; } = "kkunayothin@gmail.com";
     // public string Email { get; set; } = "bancherd@cybertracx.com";
     public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
@@ -492,7 +492,7 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        await SendApproveSalePrice(quotation, Name, Email);
+        await SendEmail(quotation, Name, Email);
 
 
         return null;
@@ -602,14 +602,14 @@ public class QuotationService : IQuotationService
     private async Task SendApproveSalePrice(QuotationEntity quotation, string managerName, string managerEmail)
     {
         var apiInstance = new TransactionalEmailsApi();
-        string senderName = "Admin";
-        string senderEmail = "admin@prom.co.th";
+        string senderName = "PROM ERP";
+        string senderEmail = "e-service@prom.co.th";
 
         SendSmtpEmailSender Email = new SendSmtpEmailSender(senderName, senderEmail);
 
         string toEmail = quotation.CustomerContact!.Email!;
         string toName = quotation.CustomerContact!.DisplayName()!;
-        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(toEmail, toName);
+        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(managerName, managerEmail);
 
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
         To.Add(smtpEmailTo);
@@ -630,7 +630,7 @@ public class QuotationService : IQuotationService
     }
 
 
-    public static async Task SendEmail(QuotationEntity entity)
+    public static async Task SendEmail(QuotationEntity entity,string managerName,string managerEmail)
     {
         Configuration.Default.ApiKey.Add("api-key",
             Environment.GetEnvironmentVariable("ERP_EMAIL"));
@@ -641,8 +641,8 @@ public class QuotationService : IQuotationService
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-        string ToEmail = "kkunayothin@gmail.com";
-        string ToName = "korn";
+        string ToEmail = managerName;
+        string ToName = managerEmail;
         SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
         To.Add(smtpEmailTo);
