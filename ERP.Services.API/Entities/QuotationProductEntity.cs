@@ -19,4 +19,9 @@ public class QuotationProductEntity
     [Column("order")] public int Order { get; set; }
     [Column("amount")] public float Amount { get; set; }
     [Column("discount")] public float Discount { get; set; }
+    
+    [Column("amount_before_vat")] public decimal AmountBeforeVat { get; set; }
+    [Column("sum_of_discount")] public decimal SumOfDiscount { get; set; }
+    [Column("real_price_msrp")] public decimal RealPriceMsrp { get; set; }
+
 }

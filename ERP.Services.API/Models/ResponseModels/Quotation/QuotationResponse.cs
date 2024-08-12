@@ -1,3 +1,5 @@
+using ERP.Services.API.Entities;
+
 namespace ERP.Services.API.Models.ResponseModels.Quotation;
 
 public class QuotationResponse
@@ -19,6 +21,7 @@ public class QuotationResponse
     public string Status { get; set; }
     public List<QuotationProductResponse> Products { get; set; }
     public List<QuotationProjectResponse> Projects { get; set; }
+    public List<QuotationProductEntity> QuotationProductEntities { get; set; }  
     public decimal Price { get; set; }
     public decimal Vat { get; set; }
     public decimal Amount { get; set; }

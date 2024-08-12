@@ -21,7 +21,8 @@ public class QuotationService : IQuotationService
     private readonly IProductRepository _productRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IPaymentAccountRepository _paymentAccountRepository;
-    public string Email { get; set; } = "bancherd@cybertracx.com";
+    public string Email { get; set; } = "kkunayothin@gmail.com";
+    // public string Email { get; set; } = "bancherd@cybertracx.com";
     public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
@@ -63,7 +64,7 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
-            Amount = x.Amount,
+            Amount = (float)x.AmountBeforeVat,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
             Discount = Convert.ToInt32(x.Discount)
@@ -169,6 +170,7 @@ public class QuotationService : IQuotationService
 
             var result = await this.Calculate(resource.Products);
 
+            quotation.Products = result.QuotationProductEntities;
 
             quotation.Price = result.Price;
             quotation.Vat = result.Vat;
@@ -234,9 +236,11 @@ public class QuotationService : IQuotationService
 
         quotation.Products = MutateResourceProduct(resource.Products);
         quotation.Projects = MutateResourceProject(resource.Projects);
-        
-        
+
+
         var result = await this.Calculate(resource.Products);
+
+        quotation.Products = result.QuotationProductEntities;
 
         quotation.Price = result.Price;
         quotation.Vat = result.Vat;
@@ -331,22 +335,35 @@ public class QuotationService : IQuotationService
 
         var products = MutateResourceProduct(resource);
 
+        var response = new QuotationResponse();
+        response.QuotationProductEntities = new List<QuotationProductEntity>();
+
         foreach (var product in products)
         {
             var selected = await _productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
-        
+
             if (selected == null)
             {
                 throw new KeyNotFoundException("product not exists");
             }
 
-            realPriceMsrp += (decimal)selected.MSRP * product.Quantity;
+            var realPrice = (decimal)selected.MSRP * product.Quantity;
+            realPriceMsrp += realPriceMsrp;
+
 
             if (product.Discount > 0)
             {
-                sumOfDiscount += (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
+                var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
+                sumOfDiscount += dis;
+
+                product.SumOfDiscount = dis;
             }
+
+            product.AmountBeforeVat = realPrice + product.SumOfDiscount;
+            product.RealPriceMsrp = realPrice;
+
+            response.QuotationProductEntities.Add(product);
         }
 
         amountBeforeVat = realPriceMsrp + sumOfDiscount;
@@ -357,15 +374,12 @@ public class QuotationService : IQuotationService
         vat = amount - price;
 
 
-        var response = new QuotationResponse()
-        {
-            Amount = amount,
-            Vat = vat,
-            Price = price,
-            AmountBeforeVat = amountBeforeVat,
-            SumOfDiscount = sumOfDiscount,
-            RealPriceMsrp = realPriceMsrp
-        };
+        response.Amount = amount;
+        response.Vat = vat;
+        response.Price = price;
+        response.AmountBeforeVat = amountBeforeVat;
+        response.SumOfDiscount = sumOfDiscount;
+        response.RealPriceMsrp = realPriceMsrp;
 
         return response;
     }

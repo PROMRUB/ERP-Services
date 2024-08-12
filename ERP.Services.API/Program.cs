@@ -13,7 +13,7 @@ using QuestPDF.Infrastructure;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
-using sib_api_v3_sdk.Client;
+zusing sib_api_v3_sdk.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
