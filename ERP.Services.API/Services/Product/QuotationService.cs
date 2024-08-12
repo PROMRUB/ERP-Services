@@ -632,11 +632,6 @@ public class QuotationService : IQuotationService
 
     public static async Task SendEmail(QuotationEntity entity,string managerName,string managerEmail)
     {
-        Configuration.Default.ApiKey.Add("api-key",
-            Environment.GetEnvironmentVariable("ERP_EMAIL"));
-
-        Console.WriteLine(Environment.GetEnvironmentVariable("ERP_EMAIL"));
-
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
