@@ -14,13 +14,16 @@ public class QuotationNoTrigger(PromDbContext dbContext) : IBeforeSaveTrigger<Qu
             var formater = $"QT{DateTime.Now.ToString("yyyyMM")}-";
 
             var runner =
-                dbContext.Quotation.FirstOrDefault(
+                dbContext.Quotation
+                    .OrderBy(x => x.Running)
+                    .LastOrDefault(
                     x => x.Month == DateTime.Now.Month && x.Year == DateTime.Now.Year);
 
 
             var date = runner == null ? 1.ToString("D4") : (runner.Running + 1).ToString("D4");
 
-            context.Entity.Running += 1;
+            var running = runner == null ? 1 : runner.Running + 1;
+            context.Entity.Running = running;
             context.Entity.QuotationNo = formater + date;
         }
 
