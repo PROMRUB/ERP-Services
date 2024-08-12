@@ -2,11 +2,6 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 
-RUN sed -i 's/^Components: main$/& contrib/' /etc/apt/sources.list.d/debian.sources
-RUN apt-get update
-RUN apt-get install -y ttf-mscorefonts-installer fontconfig
-RUN fc-cache -f -v
-
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -30,4 +25,5 @@ COPY --from=publish /app/publish .
 COPY ./ERP.Services.API/logo.jpg /app/logo.jpg
 COPY ./ERP.Services.API/logo.jpg  logo.jpg
 COPY ./ERP.Services.API/logo.jpg /app/publish/logo.jpg
+ADD ERP.Services.API/Fonts/Prompt.ttf /app/Fonts/
 ENTRYPOINT ["dotnet", "ERP.Services.API.dll"]

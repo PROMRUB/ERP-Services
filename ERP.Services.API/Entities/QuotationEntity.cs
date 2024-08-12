@@ -51,6 +51,9 @@ public class QuotationEntity
     [Column("month")] public int Month { get; set; }
     [Column("year")] public int Year { get; set; }
     [Column("running")] public int Running { get; set; }
+    [Column("amount_before_vat")] public decimal AmountBeforeVat { get; set; }
+    [Column("sum_of_discount")] public decimal SumOfDiscount { get; set; }
+    [Column("real_price_msrp")] public decimal RealPriceMsrp { get; set; }
 
 
     public void SubmitStatus(string status)

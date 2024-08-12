@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240810151504_ChangeTypeOfAmount")]
+    partial class ChangeTypeOfAmount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -925,10 +928,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
 
-                    b.Property<decimal>("AmountBeforeVat")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_before_vat");
-
                     b.Property<Guid>("BusinessId")
                         .HasColumnType("uuid")
                         .HasColumnName("business_id");
@@ -973,10 +972,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("text")
                         .HasColumnName("quotation_no");
 
-                    b.Property<decimal>("RealPriceMsrp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("real_price_msrp");
-
                     b.Property<string>("Remark")
                         .IsRequired()
                         .HasColumnType("text")
@@ -994,10 +989,6 @@ namespace ERP.Services.API.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("status");
-
-                    b.Property<decimal>("SumOfDiscount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("sum_of_discount");
 
                     b.Property<decimal>("Vat")
                         .HasColumnType("numeric")
@@ -1039,10 +1030,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("real")
                         .HasColumnName("amount");
 
-                    b.Property<decimal>("AmountBeforeVat")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_before_vat");
-
                     b.Property<float>("Discount")
                         .HasColumnType("real")
                         .HasColumnName("discount");
@@ -1058,14 +1045,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
-
-                    b.Property<decimal>("RealPriceMsrp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("real_price_msrp");
-
-                    b.Property<decimal>("SumOfDiscount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("sum_of_discount");
 
                     b.HasKey("QuotationId", "ProductId");
 
@@ -1109,8 +1088,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnName("warranty");
 
                     b.HasKey("QuotationId", "ProjectId");
-
-                    b.HasIndex("PaymentConditionId");
 
                     b.HasIndex("ProjectId");
 
@@ -1340,10 +1317,6 @@ namespace ERP.Services.API.Migrations
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProjectEntity", b =>
                 {
-                    b.HasOne("ERP.Services.API.Entities.ConditionEntity", "PaymentCondition")
-                        .WithMany()
-                        .HasForeignKey("PaymentConditionId");
-
                     b.HasOne("ERP.Services.API.Entities.ProjectEntity", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
@@ -1355,8 +1328,6 @@ namespace ERP.Services.API.Migrations
                         .HasForeignKey("QuotationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PaymentCondition");
 
                     b.Navigation("Project");
 

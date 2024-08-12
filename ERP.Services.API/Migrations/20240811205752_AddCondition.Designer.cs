@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240811205752_AddCondition")]
+    partial class AddCondition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1039,10 +1042,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("real")
                         .HasColumnName("amount");
 
-                    b.Property<decimal>("AmountBeforeVat")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_before_vat");
-
                     b.Property<float>("Discount")
                         .HasColumnType("real")
                         .HasColumnName("discount");
@@ -1058,14 +1057,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
-
-                    b.Property<decimal>("RealPriceMsrp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("real_price_msrp");
-
-                    b.Property<decimal>("SumOfDiscount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("sum_of_discount");
 
                     b.HasKey("QuotationId", "ProductId");
 

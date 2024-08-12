@@ -13,7 +13,7 @@ using QuestPDF.Infrastructure;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
-using ERP.Services.API.Services.Email;
+using sib_api_v3_sdk.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +53,10 @@ cfg["PostgreSQL:Database"] = Environment.GetEnvironmentVariable("PostgreSQL_Data
 cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
 cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
 cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
+
+ 
+Configuration.Default.ApiKey.Add("api-key",
+    Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -143,7 +147,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<PromDbContext>();
-    // dbContext.Database.Migrate();
+    dbContext.Database.Migrate();
 
     //var service = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     //service.Seed();
@@ -162,7 +166,7 @@ app.UseSwaggerUI(config =>
     }
     );
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

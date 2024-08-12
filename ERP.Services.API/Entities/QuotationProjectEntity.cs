@@ -20,6 +20,7 @@ public class QuotationProjectEntity
     [Column("warranty")] public int Warranty { get; set; }
 
     [Column("payment_condition_id")] public Guid PaymentConditionId { get; set; }
+    public ConditionEntity PaymentCondition { get; set; }
     [Column("po")] public string Po { get; set; }
     [Column("order")] public int Order { get; set; }
 }
