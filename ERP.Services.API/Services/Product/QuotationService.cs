@@ -636,8 +636,8 @@ public class QuotationService : IQuotationService
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-        string ToEmail = managerName;
-        string ToName = managerEmail;
+        string ToEmail = managerEmail;
+        string ToName = managerName;
         SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
         To.Add(smtpEmailTo);
