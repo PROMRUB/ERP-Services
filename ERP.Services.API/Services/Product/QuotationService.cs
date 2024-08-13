@@ -64,7 +64,7 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
-            Amount = (float)x.AmountBeforeVat,
+            Amount = (float)x.Amount,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
             Discount = Convert.ToInt32(x.Discount)
@@ -349,24 +349,28 @@ public class QuotationService : IQuotationService
             }
 
             var realPrice = (decimal)selected.MSRP * product.Quantity;
-            realPriceMsrp += realPriceMsrp;
+            realPriceMsrp += realPrice;
 
 
-            if (product.Discount > 0)
-            {
-                var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
-                sumOfDiscount += dis;
+            // if (product.Discount > 0)
+            // {
+            //     var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
+            //     sumOfDiscount += dis;
+            //
+            //     product.SumOfDiscount = dis;
+            // }
+            
+            var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
+            sumOfDiscount += (decimal)dis;
+            product.SumOfDiscount = (decimal)dis;
 
-                product.SumOfDiscount = dis;
-            }
-
-            product.AmountBeforeVat = realPrice + product.SumOfDiscount;
+            product.AmountBeforeVat = realPrice - product.SumOfDiscount;
             product.RealPriceMsrp = realPrice;
 
             response.QuotationProductEntities.Add(product);
         }
 
-        amountBeforeVat = realPriceMsrp + sumOfDiscount;
+        amountBeforeVat = realPriceMsrp - sumOfDiscount;
 
         price = (decimal)products.Sum(x => x.Amount * x.Quantity);
 
@@ -431,7 +435,7 @@ public class QuotationService : IQuotationService
                                 x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
                             (string.IsNullOrWhiteSpace(keyword) ||
                              x.QuotationNo.Contains(keyword)))
-                .OrderByDescending(x => x.QuotationDateTime)
+                .OrderByDescending(x => x.QuotationNo)
             ;
 
 
@@ -460,7 +464,7 @@ public class QuotationService : IQuotationService
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
-                Amount = x.AmountBeforeVat,
+                Amount = x.RealPriceMsrp - x.SumOfDiscount,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
             })
