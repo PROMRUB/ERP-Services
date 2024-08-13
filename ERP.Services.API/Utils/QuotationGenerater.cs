@@ -445,14 +445,14 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        // column.Item().AlignRight().Padding(1).Text(text =>
-                        // {
-                        //     text.Span($"{(entity.Price + entity.Vat):#,###.00}")
-                        //         .FontFamily("Prompt")
-                        //         .FontSize(8)
-                        //         .FontColor(Colors.Black)
-                        //         ;
-                        // });
+                        column.Item().AlignRight().Padding(1).Text(text =>
+                        {
+                            text.Span($"{(entity.Price + entity.Vat):#,###.00}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.Black)
+                                ;
+                        });
                     });
                 });
             }
