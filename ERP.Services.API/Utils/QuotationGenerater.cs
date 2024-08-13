@@ -346,11 +346,11 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text("E.A")
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity)
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity.ToString("#,###.##"))
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice)
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice?.ToString("#,###.##"))
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount)
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.##"))
                                 .FontFamily("Prompt").FontSize(8);
 
                         static IContainer CellStyle(IContainer container) => container
