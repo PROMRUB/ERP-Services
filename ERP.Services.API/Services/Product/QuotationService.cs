@@ -64,7 +64,7 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
-            Amount = (float)x.AmountBeforeVat,
+            Amount = (float)x.Amount,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
             Discount = Convert.ToInt32(x.Discount)
