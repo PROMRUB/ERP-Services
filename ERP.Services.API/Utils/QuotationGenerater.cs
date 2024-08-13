@@ -377,22 +377,22 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(3).Text(text =>
-                        {
-                            text.Span($"ส\u0e48วนลด (DISCOUNT)")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
-                        column.Item().AlignRight().Padding(3).Text(text =>
-                        {
-                            text.Span($"ม\u0e39ลค\u0e48าส\u0e34นค\u0e49า/บร\u0e34การ (SUB TOTAL)")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
+                        // column.Item().AlignRight().Padding(3).Text(text =>
+                        // {
+                        //     text.Span($"ส\u0e48วนลด (DISCOUNT)")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(8)
+                        //         .FontColor(Colors.Black)
+                        //         ;
+                        // });
+                        // column.Item().AlignRight().Padding(3).Text(text =>
+                        // {
+                        //     text.Span($"ม\u0e39ลค\u0e48าส\u0e34นค\u0e49า/บร\u0e34การ (SUB TOTAL)")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(8)
+                        //         .FontColor(Colors.Black)
+                        //         ;
+                        // });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
@@ -421,22 +421,22 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(3).Text(text =>
-                        {
-                            text.Span($"{entity.SumOfDiscount:#,###:##}")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
-                        column.Item().AlignRight().Padding(3).Text(text =>
-                        {
-                            text.Span($"{entity.AmountBeforeVat:#,###:##}")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
+                        // column.Item().AlignRight().Padding(3).Text(text =>
+                        // {
+                        //     text.Span($"{entity.SumOfDiscount:#,###:##}")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(8)
+                        //         .FontColor(Colors.Black)
+                        //         ;
+                        // });
+                        // column.Item().AlignRight().Padding(3).Text(text =>
+                        // {
+                        //     text.Span($"{entity.AmountBeforeVat:#,###:##}")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(8)
+                        //         .FontColor(Colors.Black)
+                        //         ;
+                        // });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
                             text.Span($"{entity.Vat:#,###:##}")
