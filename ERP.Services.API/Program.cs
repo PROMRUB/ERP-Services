@@ -159,12 +159,15 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
-app.UseSwagger();
-app.UseSwaggerUI(config =>
-    {
-        // config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
-    }
+if (builder.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(config =>
+        {
+            // config.SwaggerEndpoint("/v1/swagger/v1/swagger.json", "ERP");
+        }
     );
+}
 
 // app.UseHttpsRedirection();
 
