@@ -326,9 +326,9 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("จำนวน\n(QTY.)").Style(headerStyle)
                                 .FontFamily("Prompt");
-                        header.Cell().AlignCenter().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)").Style(headerStyle)
+                        header.Cell().AlignCenter().AlignRight().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)").Style(headerStyle)
                                 .FontFamily("Prompt");
-                        header.Cell().AlignCenter().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle)
+                        header.Cell().AlignCenter().AlignRight().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle)
                                 .FontFamily("Prompt");
 
 
