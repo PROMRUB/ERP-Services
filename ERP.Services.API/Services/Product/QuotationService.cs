@@ -352,13 +352,17 @@ public class QuotationService : IQuotationService
             realPriceMsrp += realPrice;
 
 
-            if (product.Discount > 0)
-            {
-                var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
-                sumOfDiscount += dis;
-
-                product.SumOfDiscount = dis;
-            }
+            // if (product.Discount > 0)
+            // {
+            //     var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
+            //     sumOfDiscount += dis;
+            //
+            //     product.SumOfDiscount = dis;
+            // }
+            
+            var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
+            sumOfDiscount += (decimal)dis;
+            product.SumOfDiscount = (decimal)dis;
 
             product.AmountBeforeVat = realPrice - product.SumOfDiscount;
             product.RealPriceMsrp = realPrice;
