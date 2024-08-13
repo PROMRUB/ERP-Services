@@ -319,7 +319,7 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt");
                         header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)").Style(headerStyle)
                                 .FontFamily("Prompt");
-                        header.Cell().AlignCenter().Text("รายการส\u0e34นค\u0e49า\n(PRODUCT DESCRIPTION)")
+                        header.Cell().AlignCenter().Text("รายการส\u0e34นค\u0e49า\n(DESCRIPTION)")
                                 .FontFamily("Prompt")
                             .Style(headerStyle);
                         header.Cell().AlignCenter().Text("หน\u0e48วย\n(UNIT)").Style(headerStyle)
@@ -344,11 +344,11 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text("E.A")
+                        table.Cell().Element(CellStyle).AlignCenter().Text("E.A")
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity.ToString("#,###.00"))
+                        table.Cell().Element(CellStyle).AlignCenter().Text(product.Quantity)
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice?.ToString("#,###.00"))
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.AmountBeforeVat.ToString("#,###.00"))
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.00"))
                                 .FontFamily("Prompt").FontSize(8);
@@ -369,9 +369,9 @@ namespace ERP.Services.API.Utils
 
                     row.RelativeItem().AlignRight().Column(column =>
                     {
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
-                            text.Span($"รวมเง\u0e34น (TOTAL)")
+                            text.Span($"รวมเง\u0e34น (SUB TOTAL)")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -393,7 +393,7 @@ namespace ERP.Services.API.Utils
                         //         .FontColor(Colors.Black)
                         //         ;
                         // });
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
                             text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
                                 .FontFamily("Prompt")
@@ -401,7 +401,7 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
                             text.Span($"รวมท\u0e31\u0e49งหมด (GRAND TOTAL)")
                                 .FontFamily("Prompt")
@@ -413,9 +413,9 @@ namespace ERP.Services.API.Utils
 
                     row.RelativeItem().AlignRight().Column(column =>
                     {
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
-                            text.Span($"{entity.Price:#,###.00}")
+                            text.Span($"{entity.AmountBeforeVat:#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -437,7 +437,7 @@ namespace ERP.Services.API.Utils
                         //         .FontColor(Colors.Black)
                         //         ;
                         // });
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
                             text.Span($"{entity.Vat:#,###.00}")
                                 .FontFamily("Prompt")
@@ -445,9 +445,9 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(3).Text(text =>
+                        column.Item().AlignRight().Padding(1).Text(text =>
                         {
-                            text.Span($"{(entity.Amount + entity.Vat):#,###.00}")
+                            text.Span($"{(entity.Price):#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
