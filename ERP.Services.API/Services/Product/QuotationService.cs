@@ -460,7 +460,7 @@ public class QuotationService : IQuotationService
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
-                Amount = x.AmountBeforeVat,
+                Amount = x.RealPriceMsrp - x.SumOfDiscount,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
             })
