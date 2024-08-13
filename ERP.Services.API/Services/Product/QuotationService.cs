@@ -360,13 +360,13 @@ public class QuotationService : IQuotationService
                 product.SumOfDiscount = dis;
             }
 
-            product.AmountBeforeVat = realPrice + product.SumOfDiscount;
+            product.AmountBeforeVat = realPrice - product.SumOfDiscount;
             product.RealPriceMsrp = realPrice;
 
             response.QuotationProductEntities.Add(product);
         }
 
-        amountBeforeVat = realPriceMsrp + sumOfDiscount;
+        amountBeforeVat = realPriceMsrp - sumOfDiscount;
 
         price = (decimal)products.Sum(x => x.Amount * x.Quantity);
 
