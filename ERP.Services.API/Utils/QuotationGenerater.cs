@@ -346,11 +346,11 @@ namespace ERP.Services.API.Utils
                                 .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text("E.A")
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity.ToString("#,###.##"))
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Quantity.ToString("#,###.00"))
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice?.ToString("#,###.##"))
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Product.LwPrice?.ToString("#,###.00"))
                                 .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.##"))
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.00"))
                                 .FontFamily("Prompt").FontSize(8);
 
                         static IContainer CellStyle(IContainer container) => container
@@ -415,7 +415,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Price:#,###.##}")
+                            text.Span($"{entity.Price:#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -439,7 +439,7 @@ namespace ERP.Services.API.Utils
                         // });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{entity.Vat:#,###.##}")
+                            text.Span($"{entity.Vat:#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -447,7 +447,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().AlignRight().Padding(3).Text(text =>
                         {
-                            text.Span($"{(entity.Amount + entity.Vat):#,###.##}")
+                            text.Span($"{(entity.Amount + entity.Vat):#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)

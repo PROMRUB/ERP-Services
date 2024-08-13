@@ -349,7 +349,7 @@ public class QuotationService : IQuotationService
             }
 
             var realPrice = (decimal)selected.MSRP * product.Quantity;
-            realPriceMsrp += realPriceMsrp;
+            realPriceMsrp += realPrice;
 
 
             if (product.Discount > 0)
@@ -431,7 +431,7 @@ public class QuotationService : IQuotationService
                                 x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
                             (string.IsNullOrWhiteSpace(keyword) ||
                              x.QuotationNo.Contains(keyword)))
-                .OrderByDescending(x => x.QuotationDateTime)
+                .OrderByDescending(x => x.QuotationNo)
             ;
 
 
