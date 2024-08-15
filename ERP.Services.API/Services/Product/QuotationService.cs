@@ -22,7 +22,7 @@ public class QuotationService : IQuotationService
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IPaymentAccountRepository _paymentAccountRepository;
     // public string Email { get; set; } = "kkunayothin@gmail.com";
-    public string Email { get; set; } = "bancherd@cybertracx.com";
+    public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
     public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
