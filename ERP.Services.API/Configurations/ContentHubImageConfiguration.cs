@@ -21,7 +21,6 @@ public class QuotationEntityConfiguration : IEntityTypeConfiguration<QuotationEn
             .WithMany()
             .IsRequired(false)
             .HasForeignKey(x => x.PaymentId);
-        
     }
 }
 

@@ -90,5 +90,10 @@ namespace ERP.Services.API.Entities
 
         [Column("business_status")]
         public string? BusinessStatus { get; set; }
+
+        public string Address()
+        {
+            return $"{No} {RoomNo} {Village} {Moo} {Alley} {SubDistrict} {District} {Road} {PostCode}";
+        }
     }
 }

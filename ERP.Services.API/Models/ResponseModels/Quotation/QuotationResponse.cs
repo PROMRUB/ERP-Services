@@ -32,4 +32,5 @@ public class QuotationResponse
     public decimal RealPriceMsrp { get; set; }
     public decimal SumOfDiscount { get; set; }
     public decimal AmountBeforeVat { get; set; }
+    public string ProjectName { get; set; }
 }

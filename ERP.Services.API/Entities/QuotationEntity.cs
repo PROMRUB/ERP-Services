@@ -31,8 +31,6 @@ public class QuotationEntity
     [Column("issued_by")] public Guid? IssuedById { get; set; }
 
     public OrganizationUserEntity IssuedByUser { get; set; }
-
-
     public List<QuotationProductEntity> Products { get; set; }
     public List<QuotationProjectEntity> Projects { get; set; }
 
