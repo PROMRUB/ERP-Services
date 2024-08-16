@@ -9,10 +9,8 @@ using Image = QuestPDF.Infrastructure.Image;
 namespace ERP.Services.API.Utils
 
 {
-    public class QuotationDocument(QuotationEntity entity) : IDocument
+    public class QuotationDocument(QuotationEntity entity,BusinessEntity business) : IDocument
     {
-        private readonly QuotationEntity _entity = entity;
-
         public static Image LogoImage { get; } = Image.FromFile("logo.jpg");
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -70,7 +68,7 @@ namespace ERP.Services.API.Utils
                         column
                             .Item()
                             .Text(
-                                $"{entity.Customer.DisplayName}")
+                                $"{business.BusinessName}")
                             .FontFamily("Prompt")
                             .FontSize(10)
                             .Bold()
@@ -82,20 +80,20 @@ namespace ERP.Services.API.Utils
                             .Text(text =>
                             {
                                 text.Span(
-                                        $"{entity.Customer.Address()}")
+                                        $"{business.Address()}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
                             });
 
-                        column.Item().Text(text =>
-                        {
-                            text.Span($"โทร: {entity.CustomerContact.TelNo} E-mail: {entity.CustomerContact.Email}")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                ;
-                            ;
-                        });
+                        // column.Item().Text(text =>
+                        // {
+                        //     text.Span($"โทร: {business.} E-mail: {entity.CustomerContact.Email}")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(6)
+                        //         ;
+                        //     ;
+                        // });
                     });
                     row.RelativeItem().Column(column =>
                     {
@@ -175,7 +173,7 @@ namespace ERP.Services.API.Utils
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                    $"{entity.CustomerContact.DisplayName()}")
+                                    $"คุณ {entity.CustomerContact.DisplayName()}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
@@ -186,6 +184,23 @@ namespace ERP.Services.API.Utils
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
+                            column.Item().Text(text =>
+                            {
+                                text.Span(
+                                        $"{entity.Customer.Address()}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6);
+                            });
+                            column.Item().Text(text =>
+                            {
+                                text.Span($"โทร: {entity.CustomerContact.TelNo} E-mail: {entity.CustomerContact.Email}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6)
+                                    ;
+                                ;
+                            });
+
+
                         });
 
                         column.ConstantItem(70);

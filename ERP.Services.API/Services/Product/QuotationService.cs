@@ -15,11 +15,14 @@ namespace ERP.Services.API.Services.Product;
 
 public class QuotationService : IQuotationService
 {
+    private readonly IBusinessRepository _businessRepository;
     private readonly IMapper _mapper;
     private readonly IQuotationRepository _quotationRepository;
     private readonly IProductRepository _productRepository;
     private readonly IOrganizationRepository _organizationRepository;
+
     private readonly IPaymentAccountRepository _paymentAccountRepository;
+
     // public string Email { get; set; } = "kkunayothin@gmail.com";
     public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
     public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
@@ -27,7 +30,8 @@ public class QuotationService : IQuotationService
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
         IProductRepository productRepository,
         IOrganizationRepository organizationRepository,
-        IPaymentAccountRepository paymentAccountRepository)
+        IPaymentAccountRepository paymentAccountRepository,
+        IBusinessRepository businessRepository)
     {
         try
         {
@@ -36,6 +40,7 @@ public class QuotationService : IQuotationService
             _productRepository = productRepository;
             _organizationRepository = organizationRepository;
             _paymentAccountRepository = paymentAccountRepository;
+            _businessRepository = businessRepository;
         }
         catch (Exception e)
         {
@@ -75,6 +80,7 @@ public class QuotationService : IQuotationService
         return entities.Select(x => new QuotationProjectResource
         {
             ProjectId = x.ProjectId,
+            ProjectName = x.Project.ProjectName ?? "-",
             LeadTime = x.LeadTime,
             Warranty = x.Warranty,
             ConditionId = x.PaymentConditionId,
@@ -103,6 +109,11 @@ public class QuotationService : IQuotationService
                 Remark = quotation.Remark,
                 PaymentAccountId = quotation.PaymentId
             };
+
+            if (response.Projects != null && response.Projects.Any())
+            {
+                response.Project = response.Projects.FirstOrDefault()?.ProjectName;
+            }
 
             return response;
         }
@@ -358,7 +369,7 @@ public class QuotationService : IQuotationService
             //
             //     product.SumOfDiscount = dis;
             // }
-            
+
             var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
             sumOfDiscount += (decimal)dis;
             product.SumOfDiscount = (decimal)dis;
@@ -460,6 +471,7 @@ public class QuotationService : IQuotationService
                 SalePersonIName = x.SalePerson.FirstNameTh ?? "-",
                 Status = x.Status,
                 Products = null,
+                ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
@@ -510,6 +522,8 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
+
+                
         try
         {
             await SendApproveQuotation(quotation, Name, Email
@@ -533,8 +547,14 @@ public class QuotationService : IQuotationService
         {
             throw new KeyNotFoundException("id not exists");
         }
+        var business = _businessRepository.GetBusinessesQuery().FirstOrDefault(x => x.BusinessId == quotation.BusinessId);
 
-        return new QuotationDocument(quotation);
+        if (quotation == null)
+        {
+            throw new KeyNotFoundException("business id not exists");
+        }
+        
+        return new QuotationDocument(quotation,business!);
     }
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
@@ -632,7 +652,7 @@ public class QuotationService : IQuotationService
     }
 
 
-    public static async Task SendEmail(QuotationEntity entity,string managerName,string managerEmail)
+    public static async Task SendEmail(QuotationEntity entity, string managerName, string managerEmail)
     {
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
