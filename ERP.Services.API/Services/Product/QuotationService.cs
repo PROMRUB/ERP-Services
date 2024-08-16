@@ -80,7 +80,7 @@ public class QuotationService : IQuotationService
         return entities.Select(x => new QuotationProjectResource
         {
             ProjectId = x.ProjectId,
-            ProjectName = x.Project.ProjectName ?? "-",
+            ProjectName = x.Project.ProjectName,
             LeadTime = x.LeadTime,
             Warranty = x.Warranty,
             ConditionId = x.PaymentConditionId,
@@ -112,7 +112,7 @@ public class QuotationService : IQuotationService
 
             if (response.Projects != null && response.Projects.Any())
             {
-                response.Project = response.Projects.FirstOrDefault()?.ProjectName;
+                response.ProjectName = response.Projects.FirstOrDefault()?.ProjectName;
             }
 
             return response;
