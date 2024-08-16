@@ -87,7 +87,7 @@ namespace ERP.Services.API.Entities
             
             if (!string.IsNullOrEmpty(Village))
             {
-                address += $"หมู่บ้าน {Building} ";
+                address += $"หมู่บ้าน {Village} ";
             }
             
             if (!string.IsNullOrEmpty(Alley))
