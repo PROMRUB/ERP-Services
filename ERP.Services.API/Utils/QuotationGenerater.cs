@@ -100,7 +100,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Image(LogoImage);
                         column.Item().AlignRight().Text(text =>
                         {
-                            text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {entity.Customer.TaxId})")
+                            text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {business.TaxId})")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black);
