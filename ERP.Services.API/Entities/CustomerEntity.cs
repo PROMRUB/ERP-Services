@@ -68,7 +68,59 @@ namespace ERP.Services.API.Entities
 
         public string Address()
         {
-            return $"{RoomNo} {Moo} {SubDistrict} {District} {Province} {PostCode}";
+            var address = "";
+
+            if (!string.IsNullOrEmpty(RoomNo))
+            {
+                address += $"ห้องเลขที่ {RoomNo} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Floor))
+            {
+                address += $"ชั้น {Floor} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Building))
+            {
+                address += $"อาคาร {Building} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Village))
+            {
+                address += $"หมู่บ้าน {Building} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Alley))
+            {
+                address += $"ซอย {Alley} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Alley))
+            {
+                address += $"ซอย {Alley} ";
+            }
+            
+            if (!string.IsNullOrEmpty(SubDistrict))
+            {
+                address += $"ตำบล {SubDistrict} ";
+            }
+            
+            if (!string.IsNullOrEmpty(District))
+            {
+                address += $"อำเภอ {District} ";
+            }
+            
+            if (!string.IsNullOrEmpty(Road))
+            {
+                address += $"ถนน {Road} ";
+            }
+            
+            if (!string.IsNullOrEmpty(PostCode))
+            {
+                address += $"รหัสไปรษณีย์ {PostCode} ";
+            }
+            
+            return address;
         }
     }
 }
