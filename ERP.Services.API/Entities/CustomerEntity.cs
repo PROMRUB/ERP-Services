@@ -97,22 +97,22 @@ namespace ERP.Services.API.Entities
             
             if (!string.IsNullOrEmpty(SubDistrict))
             {
-                address += $"ตำบล {SubDistrict} ";
+                address += $"ตำบล{SubDistrict} ";
             }
             
             if (!string.IsNullOrEmpty(District))
             {
-                address += $"อำเภอ {District} ";
+                address += $"อำเภอ{District} ";
             }
             
             if (!string.IsNullOrEmpty(Road))
             {
-                address += $"ถนน {Road} ";
+                address += $"ถนน{Road} ";
             }
             
             if (!string.IsNullOrEmpty(PostCode))
             {
-                address += $"รหัสไปรษณีย์ {PostCode} ";
+                address += $"รหัสไปรษณีย์{PostCode} ";
             }
             
             return address;

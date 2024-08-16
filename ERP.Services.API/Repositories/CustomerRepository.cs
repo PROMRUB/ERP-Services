@@ -19,6 +19,14 @@ namespace ERP.Services.API.Repositories
             return query;
         }
 
+        public IQueryable<CustomerEntity> GetCustomerById(Guid bussinessId)
+        {
+            var query = context.Customers!.Where(x => x.BusinessId == bussinessId);
+            return query;
+        }
+
+       
+
         public void CreateCustomer(CustomerEntity query)
         {
             context.Customers!.Add(query);
@@ -34,11 +42,15 @@ namespace ERP.Services.API.Repositories
             query.CusStatus = RecordStatus.InActive.ToString();
             context.Customers!.Update(query);
         }
-        public IQueryable<CustomerContactEntity> GetCustomerContactByCustomer(Guid orgId, Guid businessId, Guid customerId)
+
+        public IQueryable<CustomerContactEntity> GetCustomerContactByCustomer(Guid orgId, Guid businessId,
+            Guid customerId)
         {
-            var query = context.CustomerContacts!.Where(x => x.OrgId == orgId && x.BusinessId == businessId && x.CusId == customerId);
+            var query = context.CustomerContacts!.Where(x =>
+                x.OrgId == orgId && x.BusinessId == businessId && x.CusId == customerId);
             return query;
         }
+
         public void CreateCustomerContact(CustomerContactEntity query)
         {
             context.CustomerContacts!.Add(query);
@@ -54,7 +66,9 @@ namespace ERP.Services.API.Repositories
             query.CusConStatus = RecordStatus.InActive.ToString();
             context.CustomerContacts!.Update(query);
         }
-        public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode)
+
+        public async Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet,
+            int mode)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())
             {
