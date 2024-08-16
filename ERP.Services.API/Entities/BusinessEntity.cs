@@ -97,47 +97,47 @@ namespace ERP.Services.API.Entities
 
             if (!string.IsNullOrEmpty(RoomNo))
             {
-                address += $"ห้องเลขที่ {RoomNo} ";
+                address += $"{RoomNo} ";
             }
             
             if (!string.IsNullOrEmpty(Floor))
             {
-                address += $"ชั้น {Floor} ";
+                address += $"{Floor} ";
             }
             
             if (!string.IsNullOrEmpty(Building))
             {
-                address += $"อาคาร {Building} ";
+                address += $"{Building} ";
             }
             
             if (!string.IsNullOrEmpty(Village))
             {
-                address += $"หมู่บ้าน {Village} ";
+                address += $"{Village} ";
             }
             
             if (!string.IsNullOrEmpty(Alley))
             {
-                address += $"ซอย {Alley} ";
+                address += $"{Alley} ";
             }
             
             if (!string.IsNullOrEmpty(SubDistrict))
             {
-                address += $" {SubDistrict} ";
+                address += $"{SubDistrict} ";
             }
             
             if (!string.IsNullOrEmpty(District))
             {
-                address += $" {District} ";
+                address += $"{District} ";
             }
             
             if (!string.IsNullOrEmpty(Road))
             {
-                address += $"ถนน {Road} ";
+                address += $"{Road} ";
             }
             
             if (!string.IsNullOrEmpty(PostCode))
             {
-                address += $"รหัสไปรษณีย์ {PostCode} ";
+                address += $"{PostCode} ";
             }
             
             return address;
