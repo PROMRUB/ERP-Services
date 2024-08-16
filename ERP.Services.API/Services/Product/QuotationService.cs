@@ -80,7 +80,7 @@ public class QuotationService : IQuotationService
         return entities.Select(x => new QuotationProjectResource
         {
             ProjectId = x.ProjectId,
-            ProjectName = x.Project.ProjectName,
+            ProjectName = x.Project.ProjectName ?? "-",
             LeadTime = x.LeadTime,
             Warranty = x.Warranty,
             ConditionId = x.PaymentConditionId,
