@@ -18,5 +18,5 @@ public class QuotationResource
     public string? QuotationNo { get; set; }
     public int EditTime { get; set; }
     public string QuotationDateTime { get; set; } = "";
-    public string Project { get; set; }
+    public string ProjectName { get; set; }
 }
