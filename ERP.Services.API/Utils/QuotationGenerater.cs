@@ -186,13 +186,6 @@ namespace ERP.Services.API.Utils
                             });
                             column.Item().Text(text =>
                             {
-                                text.Span(
-                                        $"{entity.Customer.Address()}")
-                                    .FontFamily("Prompt")
-                                    .FontSize(6);
-                            });
-                            column.Item().Text(text =>
-                            {
                                 text.Span($"โทร: {entity.CustomerContact.TelNo} E-mail: {entity.CustomerContact.Email}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
