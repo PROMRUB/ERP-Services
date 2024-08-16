@@ -180,6 +180,13 @@ namespace ERP.Services.API.Utils
                             column.Item().Text(text =>
                             {
                                 text.Span(
+                                        $"{entity.Customer.CusNameEng}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6);
+                            });
+                            column.Item().Text(text =>
+                            {
+                                text.Span(
                                         $"{customerAddress}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
