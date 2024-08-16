@@ -7,6 +7,7 @@ namespace ERP.Services.API.Interfaces
     {
 
         public IQueryable<CustomerEntity> GetCustomerByBusiness(Guid orgId, Guid bussinessId);
+        public IQueryable<CustomerEntity> GetCustomerById(Guid bussinessId);
         public void CreateCustomer(CustomerEntity query);
         public void UpdateCustomer(CustomerEntity query);
         public void DeleteCustomer(CustomerEntity query);

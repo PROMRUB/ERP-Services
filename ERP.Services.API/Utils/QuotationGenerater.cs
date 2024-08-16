@@ -68,7 +68,7 @@ namespace ERP.Services.API.Utils
                         column
                             .Item()
                             .Text(
-                                $"{business.BusinessName}")
+                                $"{business.BusinessName} {(business.BrnId == "00000" ? "(สำน\u0e31กงานใหญ\u0e48)" : "")}")
                             .FontFamily("Prompt")
                             .FontSize(10)
                             .Bold()
@@ -174,6 +174,13 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span(
                                     $"คุณ {entity.CustomerContact.DisplayName()}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6);
+                            });
+                            column.Item().Text(text =>
+                            {
+                                text.Span(
+                                        $"{entity.CustomerContact.DisplayName()}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
