@@ -95,11 +95,6 @@ namespace ERP.Services.API.Entities
                 address += $"ซอย {Alley} ";
             }
             
-            if (!string.IsNullOrEmpty(Alley))
-            {
-                address += $"ซอย {Alley} ";
-            }
-            
             if (!string.IsNullOrEmpty(SubDistrict))
             {
                 address += $"ตำบล {SubDistrict} ";
