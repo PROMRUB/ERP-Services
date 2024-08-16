@@ -9,7 +9,7 @@ using Image = QuestPDF.Infrastructure.Image;
 namespace ERP.Services.API.Utils
 
 {
-    public class QuotationDocument(QuotationEntity entity,BusinessEntity business) : IDocument
+    public class QuotationDocument(QuotationEntity entity,BusinessEntity business,string businessAddress,string customerAddress) : IDocument
     {
         public static Image LogoImage { get; } = Image.FromFile("logo.jpg");
 
@@ -80,7 +80,7 @@ namespace ERP.Services.API.Utils
                             .Text(text =>
                             {
                                 text.Span(
-                                        $"{business.Address()}")
+                                        $"{businessAddress}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
@@ -180,14 +180,7 @@ namespace ERP.Services.API.Utils
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                        $"{entity.CustomerContact.DisplayName()}")
-                                    .FontFamily("Prompt")
-                                    .FontSize(6);
-                            });
-                            column.Item().Text(text =>
-                            {
-                                text.Span(
-                                        $"{entity.Customer.Address()}")
+                                        $"{customerAddress}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
