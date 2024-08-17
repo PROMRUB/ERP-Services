@@ -118,6 +118,7 @@ public class QuotationService : IQuotationService
             if (response.Projects != null && response.Projects.Any())
             {
                 response.ProjectName = response.Projects.FirstOrDefault()?.ProjectName;
+                response.EthSaleMonth = response.Projects.FirstOrDefault()?.EthSaleMonth;
             }
 
             return response;
@@ -152,7 +153,7 @@ public class QuotationService : IQuotationService
             Warranty = x.Warranty,
             PaymentConditionId = x.ConditionId,
             Po = x.PurchaseOrder,
-            DeliveryDateTime = DateTime.ParseExact("dd/MM/yyyy",x.DeliveryDateTime,CultureInfo.InvariantCulture),
+            DeliveryDateTime = DateTime.ParseExact("MM/yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
             Order = i
         }).ToList();
 
