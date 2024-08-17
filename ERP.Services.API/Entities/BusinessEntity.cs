@@ -91,6 +91,9 @@ namespace ERP.Services.API.Entities
         [Column("business_status")]
         public string? BusinessStatus { get; set; }
 
+        [Column("logo")]
+        public string? Logo { get; set; }
+
         public string Address()
         {
             var address = "";
