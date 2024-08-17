@@ -115,10 +115,10 @@ public class QuotationService : IQuotationService
                 PaymentAccountId = quotation.PaymentId
             };
 
-            if (response.Projects != null && response.Projects.Any())
+            if (quotation.Projects != null && quotation.Projects.Any())
             {
-                response.ProjectName = response.Projects.FirstOrDefault()?.ProjectName;
-                response.EthSaleMonth = response.Projects.FirstOrDefault()?.EthSaleMonth;
+                response.ProjectName = quotation.Projects.FirstOrDefault()?.Project.ProjectName ?? "";
+                response.EthSaleMonth = quotation.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy");
             }
 
             return response;
@@ -153,7 +153,7 @@ public class QuotationService : IQuotationService
             Warranty = x.Warranty,
             PaymentConditionId = x.ConditionId,
             Po = x.PurchaseOrder,
-            DeliveryDateTime = DateTime.ParseExact("MM/yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
+            EthSaleMonth = DateTime.ParseExact("MM/yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
             Order = i
         }).ToList();
 
