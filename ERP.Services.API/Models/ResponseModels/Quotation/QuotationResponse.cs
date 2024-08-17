@@ -33,4 +33,5 @@ public class QuotationResponse
     public decimal SumOfDiscount { get; set; }
     public decimal AmountBeforeVat { get; set; }
     public string ProjectName { get; set; }
+    public string EthSaleMonth { get; set; }
 }

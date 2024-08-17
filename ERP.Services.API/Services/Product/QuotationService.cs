@@ -86,6 +86,7 @@ public class QuotationService : IQuotationService
         {
             ProjectId = x.ProjectId,
             ProjectName = x.Project.ProjectName,
+            EthSaleMonth = x.EthSaleMonth?.ToString("MM/yyyy"),
             LeadTime = x.LeadTime,
             Warranty = x.Warranty,
             ConditionId = x.PaymentConditionId,
@@ -153,7 +154,7 @@ public class QuotationService : IQuotationService
             Warranty = x.Warranty,
             PaymentConditionId = x.ConditionId,
             Po = x.PurchaseOrder,
-            EthSaleMonth = DateTime.ParseExact("MM/yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
+            EthSaleMonth = DateTime.ParseExact("dd-MM-yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
             Order = i
         }).ToList();
 
@@ -479,6 +480,7 @@ public class QuotationService : IQuotationService
                 Status = x.Status,
                 Products = null,
                 ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
+                EthSaleMonth = x.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
