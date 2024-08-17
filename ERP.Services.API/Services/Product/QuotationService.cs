@@ -154,7 +154,7 @@ public class QuotationService : IQuotationService
             Warranty = x.Warranty,
             PaymentConditionId = x.ConditionId,
             Po = x.PurchaseOrder,
-            EthSaleMonth = DateTime.ParseExact("dd-MM-yyyy",x.EthSaleMonth,CultureInfo.InvariantCulture),
+            EthSaleMonth = DateTime.ParseExact(x.EthSaleMonth,"dd-MM-yyyy",CultureInfo.InvariantCulture),
             Order = i
         }).ToList();
 
