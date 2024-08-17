@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
@@ -151,6 +152,7 @@ public class QuotationService : IQuotationService
             Warranty = x.Warranty,
             PaymentConditionId = x.ConditionId,
             Po = x.PurchaseOrder,
+            DeliveryDateTime = DateTime.ParseExact("dd/MM/yyyy",x.DeliveryDateTime,CultureInfo.InvariantCulture),
             Order = i
         }).ToList();
 

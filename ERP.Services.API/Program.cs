@@ -45,7 +45,7 @@ Log.Logger = log;
 
 var cfg = builder.Configuration;
 
-QuestPDF.Settings.License = LicenseType.Community;
+ QuestPDF.Settings.License = LicenseType.Community;
 
 cfg["IsDev"] = Environment.GetEnvironmentVariable("IsDev")!;
 cfg["PostgreSQL:Host"] = Environment.GetEnvironmentVariable("PostgreSQL_Host")!;

@@ -8,4 +8,5 @@ public class QuotationProjectResource
     public int Warranty { get; set; }
     public Guid ConditionId { get; set; }
     public string PurchaseOrder { get; set; }
+    public string DeliveryDateTime { get; set; }
 }
