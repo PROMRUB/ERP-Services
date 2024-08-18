@@ -18,6 +18,7 @@ public class QuotationProjectEntity
     [Column("lead_time")] public int LeadTime { get; set; }
 
     [Column("warranty")] public int Warranty { get; set; }
+    [Column("eth_sale_month")] public DateTime? EthSaleMonth { get; set; }
 
     [Column("payment_condition_id")] public Guid PaymentConditionId { get; set; }
     public ConditionEntity PaymentCondition { get; set; }

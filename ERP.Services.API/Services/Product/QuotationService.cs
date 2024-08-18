@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
@@ -44,7 +45,6 @@ public class QuotationService : IQuotationService
             _paymentAccountRepository = paymentAccountRepository;
             _businessRepository = businessRepository;
             _systemRepository = systemRepository;
-
         }
         catch (Exception e)
         {
@@ -85,6 +85,7 @@ public class QuotationService : IQuotationService
         {
             ProjectId = x.ProjectId,
             ProjectName = x.Project.ProjectName,
+            EthSaleMonth = x.EthSaleMonth?.ToString("MM/yyyy"),
             LeadTime = x.LeadTime,
             Warranty = x.Warranty,
             ConditionId = x.PaymentConditionId,
@@ -114,9 +115,10 @@ public class QuotationService : IQuotationService
                 PaymentAccountId = quotation.PaymentId
             };
 
-            if (response.Projects != null && response.Projects.Any())
+            if (quotation.Projects != null && quotation.Projects.Any())
             {
-                response.ProjectName = response.Projects.FirstOrDefault()?.ProjectName;
+                response.ProjectName = quotation.Projects.FirstOrDefault()?.Project.ProjectName ?? "";
+                response.EthSaleMonth = quotation.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy");
             }
 
             return response;
@@ -144,15 +146,30 @@ public class QuotationService : IQuotationService
 
     public List<QuotationProjectEntity> MutateResourceProject(List<QuotationProjectResource> resources)
     {
-        var projects = resources.Select((x, i) => new QuotationProjectEntity
+        var projects = new List<QuotationProjectEntity>();
+
+        var i = 0;
+        foreach (var x in resources)
         {
-            ProjectId = x.ProjectId,
-            LeadTime = x.LeadTime,
-            Warranty = x.Warranty,
-            PaymentConditionId = x.ConditionId,
-            Po = x.PurchaseOrder,
-            Order = i
-        }).ToList();
+            var quotationProjectEntity = new QuotationProjectEntity
+            {
+                ProjectId = x.ProjectId,
+                LeadTime = x.LeadTime,
+                Warranty = x.Warranty,
+                PaymentConditionId = x.ConditionId,
+                Po = x.PurchaseOrder,
+                Order = ++i
+            };
+
+            if (!string.IsNullOrEmpty(x.EthSaleMonth))
+            {
+                quotationProjectEntity.EthSaleMonth =
+                    (DateTime.ParseExact(x.EthSaleMonth, "dd-MM-yyyy", CultureInfo.InvariantCulture));
+
+                quotationProjectEntity.EthSaleMonth =
+                    DateTime.SpecifyKind((DateTime)quotationProjectEntity.EthSaleMonth, DateTimeKind.Utc);
+            }
+        }
 
         return projects;
     }
@@ -476,6 +493,7 @@ public class QuotationService : IQuotationService
                 Status = x.Status,
                 Products = null,
                 ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
+                EthSaleMonth = x.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
@@ -527,7 +545,6 @@ public class QuotationService : IQuotationService
         }
 
 
-                
         try
         {
             await SendApproveQuotation(quotation, Name, Email
@@ -551,7 +568,9 @@ public class QuotationService : IQuotationService
         {
             throw new KeyNotFoundException("id not exists");
         }
-        var business = _businessRepository.GetBusinessesQuery().FirstOrDefault(x => x.BusinessId == quotation.BusinessId);
+
+        var business = _businessRepository.GetBusinessesQuery()
+            .FirstOrDefault(x => x.BusinessId == quotation.BusinessId);
 
         if (business == null)
         {
@@ -559,19 +578,31 @@ public class QuotationService : IQuotationService
         }
 
         var query = business;
-        
+
         var orgAddress = (string.IsNullOrEmpty(query.Building) ? "" : (query.Building + " ")) +
-                            (string.IsNullOrEmpty(query.RoomNo) ? "" : (query.RoomNo + " ")) +
-                            (string.IsNullOrEmpty(query.Floor) ? "" : (query.Floor + " ")) +
-                            (string.IsNullOrEmpty(query.Village) ? "" : (query.Village + " ")) +
-                            (string.IsNullOrEmpty(query.No) ? "" : (query.No + " ")) +
-                            (string.IsNullOrEmpty(query.Moo) ? "" : (query.Moo + " ")) +
-                            (string.IsNullOrEmpty(query.Alley) ? "" : (query.Alley + " ")) +
-                            (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
-                            (string.IsNullOrEmpty(query.SubDistrict) ? "" : (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                            (string.IsNullOrEmpty(query.District) ? "" : (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                            (string.IsNullOrEmpty(query.Province) ? "" : (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                            (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
+                         (string.IsNullOrEmpty(query.RoomNo) ? "" : (query.RoomNo + " ")) +
+                         (string.IsNullOrEmpty(query.Floor) ? "" : (query.Floor + " ")) +
+                         (string.IsNullOrEmpty(query.Village) ? "" : (query.Village + " ")) +
+                         (string.IsNullOrEmpty(query.No) ? "" : (query.No + " ")) +
+                         (string.IsNullOrEmpty(query.Moo) ? "" : (query.Moo + " ")) +
+                         (string.IsNullOrEmpty(query.Alley) ? "" : (query.Alley + " ")) +
+                         (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
+                         (string.IsNullOrEmpty(query.SubDistrict)
+                             ? ""
+                             : (_systemRepository.GetAll<SubDistrictEntity>()
+                                 .Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault()
+                                 .SubDistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.District)
+                             ? ""
+                             : (_systemRepository.GetAll<DistrictEntity>()
+                                 .Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault()
+                                 .DistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.Province)
+                             ? ""
+                             : (_systemRepository.GetAll<ProvinceEntity>()
+                                 .Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault()
+                                 .ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
 
         var queryCustomer = quotation.Customer;
         var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" : (queryCustomer.Building + " ")) +
@@ -582,12 +613,24 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(queryCustomer.Moo) ? "" : (queryCustomer.Moo + " ")) +
                          (string.IsNullOrEmpty(queryCustomer.Alley) ? "" : (queryCustomer.Alley + " ")) +
                          (string.IsNullOrEmpty(queryCustomer.Road) ? "" : (queryCustomer.Road + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" : (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(queryCustomer.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.District) ? "" : (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(queryCustomer.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" : (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(queryCustomer.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.SubDistrict)
+                             ? ""
+                             : (_systemRepository.GetAll<SubDistrictEntity>()
+                                 .Where(x => x.SubDistrictCode.ToString().Equals(queryCustomer.SubDistrict))
+                                 .FirstOrDefault().SubDistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.District)
+                             ? ""
+                             : (_systemRepository.GetAll<DistrictEntity>()
+                                 .Where(x => x.DistrictCode.ToString().Equals(queryCustomer.District)).FirstOrDefault()
+                                 .DistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Province)
+                             ? ""
+                             : (_systemRepository.GetAll<ProvinceEntity>()
+                                 .Where(x => x.ProvinceCode.ToString().Equals(queryCustomer.Province)).FirstOrDefault()
+                                 .ProvinceNameTh + " ")) +
                          (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" : queryCustomer.PostCode);
-        
-        return new QuotationDocument(quotation,business,orgAddress,cusAddress);
+
+        return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
 
     private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)

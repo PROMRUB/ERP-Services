@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240817030538_AdddelivertyDate")]
+    partial class AdddelivertyDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,10 +180,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("Floor")
                         .HasColumnType("text")
                         .HasColumnName("floor");
-
-                    b.Property<string>("Logo")
-                        .HasColumnType("text")
-                        .HasColumnName("logo");
 
                     b.Property<string>("Moo")
                         .HasColumnType("text")
@@ -1091,9 +1090,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
-                    b.Property<DateTime?>("EthSaleMonth")
+                    b.Property<DateTime?>("DeliveryDateTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("eth_sale_month");
+                        .HasColumnName("delivery_date");
 
                     b.Property<int>("LeadTime")
                         .HasColumnType("integer")
