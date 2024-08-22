@@ -169,6 +169,8 @@ public class QuotationService : IQuotationService
                 quotationProjectEntity.EthSaleMonth =
                     DateTime.SpecifyKind((DateTime)quotationProjectEntity.EthSaleMonth, DateTimeKind.Utc);
             }
+            
+            projects.Add(quotationProjectEntity);
         }
 
         return projects;
