@@ -26,8 +26,10 @@ public class QuotationService : IQuotationService
     private readonly IPaymentAccountRepository _paymentAccountRepository;
 
     // public string Email { get; set; } = "kkunayothin@gmail.com";
-    public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
-    public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
+    // public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
+    public string Email { get; set; } = "witchayada.a@securesolutionsasia.com";
+    public string Name { get; set; } = "ว\u0e34ชญาดา อภ\u0e34ญ";
+    // public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
         IProductRepository productRepository,
