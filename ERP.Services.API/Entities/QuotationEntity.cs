@@ -80,4 +80,9 @@ public class QuotationEntity
     {
         EditTime++;
     }
+
+    public void SetApprove()
+    {
+        this.Status = "อนุมัติ";
+    }
 }
