@@ -5,8 +5,10 @@ using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Customer;
 using ERP.Services.API.Models.ResponseModels.Customer;
+using ERP.Services.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -18,7 +20,9 @@ namespace ERP.Services.API.Services.Customer
             IOrganizationRepository organizationRepository,
             ISystemConfigRepository systemConfigRepository,
             UserPrincipalHandler userPrincipalHandler,
-            IPaymentAccountRepository paymentAccountRepositor)
+            IPaymentAccountRepository paymentAccountRepositor,
+            IUserRepository userRepository,
+            IBusinessRepository businessRepository)
         : ICustomerService
     {
         private string selectedItem = string.Empty;
@@ -241,9 +245,21 @@ namespace ERP.Services.API.Services.Customer
         public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid businessId, Guid cusId)
         {
             organizationRepository.SetCustomOrgId(orgId);
+            userRepository.SetCustomOrgId(orgId);
+            businessRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            var user = await userRepository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync();
+            var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!).Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
+            List<CustomerContactEntity> result = new List < CustomerContactEntity >();
+            if (!role!.Role!.Contains("SaleManager"))
+            {
+                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            }
+            else
+            {
+                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            }
             return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
         }
 

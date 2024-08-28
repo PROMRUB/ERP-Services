@@ -171,7 +171,7 @@ public class QuotationService : IQuotationService
                 quotationProjectEntity.EthSaleMonth =
                     DateTime.SpecifyKind((DateTime)quotationProjectEntity.EthSaleMonth, DateTimeKind.Utc);
             }
-            
+
             projects.Add(quotationProjectEntity);
         }
 
@@ -548,11 +548,24 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
+        quotation.SetApprove();
+
+        _quotationRepository.Context().Update(quotation);
+
+        await _quotationRepository.Context().SaveChangesAsync();
+
+        var emailList = new List<EmailObject>()
+        {
+            new EmailObject
+            {
+                Name = Name,
+                Email = Email
+            }
+        };
 
         try
         {
-            await SendApproveQuotation(quotation, Name, Email
-            );
+            await SendApproveQuotation(quotation, emailList);
         }
         catch (Exception e)
         {
@@ -562,6 +575,12 @@ public class QuotationService : IQuotationService
 
 
         return null;
+    }
+
+    public class EmailObject
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
     }
 
     public async Task<QuotationDocument> GeneratePDF(Guid id)
@@ -637,21 +656,26 @@ public class QuotationService : IQuotationService
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
 
-    private async Task SendApproveQuotation(QuotationEntity quotation, string managerName, string managerEmail)
+    private async Task SendApproveQuotation(QuotationEntity quotation, List<EmailObject> list)
     {
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-        string ToEmail = managerEmail;
-        string ToName = managerName;
-        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
-        To.Add(smtpEmailTo);
+
+        foreach (var email in list)
+        {
+            string ToEmail = email.Email;
+            string ToName = email.Name;
+            SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
+            To.Add(smtpEmailTo);
+        }
 
         string HtmlContent =
             $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา<br/>" +
-            $"เร\u0e35ยน {managerName}</br>" +
+            $"เร\u0e35ยน " +
+            // $"{managerName}</br>" +
             $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {quotation.QuotationNo ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
             $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
             $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
