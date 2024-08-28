@@ -254,11 +254,13 @@ namespace ERP.Services.API.Services.Customer
             List<CustomerContactEntity> result = new List < CustomerContactEntity >();
             if (!role!.Role!.Contains("SaleManager"))
             {
-                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
+                    .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
             }
             else
             {
-                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
+                    .Where(x => x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
             }
             return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
         }
