@@ -243,7 +243,9 @@ namespace ERP.Services.API.Services.Customer
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
+                .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString())
+                .ToListAsync();
             return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
         }
 
