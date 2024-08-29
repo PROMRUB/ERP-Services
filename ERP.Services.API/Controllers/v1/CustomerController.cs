@@ -13,7 +13,7 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class CustomerController : BaseController
     {
-        public record BaseParameter(string? Keyword);
+        public record BaseParameter(string Keyword,int Page,int PageSize);
         
         private readonly ICustomerService customerService;
         public CustomerController(ICustomerService customerService)
@@ -30,7 +30,7 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword ?? "");
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword);
                 return Ok(ResponseHandler.Response<List<CustomerResponse>>("1000", null, result));
             }
             catch (Exception ex)
@@ -49,8 +49,9 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword ?? "");
-                return Ok(ResponseHandler.Response<List<CustomerResponse>>("1000", null, result));
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword
+                ,baseParameter.Page,baseParameter.PageSize);
+                return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
             {

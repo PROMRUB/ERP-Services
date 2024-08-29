@@ -3,6 +3,7 @@ using ERP.Services.API.Enum;
 using ERP.Services.API.Models.RequestModels.Product;
 using ERP.Services.API.Models.ResponseModels.Product;
 using ERP.Services.API.Repositories;
+using ERP.Services.API.Utils;
 using OfficeOpenXml;
 
 namespace ERP.Services.API.Interfaces
@@ -11,6 +12,7 @@ namespace ERP.Services.API.Interfaces
     {
         public Task<List<ProductCategoryResponse>> GetProducCategorytListByBusiness(string orgId, Guid businessId);
         public Task<List<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,string keyword);
+        public Task<PagedList<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,string keyword,int page,int pageSize);
         public Task<ProductResponse> GetProductInformationById(string orgId, Guid businessId, Guid productId);
         public Task CreateProduct(string orgId, ProductRequest request);
         public Task CreateProductCategory(string orgId, ProductCategoryRequest request);

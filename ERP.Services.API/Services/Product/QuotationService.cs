@@ -451,16 +451,16 @@ public class QuotationService : IQuotationService
         var organization = await _organizationRepository.GetOrganization();
         var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
-            .OrderBy(x => x.AccountBank).ToListAsync();
+            .OrderBy(x => x.BankId).ToListAsync();
         return result.Select(x => new PaymentAccountResponse
         {
             PaymentAccountId = x.PaymentAccountId,
             OrgId = x.OrgId,
             PaymentAccountName = x.PaymentAccountName,
             AccountType = x.AccountType,
-            AccountBank = x.AccountBank,
+            AccountBank = x.BankId,
             // AccountBankName = x.AccountBank,
-            AccountBrn = x.AccountBrn,
+            AccountBrn = x.BankBranchId,
             // AccountBankBrn = x,AccountBankBrn,
             PaymentAccountNo = x.PaymentAccountNo,
             AccountStatus = "Active"

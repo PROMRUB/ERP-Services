@@ -60,7 +60,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<UserBusinessEntity>();
             modelBuilder.Entity<UserSessionEntity>();
             modelBuilder.Entity<ProductCategoryEntity>();
-            modelBuilder.Entity<ProductEntity>();
+            // modelBuilder.Entity<ProductEntity>();
             modelBuilder.Entity<ProjectEntity>();
             modelBuilder.Entity<ProjectNumberEntity>();
             modelBuilder.Entity<ConditionEntity>();
@@ -70,6 +70,8 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.ApplyConfiguration(new QuotationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProductEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProjectEntityConfiguration());
+            // modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentAccountEntityConfiguration());
         }
     }
 }

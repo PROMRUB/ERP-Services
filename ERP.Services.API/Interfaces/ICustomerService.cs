@@ -4,12 +4,14 @@ using ERP.Services.API.Models.RequestModels.Customer;
 using ERP.Services.API.Models.ResponseModels.Customer;
 using ERP.Services.API.Repositories;
 using System.Text.RegularExpressions;
+using ERP.Services.API.Utils;
 
 namespace ERP.Services.API.Interfaces
 {
     public interface ICustomerService
     {
         public Task<List<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId,string keyword);
+        public Task<PagedList<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId,string keyword,int page,int pageSize);
         public Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId, Guid customerId);
         public Task CreateCustomer(string orgId, CustomerRequest request);
         public Task ImportExcel(string orgId, Guid businessId, IFormFile request);
