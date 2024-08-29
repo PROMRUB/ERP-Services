@@ -38,6 +38,27 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetCustomerListWithPaging/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetCustomerListWithPaging(string id, Guid businessId
+            ,[FromQuery]BaseParameter baseParameter)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword ?? "");
+                return Ok(ResponseHandler.Response<List<CustomerResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
+        
 
         [HttpGet]
         [Route("org/{id}/action/GetCustomerInformation/{businessId}/{customerId}")]

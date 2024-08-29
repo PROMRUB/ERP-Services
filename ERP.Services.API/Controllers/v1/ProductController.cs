@@ -55,6 +55,27 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        // public record ProductResourceParameter(string Keyword,int Page,int PageSize);
+        //
+        // [HttpGet]
+        // [Route("org/{id}/action/GetProductListWithPaging/{businessId}")]
+        // [MapToApiVersion("1")]
+        // public async Task<IActionResult> GetProductListWithPaging(string id, Guid businessId
+        //     ,[FromQuery] ProductResourceParameter resourceParameter)
+        // {
+        //     try
+        //     {
+        //         if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+        //             throw new ArgumentException("1101");
+        //         var result = await projectService.GetProjectListByBusiness(id, businessId);
+        //         return Ok(ResponseHandler.Response<List<ProjectResponse>>("1000", null, result));
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Ok(ResponseHandler.Response(ex.Message, null));
+        //     }
+        // }
 
         [HttpGet]
         [Route("org/{id}/action/GetProductInformation/{businessId}/{productId}")]

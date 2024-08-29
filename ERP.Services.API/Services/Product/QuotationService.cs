@@ -14,6 +14,12 @@ using Task = System.Threading.Tasks.Task;
 
 namespace ERP.Services.API.Services.Product;
 
+public class EmailInformation
+{
+    public string Email { get; set; }
+    public string Name { get; set; }
+}
+
 public class QuotationService : IQuotationService
 {
     private readonly ISystemConfigRepository _systemRepository;
@@ -27,8 +33,24 @@ public class QuotationService : IQuotationService
 
     // public string Email { get; set; } = "kkunayothin@gmail.com";
     // public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
-    public string Email { get; set; } = "witchayada.a@securesolutionsasia.com";
-    public string Name { get; set; } = "ว\u0e34ชญาดา อภ\u0e34ญ";
+
+    public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
+    {
+        new EmailInformation()
+        {
+            Name = "ว\u0e34ชญาดา อภ\u0e34ญ",
+            Email = "witchayada.a@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "kitsada.t@securesolutionsasia.com",
+            Email = "kitsada.t@securesolutionsasia.com"
+        }
+    };
+
+    // public string Email { get; set; } = "witchayada.a@securesolutionsasia.com";
+
+    // public string Name { get; set; } = "ว\u0e34ชญาดา อภ\u0e34ญ";
     // public string Name { get; set; } = "อมรร\u0e31ตน\u0e4c เท\u0e35ยนบ\u0e38ญยาจารย\u0e4c";
 
     public QuotationService(IMapper mapper, IQuotationRepository quotationRepository,
@@ -533,7 +555,7 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        await SendEmail(quotation, Name, Email);
+        await SendEmail(quotation, Emails);
 
 
         return null;
@@ -554,18 +576,10 @@ public class QuotationService : IQuotationService
 
         await _quotationRepository.Context().SaveChangesAsync();
 
-        var emailList = new List<EmailObject>()
-        {
-            new EmailObject
-            {
-                Name = Name,
-                Email = Email
-            }
-        };
-
+       
         try
         {
-            await SendApproveQuotation(quotation, emailList);
+            await SendApproveQuotation(quotation, Emails);
         }
         catch (Exception e)
         {
@@ -575,12 +589,6 @@ public class QuotationService : IQuotationService
 
 
         return null;
-    }
-
-    public class EmailObject
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
     }
 
     public async Task<QuotationDocument> GeneratePDF(Guid id)
@@ -656,7 +664,7 @@ public class QuotationService : IQuotationService
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
 
-    private async Task SendApproveQuotation(QuotationEntity quotation, List<EmailObject> list)
+    private async Task SendApproveQuotation(QuotationEntity quotation, List<EmailInformation> list)
     {
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
@@ -756,17 +764,22 @@ public class QuotationService : IQuotationService
     }
 
 
-    public static async Task SendEmail(QuotationEntity entity, string managerName, string managerEmail)
+    public static async Task SendEmail(QuotationEntity entity, List<EmailInformation> emails)
     {
         var apiInstance = new TransactionalEmailsApi();
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-        string ToEmail = managerEmail;
-        string ToName = managerName;
-        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
+      
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
-        To.Add(smtpEmailTo);
+        
+        foreach (var email in emails)
+        {
+            string ToEmail = email.Email;
+            string ToName = email.Name;
+            SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
+            To.Add(smtpEmailTo);
+        }
 
         string HtmlContent = $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา<br/>" +
                              $"เร\u0e35ยน XXX</br>" +

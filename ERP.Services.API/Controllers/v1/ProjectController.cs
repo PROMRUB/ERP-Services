@@ -1,12 +1,7 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
-using ERP.Services.API.Models.RequestModels.Product;
 using ERP.Services.API.Models.RequestModels.Project;
-using ERP.Services.API.Models.ResponseModels.Product;
 using ERP.Services.API.Models.ResponseModels.Project;
-using ERP.Services.API.Services.Product;
-using ERP.Services.API.Services.Project;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Services.API.Controllers.v1
@@ -25,6 +20,27 @@ namespace ERP.Services.API.Controllers.v1
         [Route("org/{id}/action/GetProjectList/{businessId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetProjectList(string id, Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await projectService.GetProjectListByBusiness(id, businessId);
+                return Ok(ResponseHandler.Response<List<ProjectResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        public record ProjectResourceParameter(string Keyword,int Page,int PageSize);
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetProjectListWithPaging/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetProjectListWithPaging(string id, Guid businessId
+        ,[FromQuery] ProjectResourceParameter resourceParameter)
         {
             try
             {
