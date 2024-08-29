@@ -1,10 +1,6 @@
-﻿using ERP.Services.API.Controllers;
-using ERP.Services.API.Handlers;
+﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.ResponseModels.Condition;
-using ERP.Services.API.Models.ResponseModels.Customer;
-using ERP.Services.API.Services.Customer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Services.API.Controllers.v1
@@ -38,6 +34,25 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        // [HttpGet]
+        // [Route("org/{id}/action/GetConditionListWithPaging/{businessId}")]
+        // [MapToApiVersion("1")]
+        // public async Task<IActionResult> GetConditionListWithPaging(string id, Guid businessId
+        // ,[FromBody])
+        // {
+        //     try
+        //     {
+        //         if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+        //             throw new ArgumentException("1101");
+        //         var result = await conditionService.GetConditionListByBusiness(id, businessId);
+        //         return Ok(ResponseHandler.Response<List<ConditionResponse>>("1000", null, result));
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Ok(ResponseHandler.Response(ex.Message, null));
+        //     }
+        // }
 
         [HttpPost()]
         [Route("org/{id}/action/ImportExcel/{businessId}")]
