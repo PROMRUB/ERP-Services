@@ -34,7 +34,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        public record ProjectResourceParameter(string Keyword,int Page,int PageSize);
+        public record ProjectResourceParameter(string? Keyword,int Page,int PageSize);
         
         [HttpGet]
         [Route("org/{id}/action/GetProjectListWithPaging/{businessId}")]
