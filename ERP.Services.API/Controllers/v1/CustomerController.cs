@@ -13,7 +13,7 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class CustomerController : BaseController
     {
-        public record BaseParameter(string Keyword = "", int Page = 1, int PageSize = 10);
+        public record BaseParameter(string? Keyword = "", int Page = 1, int PageSize = 10);
 
         private readonly ICustomerService customerService;
 
