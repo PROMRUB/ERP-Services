@@ -35,7 +35,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        public record ConditionResourceParameter(string Keyword,int Page,int PageSize);
+        public record ConditionResourceParameter(string? Keyword,int Page,int PageSize);
 
         
         [HttpGet]

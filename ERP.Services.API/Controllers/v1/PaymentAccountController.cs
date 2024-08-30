@@ -39,7 +39,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        public record PaymentAccountResourceParameter(string Keyword,int Page,int PageSize);
+        public record PaymentAccountResourceParameter(string? Keyword,int Page,int PageSize);
         
         [HttpGet]
         [Route("org/{id}/action/GetPaymentAccountWithPaging/{businessId}")]

@@ -56,7 +56,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        public record ProductResourceParameter(string Keyword,int Page,int PageSize);
+        public record ProductResourceParameter(string? Keyword,int Page,int PageSize);
         
         [HttpGet]
         [Route("org/{id}/action/GetProductListWithPaging/{businessId}")]
