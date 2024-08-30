@@ -13,9 +13,10 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class CustomerController : BaseController
     {
-        public record BaseParameter(string Keyword,int Page,int PageSize);
-        
+        public record BaseParameter(string Keyword = "", int Page = 1, int PageSize = 10);
+
         private readonly ICustomerService customerService;
+
         public CustomerController(ICustomerService customerService)
         {
             this.customerService = customerService;
@@ -24,13 +25,14 @@ namespace ERP.Services.API.Controllers.v1
         [HttpGet]
         [Route("org/{id}/action/GetCustomerList/{businessId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerList(string id, Guid businessId,[FromQuery]BaseParameter baseParameter)
+        public async Task<IActionResult> GetCustomerList(string id, Guid businessId,
+            [FromQuery] BaseParameter baseParameter)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword);
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId, baseParameter.Keyword);
                 return Ok(ResponseHandler.Response<List<CustomerResponse>>("1000", null, result));
             }
             catch (Exception ex)
@@ -38,19 +40,19 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-        
+
         [HttpGet]
         [Route("org/{id}/action/GetCustomerListWithPaging/{businessId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetCustomerListWithPaging(string id, Guid businessId
-            ,[FromQuery]BaseParameter baseParameter)
+            , [FromQuery] BaseParameter baseParameter)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerByBusinessAsync(id, businessId,baseParameter.Keyword
-                ,baseParameter.Page,baseParameter.PageSize);
+                var result = await customerService.GetCustomerByBusinessAsync(id, businessId, baseParameter.Keyword
+                    , baseParameter.Page, baseParameter.PageSize);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -58,8 +60,7 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-        
-        
+
 
         [HttpGet]
         [Route("org/{id}/action/GetCustomerInformation/{businessId}/{customerId}")]
@@ -118,7 +119,8 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/UpdateCustomer/{businessId}/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> UpdateCustomer(string id, Guid businessId, Guid customerId, [FromBody] CustomerRequest request)
+        public async Task<IActionResult> UpdateCustomer(string id, Guid businessId, Guid customerId,
+            [FromBody] CustomerRequest request)
         {
             try
             {
@@ -173,13 +175,15 @@ namespace ERP.Services.API.Controllers.v1
         [HttpGet]
         [Route("org/{id}/action/GetCustomerContactInformation/{businessId}/{customerId}/{cusConId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetCustomerContactInformation(string id, Guid businessId, Guid customerId, Guid cusConId)
+        public async Task<IActionResult> GetCustomerContactInformation(string id, Guid businessId, Guid customerId,
+            Guid cusConId)
         {
             try
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await customerService.GetCustomerContactInformationByIdAsync(id, businessId, customerId, cusConId);
+                var result =
+                    await customerService.GetCustomerContactInformationByIdAsync(id, businessId, customerId, cusConId);
                 return Ok(ResponseHandler.Response<CustomerContactResponse>("1000", null, result));
             }
             catch (Exception ex)
@@ -191,7 +195,8 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/AddCustomerContact/{businessId}/{customerId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> AddCustomerContact(string id, Guid businessId, Guid customerId, [FromBody] CustomerContactRequest request)
+        public async Task<IActionResult> AddCustomerContact(string id, Guid businessId, Guid customerId,
+            [FromBody] CustomerContactRequest request)
         {
             try
             {
@@ -209,7 +214,8 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/UpdateCustomerContact/{businessId}/{customerId}/{cusConId}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> UpdateCustomerContact(string id, Guid businessId, Guid customerId, Guid cusConId, [FromBody] CustomerContactRequest request)
+        public async Task<IActionResult> UpdateCustomerContact(string id, Guid businessId, Guid customerId,
+            Guid cusConId, [FromBody] CustomerContactRequest request)
         {
             try
             {
@@ -227,7 +233,8 @@ namespace ERP.Services.API.Controllers.v1
         [HttpPost]
         [Route("org/{id}/action/DeleteCustomerContact")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> DeleteCustomerContact(string id, [FromBody] List<CustomerContactRequest> request)
+        public async Task<IActionResult> DeleteCustomerContact(string id,
+            [FromBody] List<CustomerContactRequest> request)
         {
             try
             {
