@@ -42,7 +42,7 @@ namespace ERP.Services.API.Controllers.v1
         [Route("org/{id}/action/GetConditionListWithPaging/{businessId}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetConditionListWithPaging(string id, Guid businessId
-        ,[FromBody]ConditionResourceParameter resourceParameter)
+        ,[FromQuery]ConditionResourceParameter resourceParameter)
         {
             try
             {
