@@ -125,6 +125,24 @@ namespace ERP.Services.API.Controllers.v1
             {
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
+        }  
+        
+        [HttpDelete]
+        [Route("org/{id}/action/DeleteProjectAll/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> DeleteProjectAll(string id, Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await projectService.DeleteProjectAll(id, businessId);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
         }
     }
 }

@@ -19,5 +19,6 @@ namespace ERP.Services.API.Interfaces
         public Task<AuthorizationResponse> SignIn(string orgId, SignInRequest user);
         public Task<OrganizationUserResponse> GetUserProfile();
         public Task<OrganizationUserResponse> GetRole(string orgId, Guid businessId);
+        public Task RunningUser(string id, Guid businessId);
     }
 }

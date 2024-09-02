@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240902024148_EmployeeCode")]
+    partial class EmployeeCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1218,10 +1221,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("EmployeeCode")
                         .HasColumnType("text")
                         .HasColumnName("employee_code");
-
-                    b.Property<int>("EmployeeRunning")
-                        .HasColumnType("integer")
-                        .HasColumnName("employee_running");
 
                     b.Property<Guid?>("OrgId")
                         .HasColumnType("uuid")

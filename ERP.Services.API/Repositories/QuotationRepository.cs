@@ -64,4 +64,9 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
     {
         return _context;
     }
+
+    public void DeleteAll(List<QuotationEntity> query)
+    {
+        _context.RemoveRange(query);
+    }
 }

@@ -24,5 +24,11 @@ namespace ERP.Services.API.Entities
 
         [Column("role")]
         public string? Role { get; set; }
+        
+        [Column("employee_code")]
+        public string? EmployeeCode { get; set; }
+        
+        [Column("employee_running")]
+        public int EmployeeRunning { get; set; }
     }
 }

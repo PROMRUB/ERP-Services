@@ -25,7 +25,7 @@ namespace ERP.Services.API.Repositories
         }
         
 
-        public IQueryable<UserBusinessEntity> GetBusinessUserList(Guid orgId, Guid businessId)
+        public IQueryable<UserBusinessEntity> GetBusinessUserList(Guid businessId, Guid orgId)
         {
             var query = context!.UserBusinesses!.Where(x => x.OrgId == orgId && x.BusinessId == businessId);
             return query;

@@ -9,6 +9,7 @@ namespace ERP.Services.API.Interfaces
         public void AddProject(ProjectEntity query);
         public void UpdateProject(ProjectEntity query);
         public void DeleteProject(ProjectEntity query);
+        public void DeleteProjectAll(List<ProjectEntity> query);
         public Task<ProjectNumberEntity> ProjectNumberAsync(Guid orgId, Guid businessId, string year, int mode);
         public void Commit();
     }

@@ -13,4 +13,5 @@ public interface IQuotationRepository
     public void DeleteProduct(List<QuotationProductEntity> entity);
     public void DeleteProject(List<QuotationProjectEntity> entity);
     public DbContext? Context();
+    public void DeleteAll(List<QuotationEntity> query);
 }

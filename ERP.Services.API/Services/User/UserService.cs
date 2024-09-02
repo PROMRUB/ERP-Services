@@ -6,15 +6,11 @@ using ERP.Services.API.Models.RequestModels.Authorization;
 using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Models.ResponseModels.Organization;
 using ERP.Services.API.Models.ResponseModels.User;
-using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ERP.Services.API.Services.User
 {
@@ -134,6 +130,12 @@ namespace ERP.Services.API.Services.User
             //     result.Role?.Add(title);
             // }
             return result;
+        }
+
+        public Task RunningUser(string id, Guid businessId)
+        {
+            //TODO : 
+            throw new NotImplementedException();
         }
 
         public async Task<IQueryable<UserBusinessEntity>> GetUserBusiness(string orgId)

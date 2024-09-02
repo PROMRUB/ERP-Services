@@ -96,10 +96,11 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
-            Amount = (float)x.Amount,
+            Amount = x.Amount,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
-            Discount = Convert.ToInt32(x.Discount)
+            Discount = Convert.ToInt32(x.Discount),
+            Order = x.Order
         }).ToList();
     }
 
@@ -162,7 +163,7 @@ public class QuotationService : IQuotationService
             ProductId = x.ProductId,
             Discount = x.Discount,
             Quantity = x.Quantity,
-            Order = i,
+            Order = x.Order,
         }).ToList();
 
         return products;
@@ -576,7 +577,7 @@ public class QuotationService : IQuotationService
 
         await _quotationRepository.Context().SaveChangesAsync();
 
-       
+
         try
         {
             await SendApproveQuotation(quotation, Emails);
@@ -662,6 +663,15 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" : queryCustomer.PostCode);
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
+    }
+
+    public async Task DeleteAll()
+    {
+        var query = await _quotationRepository.GetQuotationQuery().ToListAsync();
+        
+        _quotationRepository.DeleteAll(query);
+
+        await _quotationRepository.Context().SaveChangesAsync();
     }
 
     private async Task SendApproveQuotation(QuotationEntity quotation, List<EmailInformation> list)
@@ -770,9 +780,9 @@ public class QuotationService : IQuotationService
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-      
+
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
-        
+
         foreach (var email in emails)
         {
             string ToEmail = email.Email;

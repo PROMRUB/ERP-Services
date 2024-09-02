@@ -126,5 +126,15 @@ namespace ERP.Services.API.Services.Project
             projectRepository.DeleteProject(query);
             projectRepository.Commit();
         }
+
+        public async Task DeleteProjectAll(string orgId, Guid businessId)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
+                .ToListAsync();
+            projectRepository.DeleteProjectAll(query);
+            projectRepository.Commit();
+        }
     }
 }

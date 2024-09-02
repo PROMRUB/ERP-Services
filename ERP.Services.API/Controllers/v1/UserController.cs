@@ -36,5 +36,23 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpPost]
+        [Route("org/{id}/action/AdminRunningUser/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AdminRunningUser(string id, Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await services.RunningUser(id, businessId);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }

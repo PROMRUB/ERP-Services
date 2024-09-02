@@ -16,5 +16,6 @@ namespace ERP.Services.API.Interfaces
         public Task CreateProject(string orgId, ProjectRequest request);
         public Task UpdateProject(string orgId, Guid businessId, Guid projectId, ProjectRequest request);
         public Task DeleteProject(string orgId, Guid businessId, Guid projectId, ProjectRequest request);
+        public Task DeleteProjectAll(string id, Guid businessId);
     }
 }
