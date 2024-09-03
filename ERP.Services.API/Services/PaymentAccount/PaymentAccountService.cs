@@ -80,7 +80,7 @@ namespace ERP.Services.API.Services.PaymentAccount
                 AccountBankName = x.BankEntity.BankTHName,
                 AccountBankBrn = x.BankBranchEntity.BankBranchTHName,
                 PaymentAccountNo = x.PaymentAccountNo,
-                AccountStatus = x.AccountStatus
+                AccountStatus = x.AccountStatus == "Active" ? "ปกติ" : "รออนุมติ"
             });
 
             var paged = await PagedList<PaymentAccountResponse>.Create(result, page, pageSize);
