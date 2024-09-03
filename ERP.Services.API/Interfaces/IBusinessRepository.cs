@@ -1,4 +1,5 @@
 ﻿using ERP.Services.API.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Interfaces
 {
@@ -6,10 +7,13 @@ namespace ERP.Services.API.Interfaces
     {
         public IQueryable<BusinessEntity> GetBusinesses(Guid orgId);
         public IQueryable<BusinessEntity> GetBusinessesQuery();
+        public IQueryable<UserBusinessEntity> GetUserBusinessQuery();
         public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid? userId, Guid orgId);
-        public IQueryable<UserBusinessEntity> GetBusinessUserList(Guid orgId, Guid businessId);
+        public IQueryable<UserBusinessEntity> GetBusinessUserList();
         public void SetCustomOrgId(string customOrgId);
         public bool IsCustomBusinessIdExist(string orgCustomId);
         public Task AddBusiness(BusinessEntity bus);
+        public void UpdateUserBusiness(List<UserBusinessEntity> bus);
+        public DbContext Context();
     }
 }

@@ -71,7 +71,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.ApplyConfiguration(new QuotationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProductEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProjectEntityConfiguration());
-            // modelBuilder.ApplyConfiguration(new ProjectLowerPriceProductEntityConfiguration());
+            // modelBuilder.ApplyConfiguration(new UserBusinessEntityConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentAccountEntityConfiguration());
         }
     }

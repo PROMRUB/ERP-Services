@@ -60,7 +60,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasIndex("OrgId");
 
-                    b.ToTable("ApiKeys");
+                    b.ToTable("ApiKeys", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.BankBranchEntity", b =>
@@ -88,7 +88,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("BankBranchId");
 
-                    b.ToTable("BankBranch");
+                    b.ToTable("BankBranch", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.BankEntity", b =>
@@ -116,7 +116,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("BankId");
 
-                    b.ToTable("Bank");
+                    b.ToTable("Bank", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.BusinessEntity", b =>
@@ -231,7 +231,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("BusinessCustomId")
                         .IsUnique();
 
-                    b.ToTable("Businesses");
+                    b.ToTable("Businesses", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ConditionEntity", b =>
@@ -266,7 +266,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("ConditionId", "OrgId", "BusinessId")
                         .IsUnique();
 
-                    b.ToTable("Conditions");
+                    b.ToTable("Conditions", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.CustomerContactEntity", b =>
@@ -325,7 +325,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("CusConId", "OrgId", "BusinessId", "CusId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("CustomerContact");
+                    b.ToTable("CustomerContact", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.CustomerEntity", b =>
@@ -440,7 +440,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("CusId", "CusCustomId", "OrgId", "BusinessId")
                         .IsUnique();
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.CustomerNumberEntity", b =>
@@ -474,7 +474,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("OrgId", "BusinessId", "Character")
                         .IsUnique();
 
-                    b.ToTable("CustomerNo");
+                    b.ToTable("CustomerNo", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.DistrictEntity", b =>
@@ -506,7 +506,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("DistrictId");
 
-                    b.ToTable("Districts");
+                    b.ToTable("Districts", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.OrganizationEntity", b =>
@@ -613,7 +613,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("OrgCustomId")
                         .IsUnique();
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.OrganizationNumberEntity", b =>
@@ -633,7 +633,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("OrgId");
 
-                    b.ToTable("OrganizationNo");
+                    b.ToTable("OrganizationNo", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.OrganizationUserEntity", b =>
@@ -677,7 +677,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("OrgUserId");
 
-                    b.ToTable("OrganizationsUsers");
+                    b.ToTable("OrganizationsUsers", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.PaymentAccountEntity", b =>
@@ -728,7 +728,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("PaymentAccountId", "OrgId", "BusinessId")
                         .IsUnique();
 
-                    b.ToTable("PaymentAccounts");
+                    b.ToTable("PaymentAccounts", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ProductCategoryEntity", b =>
@@ -767,7 +767,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("ProductCatId", "OrgId", "BusinessId", "CustomCatId")
                         .IsUnique();
 
-                    b.ToTable("ProductCategory");
+                    b.ToTable("ProductCategory", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ProductEntity", b =>
@@ -818,7 +818,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("ProductId", "OrgId", "BusinessId", "ProductCustomId")
                         .IsUnique();
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ProjectEntity", b =>
@@ -861,7 +861,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("ProjectId", "BusinessId", "CustomerId", "ProjectCustomId")
                         .IsUnique();
 
-                    b.ToTable("Project");
+                    b.ToTable("Project", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ProjectNumberEntity", b =>
@@ -895,7 +895,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("OrgId", "BusinessId", "Year")
                         .IsUnique();
 
-                    b.ToTable("ProjectNo");
+                    b.ToTable("ProjectNo", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.ProvinceEntity", b =>
@@ -919,7 +919,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("ProvinceId");
 
-                    b.ToTable("Provinces");
+                    b.ToTable("Provinces", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationEntity", b =>
@@ -1030,7 +1030,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasIndex("SalePersonId");
 
-                    b.ToTable("Quotation");
+                    b.ToTable("Quotation", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProductEntity", b =>
@@ -1082,7 +1082,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("QuotationId", "ProductId")
                         .IsUnique();
 
-                    b.ToTable("QuotationProduct");
+                    b.ToTable("QuotationProduct", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProjectEntity", b =>
@@ -1129,7 +1129,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("QuotationId", "ProjectId")
                         .IsUnique();
 
-                    b.ToTable("QuotationProject");
+                    b.ToTable("QuotationProject", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.RoleEntity", b =>
@@ -1165,7 +1165,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("RoleName")
                         .IsUnique();
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.SubDistrictEntity", b =>
@@ -1201,7 +1201,7 @@ namespace ERP.Services.API.Migrations
 
                     b.HasKey("SubDistrictId");
 
-                    b.ToTable("SubDistricts");
+                    b.ToTable("SubDistricts", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.UserBusinessEntity", b =>
@@ -1240,7 +1240,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("UserBusinessId")
                         .IsUnique();
 
-                    b.ToTable("UserBusiness");
+                    b.ToTable("UserBusiness", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.UserEntity", b =>
@@ -1270,7 +1270,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.UserSessionEntity", b =>
@@ -1299,7 +1299,7 @@ namespace ERP.Services.API.Migrations
                     b.HasIndex("UserSessionId")
                         .IsUnique();
 
-                    b.ToTable("UserSession");
+                    b.ToTable("UserSession", (string)null);
                 });
 
             modelBuilder.Entity("ERP.Services.API.Entities.PaymentAccountEntity", b =>

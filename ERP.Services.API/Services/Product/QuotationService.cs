@@ -2,6 +2,7 @@ using System.Globalization;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
+using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Quotation;
 using ERP.Services.API.Models.ResponseModels.PaymentAccount;
@@ -22,6 +23,7 @@ public class EmailInformation
 
 public class QuotationService : IQuotationService
 {
+    private readonly UserPrincipalHandler _userPrincipalHandler;
     private readonly ISystemConfigRepository _systemRepository;
     private readonly IBusinessRepository _businessRepository;
     private readonly IMapper _mapper;
@@ -58,10 +60,12 @@ public class QuotationService : IQuotationService
         IOrganizationRepository organizationRepository,
         IPaymentAccountRepository paymentAccountRepository,
         IBusinessRepository businessRepository,
-        ISystemConfigRepository systemRepository)
+        ISystemConfigRepository systemRepository,
+        UserPrincipalHandler userPrincipalHandler)
     {
         try
         {
+            _userPrincipalHandler = userPrincipalHandler;
             _mapper = mapper;
             _quotationRepository = quotationRepository;
             _productRepository = productRepository;
@@ -485,8 +489,14 @@ public class QuotationService : IQuotationService
             keyword = keyword.ToLower();
         }
 
+        var userId = _userPrincipalHandler.Id;
+
+        var user = _businessRepository.GetUserBusinessQuery()
+            .FirstOrDefault(x => x.UserId == userId);
+
         var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
+                .Where(x => ((user == null) || (user.Role.Contains("SaleManager")) || (user.UserId == x.SalePersonId)))
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) ||

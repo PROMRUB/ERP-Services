@@ -1,4 +1,5 @@
 ﻿using ERP.Services.API.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Interfaces
 {
@@ -9,6 +10,8 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<OrganizationEntity> GetOrganizationList();
         public void AddUserToOrganization(OrganizationUserEntity user);
         public IQueryable<OrganizationUserEntity> GetUserListAsync();
+        public DbContext Context();
+        public void UpdateUserRange(List<OrganizationUserEntity> userList);
         public bool IsUserNameExist(string userName);
         public bool IsCustomOrgIdExist(string orgCustomId);
         public Task<OrganizationUserEntity> GetUserInOrganization(string userName);
