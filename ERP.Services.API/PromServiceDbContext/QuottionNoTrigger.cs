@@ -12,7 +12,7 @@ public class QuotationNoTrigger(PromDbContext dbContext) : IBeforeSaveTrigger<Qu
         if (context.ChangeType == ChangeType.Added)
         {
             var saleFormat = dbContext.UserBusinesses
-                .FirstOrDefault(x => context.Entity.SalePersonId == x.UserId);
+                .FirstOrDefault(x => context.Entity.SalePersonId == x.UserId && context.Entity.BusinessId == x.BusinessId);
 
 
             var formater = $"{saleFormat.EmployeeCode}-QT{DateTime.Now.ToString("yyyyMM")}-";

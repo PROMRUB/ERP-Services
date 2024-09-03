@@ -136,7 +136,7 @@ namespace ERP.Services.API.Services.User
         {
             organizationRepository!.SetCustomOrgId(orgId);
             var org = await organizationRepository.GetOrganization();
-           
+
             var users = businessRepository.GetBusinessUserList()
                 .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId)
                 .OrderByDescending(x => x.EmployeeRunning)
@@ -154,6 +154,34 @@ namespace ERP.Services.API.Services.User
                 var list = await businessRepository.GetBusinessUserList()
                     .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId)
                     .ToListAsync();
+
+                foreach (var userBusinessEntity in list)
+                {
+                    max++;
+                    userBusinessEntity.EmployeeRunning = max;
+                    userBusinessEntity.EmployeeCode = max.ToString("0000");
+                }
+
+                businessRepository.UpdateUserBusiness(list);
+                await businessRepository.Context().SaveChangesAsync();
+            }
+            else
+            {
+                var list = await businessRepository.GetBusinessUserList()
+                    .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId
+                                                     && x.EmployeeRunning == 0)
+                    .OrderByDescending(x => x.EmployeeRunning)
+                    .ToListAsync();
+
+                if (!list.Any())
+                {
+                    return;
+                }
+
+                max = businessRepository.GetBusinessUserList()
+                    .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId)
+                    .OrderByDescending(x => x.EmployeeRunning)
+                    .FirstOrDefault()!.EmployeeRunning;
 
                 foreach (var userBusinessEntity in list)
                 {
