@@ -13,6 +13,7 @@ using ERP.Services.API.Models.ResponseModels.Project;
 using ERP.Services.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using ERP.Services.API.Utils;
 
 namespace ERP.Services.API.Services.PaymentAccount
 {
@@ -38,7 +39,7 @@ namespace ERP.Services.API.Services.PaymentAccount
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.AccountStatus == RecordStatus.Active.ToString()).OrderBy(x => x.AccountBank).ToListAsync();
+            var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.AccountStatus == RecordStatus.Active.ToString()).OrderBy(x => x.BankId).ToListAsync();
             var result = mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(query);
             var bankQuery = await systemConfigRepository.GetAll<BankEntity>().ToListAsync();
             foreach (var item in result)
@@ -49,6 +50,42 @@ namespace ERP.Services.API.Services.PaymentAccount
                 item.AccountBankBrn = branch.Where(x => x.BankBranchId == item.AccountBrn).FirstOrDefault().BankBranchTHName;
             }
             return result;
+        } 
+        
+        public async Task<PagedList<PaymentAccountResponse>> GetPaymentAccountListByBusiness(string orgId, Guid businessId,string keyword,int page,int pageSize)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query =  paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+                .Include(x => x.BankEntity)
+                .Include(x => x.BankBranchEntity)
+                .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
+                .OrderBy(x => x.BankId);
+            // var result = mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(query);
+            // var bankQuery = await systemConfigRepository.GetAll<BankEntity>().ToListAsync();
+            // foreach (var item in result)
+            // {
+            //     var bank = bankQuery.Where(x => x.BankId == item.AccountBank).FirstOrDefault();
+            //     item.AccountBankName = bank.BankTHName;
+            //     var branch = await systemConfigRepository.GetAll<BankBranchEntity>().Where(x => x.BankCode.Equals(bank.BankCode)).ToListAsync();
+            //     item.AccountBankBrn = branch.Where(x => x.BankBranchId == item.AccountBrn).FirstOrDefault().BankBranchTHName;
+            // }
+
+            var result = query.Select(x => new PaymentAccountResponse
+            {
+                PaymentAccountId = x.PaymentAccountId,
+                OrgId = x.OrgId,
+                PaymentAccountName = x.PaymentAccountName,
+                AccountType = x.AccountType,
+                AccountBankName = x.BankEntity.BankTHName,
+                AccountBankBrn = x.BankBranchEntity.BankBranchTHName,
+                PaymentAccountNo = x.PaymentAccountNo,
+                AccountStatus = x.AccountStatus
+            });
+
+            var paged = await PagedList<PaymentAccountResponse>.Create(result, page, pageSize);
+            
+            return paged;
         }
 
         public async Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId, Guid paymentAccountId)
@@ -75,8 +112,8 @@ namespace ERP.Services.API.Services.PaymentAccount
             var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.PaymentAccountId == paymentAccountId).FirstOrDefaultAsync();
             query.PaymentAccountName = request.PaymentAccountName;
             query.PaymentAccountNo = request.PaymentAccountNo;
-            query.AccountBank = request.AccountBank;
-            query.AccountBrn = request.AccountBrn;
+            query.BankId = request.AccountBank;
+            query.BankBranchId = request.AccountBrn;
             paymentAccountRepository.UpdatePaymentAccount(query);
             paymentAccountRepository.Commit();
         }

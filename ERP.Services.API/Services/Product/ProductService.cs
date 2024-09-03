@@ -6,6 +6,7 @@ using ERP.Services.API.Models.RequestModels.Product;
 using ERP.Services.API.Models.ResponseModels.Customer;
 using ERP.Services.API.Models.ResponseModels.Product;
 using ERP.Services.API.Repositories;
+using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -64,6 +65,66 @@ namespace ERP.Services.API.Services.Product
             }
 
             return result;
+        }
+
+        public async Task<PagedList<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,
+            string keyword, int page, int pageSize)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x =>
+                x.ProductStatus == RecordStatus.Active.ToString()
+                && (string.IsNullOrWhiteSpace(keyword) ||
+                    (!string.IsNullOrWhiteSpace(x.ProductCustomId) && x.ProductCustomId.Contains(keyword))
+                    || (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.ToLower().Contains(keyword))
+                )
+            ).OrderBy(x => x.ProductCustomId);
+            // var result = mapper.Map<List<ProductEntity>, List<ProductResponse>>(query);
+            // var cat = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+            //     .ToListAsync();
+            // foreach (var item in result)
+            // {
+            //     item.ProductCategory =
+            //         cat.Where(x => x.ProductCatId == item.ProductCatId).FirstOrDefault()?.CategoryName;
+            //     item.ProductSubCategory = cat.Where(x => x.ProductCatId == item.ProductSubCatId).FirstOrDefault()
+            //         ?.CategoryName;
+            //     if (item.ProductStatus == RecordStatus.Active.ToString())
+            //     {
+            //         item.ProductStatus = "ปกติ";
+            //     }
+            // }
+
+            var result = query.Select(x => new ProductResponse
+            {
+                ProductId = x.ProductId,
+                OrgId = x.OrgId,
+                BusinessId = x.BusinessId,
+                ProductCatId = x.ProductCatId,
+                ProductSubCatId = x.ProductSubCatId,
+                // ProductCategory = x.CategoryEntity.CategoryName,
+                // ProductSubCategory = x.SubCategoryEntity.CategoryName,
+                ProductCustomId = x.ProductCustomId,
+                ProductName = x.ProductName,
+                MSRP = x.MSRP,
+                LwPrice = x.LwPrice,
+                ProductStatus = x.ProductStatus == RecordStatus.Active.ToString() ? "ปกติ" : ""
+            });
+
+            var paged = await PagedList<ProductResponse>.Create(result, page, pageSize);
+
+            var cat = await productRepository.GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
+                .ToListAsync();
+            foreach (var item in paged.Items)
+            {
+                item.ProductCategory =
+                    cat.FirstOrDefault(x => x.ProductCatId == item.ProductCatId)?.CategoryName;
+                item.ProductSubCategory = cat.FirstOrDefault(x => x.ProductCatId == item.ProductSubCatId)
+                    ?.CategoryName;
+            }
+            
+            
+            return paged;
         }
 
         public async Task<ProductResponse> GetProductInformationById(string orgId, Guid businessId, Guid productId)

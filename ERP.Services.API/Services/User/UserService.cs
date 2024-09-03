@@ -6,15 +6,11 @@ using ERP.Services.API.Models.RequestModels.Authorization;
 using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Models.ResponseModels.Organization;
 using ERP.Services.API.Models.ResponseModels.User;
-using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ERP.Services.API.Services.User
 {
@@ -134,6 +130,67 @@ namespace ERP.Services.API.Services.User
             //     result.Role?.Add(title);
             // }
             return result;
+        }
+
+        public async Task RunningUser(string orgId, Guid businessId)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var org = await organizationRepository.GetOrganization();
+           
+            var users = businessRepository.GetBusinessUserList()
+                .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId)
+                .OrderByDescending(x => x.EmployeeRunning)
+                .FirstOrDefault();
+
+            if (users == null)
+            {
+                return;
+            }
+
+            var max = users.EmployeeRunning;
+
+            if (max == 0)
+            {
+                var list = await businessRepository.GetBusinessUserList()
+                    .Where(x => x.OrgId == org.OrgId && x.BusinessId == businessId)
+                    .ToListAsync();
+
+                foreach (var userBusinessEntity in list)
+                {
+                    max++;
+                    userBusinessEntity.EmployeeRunning = max;
+                    userBusinessEntity.EmployeeCode = max.ToString("0000");
+                }
+
+                businessRepository.UpdateUserBusiness(list);
+                await businessRepository.Context().SaveChangesAsync();
+            }
+        }
+
+        public async Task ChangeAllPassword()
+        {
+            var list = new List<string>()
+            {
+                "amornrat.t@securesolutionsasia.com",
+                "kitsada.t@securesolutionsasia.com",
+                "muankhwan.u@securesolutionsasia.com",
+                "witchayada.a@securesolutionsasia.com",
+                "nopporn.k@cybermasters.co.th",
+                "nattapol.c@securesolutionsasia.com"
+            };
+
+            var user = organizationRepository.GetUserListAsync()
+                .Where(x => !list.Contains(x.email))
+                .ToList();
+
+            foreach (var entity in user)
+            {
+                entity.Password = "111111112@";
+            }
+
+            organizationRepository.UpdateUserRange(user);
+
+            await organizationRepository.Context().SaveChangesAsync();
         }
 
         public async Task<IQueryable<UserBusinessEntity>> GetUserBusiness(string orgId)

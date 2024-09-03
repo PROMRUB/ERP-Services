@@ -2,6 +2,7 @@ using System.Globalization;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
+using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Quotation;
 using ERP.Services.API.Models.ResponseModels.PaymentAccount;
@@ -22,6 +23,7 @@ public class EmailInformation
 
 public class QuotationService : IQuotationService
 {
+    private readonly UserPrincipalHandler _userPrincipalHandler;
     private readonly ISystemConfigRepository _systemRepository;
     private readonly IBusinessRepository _businessRepository;
     private readonly IMapper _mapper;
@@ -58,10 +60,12 @@ public class QuotationService : IQuotationService
         IOrganizationRepository organizationRepository,
         IPaymentAccountRepository paymentAccountRepository,
         IBusinessRepository businessRepository,
-        ISystemConfigRepository systemRepository)
+        ISystemConfigRepository systemRepository,
+        UserPrincipalHandler userPrincipalHandler)
     {
         try
         {
+            _userPrincipalHandler = userPrincipalHandler;
             _mapper = mapper;
             _quotationRepository = quotationRepository;
             _productRepository = productRepository;
@@ -96,10 +100,11 @@ public class QuotationService : IQuotationService
     {
         return entities.Select(x => new QuotationProductResource
         {
-            Amount = (float)x.Amount,
+            Amount = x.Amount,
             ProductId = x.ProductId,
             Quantity = x.Quantity,
-            Discount = Convert.ToInt32(x.Discount)
+            Discount = Convert.ToInt32(x.Discount),
+            Order = x.Order
         }).ToList();
     }
 
@@ -162,7 +167,7 @@ public class QuotationService : IQuotationService
             ProductId = x.ProductId,
             Discount = x.Discount,
             Quantity = x.Quantity,
-            Order = i,
+            Order = x.Order,
         }).ToList();
 
         return products;
@@ -451,16 +456,16 @@ public class QuotationService : IQuotationService
         var organization = await _organizationRepository.GetOrganization();
         var result = await _paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
             .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
-            .OrderBy(x => x.AccountBank).ToListAsync();
+            .OrderBy(x => x.BankId).ToListAsync();
         return result.Select(x => new PaymentAccountResponse
         {
             PaymentAccountId = x.PaymentAccountId,
             OrgId = x.OrgId,
             PaymentAccountName = x.PaymentAccountName,
             AccountType = x.AccountType,
-            AccountBank = x.AccountBank,
+            AccountBank = x.BankId,
             // AccountBankName = x.AccountBank,
-            AccountBrn = x.AccountBrn,
+            AccountBrn = x.BankBranchId,
             // AccountBankBrn = x,AccountBankBrn,
             PaymentAccountNo = x.PaymentAccountNo,
             AccountStatus = "Active"
@@ -484,8 +489,14 @@ public class QuotationService : IQuotationService
             keyword = keyword.ToLower();
         }
 
+        var userId = _userPrincipalHandler.Id;
+
+        var user = _businessRepository.GetUserBusinessQuery()
+            .FirstOrDefault(x => x.UserId == userId);
+
         var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
+                .Where(x => ((user == null) || (user.Role.Contains("SaleManager")) || (user.UserId == x.SalePersonId)))
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) ||
@@ -576,7 +587,7 @@ public class QuotationService : IQuotationService
 
         await _quotationRepository.Context().SaveChangesAsync();
 
-       
+
         try
         {
             await SendApproveQuotation(quotation, Emails);
@@ -662,6 +673,15 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" : queryCustomer.PostCode);
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
+    }
+
+    public async Task DeleteAll()
+    {
+        var query = await _quotationRepository.GetQuotationQuery().ToListAsync();
+        
+        _quotationRepository.DeleteAll(query);
+
+        await _quotationRepository.Context().SaveChangesAsync();
     }
 
     private async Task SendApproveQuotation(QuotationEntity quotation, List<EmailInformation> list)
@@ -770,9 +790,9 @@ public class QuotationService : IQuotationService
         string SenderName = "PROM ERP";
         string SenderEmail = "e-service@prom.co.th";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
-      
+
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
-        
+
         foreach (var email in emails)
         {
             string ToEmail = email.Email;

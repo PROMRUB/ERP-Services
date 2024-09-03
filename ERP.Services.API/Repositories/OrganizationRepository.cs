@@ -37,6 +37,16 @@ namespace ERP.Services.API.Repositories
             return context!.OrganizationUsers!;
         }
 
+        public DbContext Context()
+        {
+            return context;
+        }
+
+        public void UpdateUserRange(List<OrganizationUserEntity> userList)
+        {
+            context.UpdateRange(userList);
+        }
+
         public async Task<IEnumerable<OrganizationUserEntity>> GetUserAllowedOrganizationAsync(string userName)
         {
             var query = await context!.OrganizationUsers!.Where(

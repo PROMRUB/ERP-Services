@@ -39,26 +39,27 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        // public record PaymentAccountResourceParameter(string Keyword,int Page,int PageSize);
-        //
-        // [HttpGet]
-        // [Route("org/{id}/action/GetPaymentAccountWithPaging/{businessId}")]
-        // [MapToApiVersion("1")]
-        // public async Task<IActionResult> GetProductListWithPaging(string id, Guid businessId
-        //     ,[FromQuery] PaymentAccountResourceParameter resourceParameter)
-        // {
-        //     try
-        //     {
-        //         if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-        //             throw new ArgumentException("1101");
-        //         var result = await projectService.GetProjectListByBusiness(id, businessId);
-        //         return Ok(ResponseHandler.Response<List<ProjectResponse>>("1000", null, result));
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Ok(ResponseHandler.Response(ex.Message, null));
-        //     }
-        // }
+        public record PaymentAccountResourceParameter(string? Keyword,int Page,int PageSize);
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetPaymentAccountWithPaging/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetPaymentAccountListWithPaging(string id, Guid businessId
+            ,[FromQuery] PaymentAccountResourceParameter resourceParameter)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await paymentAccountService.GetPaymentAccountListByBusiness(id, businessId,
+                    resourceParameter.Keyword,resourceParameter.Page,resourceParameter.PageSize);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
 
         [HttpPost]

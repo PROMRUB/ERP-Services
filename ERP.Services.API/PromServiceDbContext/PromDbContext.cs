@@ -39,6 +39,7 @@ namespace ERP.Services.API.PromServiceDbContext
         public DbSet<QuotationEntity> Quotation { get; set; }
         public DbSet<QuotationProductEntity> QuotationProduct { get; set; }
         public DbSet<QuotationProjectEntity> QuotationProject { get; set; }
+        // public DbSet<ProjectLowerPriceProductEntity> ProjectLowerPriceProduct { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,7 +61,7 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.Entity<UserBusinessEntity>();
             modelBuilder.Entity<UserSessionEntity>();
             modelBuilder.Entity<ProductCategoryEntity>();
-            modelBuilder.Entity<ProductEntity>();
+            // modelBuilder.Entity<ProductEntity>();
             modelBuilder.Entity<ProjectEntity>();
             modelBuilder.Entity<ProjectNumberEntity>();
             modelBuilder.Entity<ConditionEntity>();
@@ -70,6 +71,8 @@ namespace ERP.Services.API.PromServiceDbContext
             modelBuilder.ApplyConfiguration(new QuotationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProductEntityConfiguration());
             modelBuilder.ApplyConfiguration(new QuotationProjectEntityConfiguration());
+            // modelBuilder.ApplyConfiguration(new UserBusinessEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentAccountEntityConfiguration());
         }
     }
 }

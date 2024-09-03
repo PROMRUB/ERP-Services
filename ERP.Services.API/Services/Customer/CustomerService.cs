@@ -11,6 +11,7 @@ using OfficeOpenXml;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using ERP.Services.API.Utils;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ERP.Services.API.Services.Customer
@@ -41,7 +42,7 @@ namespace ERP.Services.API.Services.Customer
                                     x.CusNameEng.ToLower().Contains(keyword))
                                 || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
                                     x.CusCustomId.ToLower().Contains(keyword))
-                                )
+                            )
                 ).OrderBy(x => x.CusCustomId).ToListAsync();
             var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
             foreach (var item in result)
@@ -53,6 +54,66 @@ namespace ERP.Services.API.Services.Customer
             }
 
             return result;
+        }
+
+        public async Task<PagedList<CustomerResponse>> GetCustomerByBusinessAsync(string orgId, Guid businessId,
+            string keyword, int page, int pageSize)
+        {
+            keyword = keyword.ToLower();
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.CusStatus != RecordStatus.InActive.ToString()
+                            && (string.IsNullOrWhiteSpace(keyword) ||
+                                (!string.IsNullOrWhiteSpace(x.CusName) && x.CusName.ToLower().Contains(keyword))
+                                || (!string.IsNullOrWhiteSpace(x.CusNameEng) &&
+                                    x.CusNameEng.ToLower().Contains(keyword))
+                                || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
+                                    x.CusCustomId.ToLower().Contains(keyword))
+                            )
+                ).OrderBy(x => x.CusCustomId);
+
+            // .ToListAsync();
+            // var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
+            // foreach (var item in result)
+            // {
+            //     if (item.CusStatus.Equals(RecordStatus.Waiting.ToString()))
+            //         item.CusStatus = "รออนุมัติ";
+            //     else if (item.CusStatus.Equals(RecordStatus.Active.ToString()))
+            //         item.CusStatus = "ปกติ";
+            // }
+
+            var result = query.Select(x => new CustomerResponse
+            {
+                CusId = x.CusId,
+                CusCustomId = x.CusCustomId,
+                BusinessId = x.BusinessId,
+                CusType = x.CusType,
+                CusName = x.CusName,
+                CusNameEng = x.CusNameEng,
+                DisplayName = x.DisplayName,
+                TaxId = x.TaxId,
+                BrnId = x.BrnId,
+                Building = x.Building,
+                RoomNo = x.RoomNo,
+                Floor = x.Floor,
+                Village = x.Village,
+                Moo = x.Moo,
+                No = x.No,
+                Road = x.Road,
+                Alley = x.Alley,
+                Province = x.Province,
+                District = x.District,
+                SubDistrict = x.SubDistrict,
+                PostCode = x.PostCode,
+                Website = x.Website,
+                CusStatus = x.CusStatus.Equals(RecordStatus.Waiting.ToString()) ? "รออนุมัติ"
+                    : x.CusStatus.Equals(RecordStatus.Active.ToString()) ? "ปกติ" : ""
+            });
+
+            var paged = await PagedList<CustomerResponse>.Create(result, page, pageSize);
+
+            return paged;
         }
 
         public async Task<CustomerResponse> GetCustomerInformationByIdAsync(string orgId, Guid businessId,
@@ -242,26 +303,33 @@ namespace ERP.Services.API.Services.Customer
             customerRepository.Commit();
         }
 
-        public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid businessId, Guid cusId)
+        public async Task<List<CustomerContactResponse>> GetCustomerContactByCustomer(string orgId, Guid businessId,
+            Guid cusId)
         {
             organizationRepository.SetCustomOrgId(orgId);
             userRepository.SetCustomOrgId(orgId);
             businessRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            var user = await userRepository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id).FirstOrDefaultAsync();
-            var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!).Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
-            List<CustomerContactEntity> result = new List < CustomerContactEntity >();
+            var user = await userRepository.GetUserProfiles().Where(x => x.OrgUserId == userPrincipalHandler.Id)
+                .FirstOrDefaultAsync();
+            var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
+                .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
+            List<CustomerContactEntity> result = new List<CustomerContactEntity>();
             if (!role!.Role!.Contains("SaleManager"))
             {
-                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
-                    .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
+                result = await customerRepository
+                    .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
+                    .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConStatus == RecordStatus.Active.ToString())
+                    .ToListAsync();
             }
             else
             {
-                result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
+                result = await customerRepository
+                    .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
                     .Where(x => x.CusConStatus == RecordStatus.Active.ToString()).ToListAsync();
             }
+
             return mapper.Map<List<CustomerContactEntity>, List<CustomerContactResponse>>(result);
         }
 
@@ -271,7 +339,9 @@ namespace ERP.Services.API.Services.Customer
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            var result = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId).Where(x => x.UserId == userPrincipalHandler.Id &&  x.CusConId == cusConId).FirstOrDefaultAsync();
+            var result = await customerRepository
+                .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId)
+                .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == cusConId).FirstOrDefaultAsync();
             return mapper.Map<CustomerContactEntity, CustomerContactResponse>(result);
         }
 
@@ -302,7 +372,9 @@ namespace ERP.Services.API.Services.Customer
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == cusConId).FirstOrDefaultAsync();
+            var query = await customerRepository
+                .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, customerId)
+                .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == cusConId).FirstOrDefaultAsync();
             if (query == null)
                 throw new ArgumentException("1111");
             query.CusConFirstname = request.CusConFirstname;
@@ -321,8 +393,11 @@ namespace ERP.Services.API.Services.Customer
             var organization = await organizationRepository.GetOrganization();
             foreach (var customer in request)
             {
-
-                var query = await customerRepository.GetCustomerContactByCustomer((Guid)organization.OrgId, (Guid)customer.BusinessId, (Guid)customer.CusId).Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == customer.CusConId).FirstOrDefaultAsync();
+                var query = await customerRepository
+                    .GetCustomerContactByCustomer((Guid)organization.OrgId, (Guid)customer.BusinessId,
+                        (Guid)customer.CusId)
+                    .Where(x => x.UserId == userPrincipalHandler.Id && x.CusConId == customer.CusConId)
+                    .FirstOrDefaultAsync();
                 customerRepository.DeleteCustomerContact(query);
             }
 

@@ -51,6 +51,12 @@ namespace ERP.Services.API.Repositories
                 throw;
             }
         }
+
+        public void DeleteProjectAll(List<ProjectEntity> query)
+        {
+            context.RemoveRange(query);
+        }
+
         public async Task<ProjectNumberEntity> ProjectNumberAsync(Guid orgId, Guid businessId, string year, int mode)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())

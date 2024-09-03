@@ -25,10 +25,13 @@ namespace ERP.Services.API.Entities
         public string? AccountType { get; set; }
 
         [Column("account_bank_id")]
-        public Guid? AccountBank { get; set; }
+        public Guid? BankId { get; set; }
+        public BankEntity BankEntity { get; set; }
 
         [Column("account_brn_id")]
-        public Guid? AccountBrn { get; set; }
+        public Guid? BankBranchId { get; set; }
+        public BankBranchEntity BankBranchEntity { get; set; }
+
 
         [Column("account_no")]
         public string? PaymentAccountNo { get; set; }

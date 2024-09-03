@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using System.Runtime.CompilerServices;
+using ERP.Services.API.Utils;
 
 namespace ERP.Services.API.Services.Condition
 {
@@ -35,15 +36,41 @@ namespace ERP.Services.API.Services.Condition
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ConditionStatus == RecordStatus.Active.ToString()).OrderBy(x => x.OrderBy).ToListAsync();
+            var result = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ConditionStatus == RecordStatus.Active.ToString()).OrderBy(x => x.OrderBy).ToListAsync();
             return mapper.Map<List<ConditionEntity>, List<ConditionResponse>>(result);
         }
 
-        public async Task<ConditionResponse> GetConditionInformationById(string orgId, Guid businessId, Guid conditionId)
+        public async Task<PagedList<ConditionResponse>> GetConditionListByBusiness(string orgId, Guid businessId,
+            string keyword, int page, int pageSize)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var result = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
+            var query = conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ConditionStatus == RecordStatus.Active.ToString())
+                .OrderBy(x => x.OrderBy);
+            // .ToListAsync();
+
+            var result = query.Select(x => new ConditionResponse
+            {
+                ConditionId = x.ConditionId,
+                OrgId = x.OrgId,
+                BusinessId = x.BusinessId,
+                ConditionDescription = x.ConditionDescription,
+                OrderBy = x.OrderBy,
+                ConditionStatus = x.ConditionStatus
+            });
+
+            return await PagedList<ConditionResponse>.Create(result, page, pageSize);
+        }
+
+        public async Task<ConditionResponse> GetConditionInformationById(string orgId, Guid businessId,
+            Guid conditionId)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var result = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
             return mapper.Map<ConditionEntity, ConditionResponse>(result);
         }
 
@@ -56,11 +83,13 @@ namespace ERP.Services.API.Services.Condition
             conditionRepository.AddCondition(query);
             conditionRepository.Commit();
         }
+
         public async Task UpdateCondition(string orgId, Guid businessId, Guid conditionId, ConditionRequest request)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
+            var query = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
             query.ConditionDescription = request.ConditionDescription;
             conditionRepository.UpdateCondition(query);
             conditionRepository.Commit();
@@ -70,7 +99,8 @@ namespace ERP.Services.API.Services.Condition
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId).Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
+            var query = await conditionRepository.GetConditionByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.ConditionId == conditionId).FirstOrDefaultAsync();
             conditionRepository.DeleteCondition(query);
             conditionRepository.Commit();
         }
@@ -106,6 +136,7 @@ namespace ERP.Services.API.Services.Condition
                                 ConditionStatus = RecordStatus.Active.ToString()
                             });
                         }
+
                         stream.Dispose();
                     }
                 }
@@ -114,6 +145,7 @@ namespace ERP.Services.API.Services.Condition
                 {
                     conditionRepository.AddCondition(item);
                 }
+
                 conditionRepository.Commit();
             }
             catch

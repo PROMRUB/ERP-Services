@@ -125,6 +125,21 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpDelete("all")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> DeleteAll()
+        {
+            try
+            {
+                await service.DeleteAll();
+                return Ok(ResponseHandler.Response<QuotationResponse>("1000", null, null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         public record PaymentAccountList(string OrgId, Guid BusinessId);
 

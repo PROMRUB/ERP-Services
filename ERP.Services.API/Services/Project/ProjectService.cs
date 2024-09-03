@@ -10,6 +10,7 @@ using ERP.Services.API.Models.ResponseModels.Project;
 using ERP.Services.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using ERP.Services.API.Utils;
 
 namespace ERP.Services.API.Services.Project
 {
@@ -47,6 +48,43 @@ namespace ERP.Services.API.Services.Project
                     item.ProjectStatus = "ปกติ";
             }
             return result;
+        }
+        
+        public async Task<PagedList<ProjectResponse>> GetProjectListByBusiness(string orgId, Guid businessId,string keyword,int page,int pageSize)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query =  projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()
+                                                                && (string.IsNullOrEmpty(keyword) ||
+                                                                    x.ProjectName.Contains(keyword)))
+                .OrderBy(x => x.ProjectCustomId);
+                
+            // var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);
+            // foreach (var item in result)
+            // {
+            //     if (item.ProjectStatus.Equals(RecordStatus.Waiting.ToString()))
+            //         item.ProjectStatus = "ปกติ";
+            //     else if (item.ProjectStatus.Equals(RecordStatus.Active.ToString()))
+            //         item.ProjectStatus = "ปกติ";
+            // }
+
+            var result = query.Select(x => new ProjectResponse
+            {
+                ProjectId = x.ProjectId,
+                OrgId = x.OrgId,
+                BusinessId = x.BusinessId,
+                CustomerId = x.CustomerId.Value,
+                ProjectCustomId = x.ProjectCustomId,
+                ProjectName = x.ProjectName,
+                ProjectStatus = x.ProjectStatus.Equals(RecordStatus.Active.ToString() )
+                                                        || x.ProjectStatus.Equals(RecordStatus.Waiting.ToString())
+                                                           ? "ปกติ":"",
+            });
+
+            var paged = await PagedList<ProjectResponse>.Create(result, page, pageSize);
+            
+            return paged;
         }
 
         public async Task<ProjectResponse> GetProjectInformationById(string orgId, Guid businessId, Guid projectId)
@@ -86,6 +124,16 @@ namespace ERP.Services.API.Services.Project
             var organization = await organizationRepository.GetOrganization();
             var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId).Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectId == projectId).FirstOrDefaultAsync();
             projectRepository.DeleteProject(query);
+            projectRepository.Commit();
+        }
+
+        public async Task DeleteProjectAll(string orgId, Guid businessId)
+        {
+            organizationRepository.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
+                .ToListAsync();
+            projectRepository.DeleteProjectAll(query);
             projectRepository.Commit();
         }
     }

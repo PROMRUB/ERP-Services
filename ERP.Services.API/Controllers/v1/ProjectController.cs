@@ -34,7 +34,7 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        public record ProjectResourceParameter(string Keyword,int Page,int PageSize);
+        public record ProjectResourceParameter(string? Keyword,int Page,int PageSize);
         
         [HttpGet]
         [Route("org/{id}/action/GetProjectListWithPaging/{businessId}")]
@@ -46,8 +46,9 @@ namespace ERP.Services.API.Controllers.v1
             {
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
-                var result = await projectService.GetProjectListByBusiness(id, businessId);
-                return Ok(ResponseHandler.Response<List<ProjectResponse>>("1000", null, result));
+                var result = await projectService.GetProjectListByBusiness(id, businessId,
+                    resourceParameter.Keyword,resourceParameter.Page,resourceParameter.PageSize);
+                return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
             {
@@ -118,6 +119,24 @@ namespace ERP.Services.API.Controllers.v1
                 if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                     throw new ArgumentException("1101");
                 await projectService.DeleteProject(id, businessId, projectId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }  
+        
+        [HttpDelete]
+        [Route("org/{id}/action/DeleteProjectAll/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> DeleteProjectAll(string id, Guid businessId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await projectService.DeleteProjectAll(id, businessId);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)

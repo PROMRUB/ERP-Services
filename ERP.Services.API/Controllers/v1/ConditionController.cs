@@ -35,24 +35,28 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
-        // [HttpGet]
-        // [Route("org/{id}/action/GetConditionListWithPaging/{businessId}")]
-        // [MapToApiVersion("1")]
-        // public async Task<IActionResult> GetConditionListWithPaging(string id, Guid businessId
-        // ,[FromBody])
-        // {
-        //     try
-        //     {
-        //         if (!ModelState.IsValid || string.IsNullOrEmpty(id))
-        //             throw new ArgumentException("1101");
-        //         var result = await conditionService.GetConditionListByBusiness(id, businessId);
-        //         return Ok(ResponseHandler.Response<List<ConditionResponse>>("1000", null, result));
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Ok(ResponseHandler.Response(ex.Message, null));
-        //     }
-        // }
+        public record ConditionResourceParameter(string? Keyword,int Page,int PageSize);
+
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetConditionListWithPaging/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetConditionListWithPaging(string id, Guid businessId
+        ,[FromQuery]ConditionResourceParameter resourceParameter)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await conditionService.GetConditionListByBusiness(id, businessId,
+                    resourceParameter.Keyword,resourceParameter.Page,resourceParameter.PageSize);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         [HttpPost()]
         [Route("org/{id}/action/ImportExcel/{businessId}")]

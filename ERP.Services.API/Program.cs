@@ -62,6 +62,7 @@ Configuration.Default.ApiKey.Add("api-key",
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var connStr =
+    // $"Host=119.13.29.117;Port=2022; Database=erp; Username=postgres; Password=yoouhCyodbow-jg0up";
     $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
 builder.Services.AddDbContext<PromDbContext>(
     options =>

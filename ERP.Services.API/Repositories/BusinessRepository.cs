@@ -2,6 +2,7 @@
 using ERP.Services.API.Enum;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.PromServiceDbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Repositories
 {
@@ -23,11 +24,16 @@ namespace ERP.Services.API.Repositories
             var query = context.Businesses.Where(x =>  x.BusinessStatus == RecordStatus.Active.ToString()).AsQueryable();
             return query;
         }
-        
 
-        public IQueryable<UserBusinessEntity> GetBusinessUserList(Guid orgId, Guid businessId)
+        public IQueryable<UserBusinessEntity> GetUserBusinessQuery()
         {
-            var query = context!.UserBusinesses!.Where(x => x.OrgId == orgId && x.BusinessId == businessId);
+            return context.UserBusinesses.AsQueryable();
+        }
+
+
+        public IQueryable<UserBusinessEntity> GetBusinessUserList()
+        {
+            var query = context!.UserBusinesses!;
             return query;
         }
 
@@ -49,6 +55,16 @@ namespace ERP.Services.API.Repositories
         {
             context!.Businesses!.Add(bus);
             await context.SaveChangesAsync();
+        }
+
+        public void UpdateUserBusiness(List<UserBusinessEntity> bus)
+        {
+            context.UpdateRange(bus);
+        }
+
+        public DbContext Context()
+        {
+            return context;
         }
     }
 }
