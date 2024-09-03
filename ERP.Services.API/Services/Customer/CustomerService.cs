@@ -107,7 +107,7 @@ namespace ERP.Services.API.Services.Customer
                 SubDistrict = x.SubDistrict,
                 PostCode = x.PostCode,
                 Website = x.Website,
-                CusStatus = x.CusStatus.Equals(RecordStatus.Waiting.ToString()) ? "รออนุมัติ"
+                CusStatus = x.CusStatus.Equals(RecordStatus.Waiting.ToString()) ? "รอตรวจสอบ"
                     : x.CusStatus.Equals(RecordStatus.Active.ToString()) ? "ปกติ" : ""
             });
 
