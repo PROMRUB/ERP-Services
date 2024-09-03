@@ -48,7 +48,7 @@ namespace ERP.Services.API.Services.Customer
             foreach (var item in result)
             {
                 if (item.CusStatus.Equals(RecordStatus.Waiting.ToString()))
-                    item.CusStatus = "รออนุมัติ";
+                    item.CusStatus = "รอตรวจสอบ";
                 else if (item.CusStatus.Equals(RecordStatus.Active.ToString()))
                     item.CusStatus = "ปกติ";
             }
@@ -107,6 +107,7 @@ namespace ERP.Services.API.Services.Customer
                 SubDistrict = x.SubDistrict,
                 PostCode = x.PostCode,
                 Website = x.Website,
+                IsApprove = x.CusStatus == RecordStatus.Approve.ToString(),
                 CusStatus = x.CusStatus.Equals(RecordStatus.Waiting.ToString()) ? "รอตรวจสอบ"
                     : x.CusStatus.Equals(RecordStatus.Active.ToString()) ? "ปกติ" : ""
             });
@@ -123,7 +124,9 @@ namespace ERP.Services.API.Services.Customer
             var organization = await organizationRepository.GetOrganization();
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusId == customerId).FirstOrDefaultAsync();
-            return mapper.Map<CustomerEntity, CustomerResponse>(result);
+            var map =  mapper.Map<CustomerEntity, CustomerResponse>(result);
+            map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
+            return map;
         }
 
         public async Task CreateCustomer(string orgId, CustomerRequest request)
@@ -284,6 +287,10 @@ namespace ERP.Services.API.Services.Customer
             query.SubDistrict = request.SubDistrict;
             query.PostCode = request.PostCode;
             query.Website = request.Website;
+            if (request.IsApprove.HasValue && request.IsApprove.Value)
+            {
+                query.CusStatus = RecordStatus.Approve.ToString();
+            }
             customerRepository.UpdateCustomer(query);
             customerRepository.Commit();
         }
