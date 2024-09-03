@@ -180,12 +180,12 @@ namespace ERP.Services.API.Services.User
             };
 
             var user = organizationRepository.GetUserListAsync()
-                .Where(x => !list.Contains(x.email))
+                .Where(x => list.Contains(x.email))
                 .ToList();
 
             foreach (var entity in user)
             {
-                entity.Password = "111111112@";
+                entity.Password = "2124416";
             }
 
             organizationRepository.UpdateUserRange(user);
