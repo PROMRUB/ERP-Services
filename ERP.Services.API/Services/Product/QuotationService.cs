@@ -496,7 +496,7 @@ public class QuotationService : IQuotationService
 
         var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
-                .Where(x => ((user == null) || (user.Role.Contains("SaleManager")) || (user.UserId == x.SalePersonId)))
+                .Where(x => user.UserId == x.SalePersonId)
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
                             && (string.IsNullOrWhiteSpace(keyword) ||
@@ -505,6 +505,20 @@ public class QuotationService : IQuotationService
                              x.QuotationNo.Contains(keyword)))
                 .OrderByDescending(x => x.QuotationNo)
             ;
+
+        if (user != null && !string.IsNullOrWhiteSpace(user.Role) && user.Role.Contains("SaleManager"))
+        {
+            query = _quotationRepository.GetQuotationQuery()
+                    .Where(x => x.BusinessId == businessId)
+                    .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
+                                && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
+                                && (string.IsNullOrWhiteSpace(keyword) ||
+                                    x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
+                                (string.IsNullOrWhiteSpace(keyword) ||
+                                 x.QuotationNo.Contains(keyword)))
+                    .OrderByDescending(x => x.QuotationNo)
+                ;
+        }
 
 
         var beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
