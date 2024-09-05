@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <Folder Include="Fonts\" />
-    <Folder Include="images\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

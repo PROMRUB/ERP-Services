@@ -99,7 +99,7 @@ namespace ERP.Services.API.Utils
                     
                     row.RelativeItem().Column(column =>
                     {
-                        column.Item().Image(Image.FromFile(entity.Business.Logo));
+                        column.Item().Image(Image.FromFile($"images/{entity.Business.Logo}"));
                         column.Item().AlignRight().Text(text =>
                         {
                             text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {business.TaxId})")
@@ -137,7 +137,7 @@ namespace ERP.Services.API.Utils
                     {
                         row.RelativeItem().Column(column =>
                         {
-                            column.Item().Image(Image.FromFile("Quotation_Line.png"));
+                            column.Item().Image(Image.FromFile($"images/Quotation_Line.png"));
                         });
                         
                         // row.RelativeItem().Column(column =>
