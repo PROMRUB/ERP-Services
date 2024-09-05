@@ -62,6 +62,9 @@ namespace ERP.Services.API.Services.Customer
             keyword = keyword.ToLower();
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
+            var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
+                .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
+
             var query = customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusStatus != RecordStatus.InActive.ToString()
                             && (string.IsNullOrWhiteSpace(keyword) ||
@@ -72,6 +75,13 @@ namespace ERP.Services.API.Services.Customer
                                     x.CusCustomId.ToLower().Contains(keyword))
                             )
                 ).OrderBy(x => x.CusCustomId);
+
+
+            if (string.IsNullOrEmpty(keyword) && (role.Role.Contains("Representative") || role.Role.Contains("Admin")))
+            {
+                return await PagedList<CustomerResponse>.Create(null, page, pageSize);
+            }
+
 
             // .ToListAsync();
             // var result = mapper.Map<List<CustomerEntity>, List<CustomerResponse>>(query);
@@ -124,7 +134,7 @@ namespace ERP.Services.API.Services.Customer
             var organization = await organizationRepository.GetOrganization();
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusId == customerId).FirstOrDefaultAsync();
-            var map =  mapper.Map<CustomerEntity, CustomerResponse>(result);
+            var map = mapper.Map<CustomerEntity, CustomerResponse>(result);
             map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
             return map;
         }
@@ -291,6 +301,7 @@ namespace ERP.Services.API.Services.Customer
             {
                 query.CusStatus = RecordStatus.Approve.ToString();
             }
+
             customerRepository.UpdateCustomer(query);
             customerRepository.Commit();
         }

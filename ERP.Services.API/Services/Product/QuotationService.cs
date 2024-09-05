@@ -620,6 +620,10 @@ public class QuotationService : IQuotationService
     {
         var quotation = await _quotationRepository.GetQuotationQuery()
             .Include(x => x.Business)
+            .Include(x => x.PaymentAccountEntity)
+            .ThenInclude(x => x.BankEntity)
+            .Include(x => x.PaymentAccountEntity)
+            .ThenInclude(x => x.BankBranchEntity)
             .FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)

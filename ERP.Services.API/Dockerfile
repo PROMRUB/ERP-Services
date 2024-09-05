@@ -22,9 +22,11 @@ RUN dotnet publish "./ERP.Services.API.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+#COPY ./ERP.Services.API/SECURE_SOLUTION_ASIA.png /app/SECURE_SOLUTION_ASIA.png
+#COPY ./ERP.Services.API/SECURE_SOLUTION_ASIA.png  SECURE_SOLUTION_ASIA.png
+#COPY ./ERP.Services.API/SECURE_SOLUTION_ASIA.png /app/publish/SECURE_SOLUTION_ASIA.png
 COPY ./ERP.Services.API/images /app/images
 COPY ./ERP.Services.API/images  images
 COPY ./ERP.Services.API/images /app/publish/images
-
 ADD ERP.Services.API/Fonts/Prompt.ttf /app/Fonts/
 ENTRYPOINT ["dotnet", "ERP.Services.API.dll"]

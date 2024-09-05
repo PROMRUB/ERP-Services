@@ -558,22 +558,15 @@ namespace ERP.Services.API.Utils
 
             void ComponentBank(IContainer container)
             {
-                container.Padding(10).Row(row =>
+                container
+                    .PaddingTop(10)
+                    .Row(row =>
                 {
                     row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
                     {
                         column.Item().Padding(3).Text(text =>
                         {
-                            text.Span($"KBANK (พ\u0e31ฒนาการ 29)")
-                                .FontFamily("Prompt")
-                                .FontSize(10)
-                                .FontColor(Colors.White)
-                                ;
-                        });
-                        column.Item().Padding(3).Text(text =>
-                        {
-                            text.Span(
-                                    $"บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด")
+                            text.Span($"สามารถชำระเงินผ่านในนาม {entity.Business.BusinessName}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.White)
@@ -581,7 +574,24 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().Padding(3).Text(text =>
                         {
-                            text.Span($"บ\u0e31ญช\u0e35: กระแสรายว\u0e31น เลขท\u0e35\u0e48: 727-1-02814-2")
+                            text.Span(
+                                    $"{entity.PaymentAccountEntity.BankEntity.BankTHName}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span($"บ\u0e31ญช\u0e35: {entity.PaymentAccountEntity.AccountType} เลขท\u0e35\u0e48: {entity.PaymentAccountEntity.PaymentAccountNo}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span($"ชื่อบัญชี: {entity.PaymentAccountEntity.PaymentAccountName}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.White)
