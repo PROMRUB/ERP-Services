@@ -618,7 +618,9 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationDocument> GeneratePDF(Guid id)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var quotation = await _quotationRepository.GetQuotationQuery()
+            .Include(x => x.Business)
+            .FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
         {

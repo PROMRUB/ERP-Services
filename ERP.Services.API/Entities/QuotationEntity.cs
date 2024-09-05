@@ -45,6 +45,7 @@ public class QuotationEntity
     public PaymentAccountEntity PaymentAccountEntity { get; set; }
     [Column("status")] public string Status { get; set; }
     [Column("business_id")] public Guid BusinessId { get; set; }
+    public BusinessEntity Business { get; set; }
     [Column("remark")] public string Remark { get; set; }
     [Column("month")] public int Month { get; set; }
     [Column("year")] public int Year { get; set; }
