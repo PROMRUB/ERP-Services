@@ -79,7 +79,9 @@ namespace ERP.Services.API.Services.Customer
 
             if (string.IsNullOrEmpty(keyword) && (role.Role.Contains("Representative") || role.Role.Contains("Admin")))
             {
-                return await PagedList<CustomerResponse>.Create(null, page, pageSize);
+                query = customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
+                    .Where(x => false
+                    ).OrderBy(x => x.CusCustomId);
             }
 
 
