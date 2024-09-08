@@ -255,7 +255,10 @@ namespace ERP.Services.API.Controllers.v1
                 
                 byte[] pdfBytes = document.GeneratePdf();
                 MemoryStream ms = new MemoryStream(pdfBytes);
-                return new FileStreamResult(ms, "application/pdf");
+                return new FileStreamResult(ms, "application/pdf")
+                {
+                    FileDownloadName = document.FileName+".pdf",
+                };
             }
             catch (Exception ex)
             {

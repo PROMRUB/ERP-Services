@@ -71,8 +71,8 @@ namespace ERP.Services.API.Services.Customer
                                 (!string.IsNullOrWhiteSpace(x.CusName) && x.CusName.ToLower().Contains(keyword))
                                 || (!string.IsNullOrWhiteSpace(x.CusNameEng) &&
                                     x.CusNameEng.ToLower().Contains(keyword))
-                                || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
-                                    x.CusCustomId.ToLower().Contains(keyword))
+                                // || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
+                                //     x.CusCustomId.ToLower().Contains(keyword))
                             )
                 ).OrderBy(x => x.CusCustomId);
 

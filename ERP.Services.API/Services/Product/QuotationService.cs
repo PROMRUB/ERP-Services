@@ -498,8 +498,8 @@ public class QuotationService : IQuotationService
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
                 .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                            && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
-                            && (string.IsNullOrWhiteSpace(keyword) ||
+                            || (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
+                            || (string.IsNullOrWhiteSpace(keyword) ||
                                 x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
                             (string.IsNullOrWhiteSpace(keyword) ||
                              x.QuotationNo.Contains(keyword)))
@@ -641,56 +641,32 @@ public class QuotationService : IQuotationService
 
         var query = business;
 
-        var orgAddress = (string.IsNullOrEmpty(query.Building) ? "" : (query.Building + " ")) +
-                         (string.IsNullOrEmpty(query.RoomNo) ? "" : (query.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(query.Floor) ? "" : (query.Floor + " ")) +
-                         (string.IsNullOrEmpty(query.Village) ? "" : (query.Village + " ")) +
-                         (string.IsNullOrEmpty(query.No) ? "" : (query.No + " ")) +
-                         (string.IsNullOrEmpty(query.Moo) ? "" : (query.Moo + " ")) +
-                         (string.IsNullOrEmpty(query.Alley) ? "" : (query.Alley + " ")) +
-                         (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
-                         (string.IsNullOrEmpty(query.SubDistrict)
-                             ? ""
-                             : (_systemRepository.GetAll<SubDistrictEntity>()
-                                 .Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault()
-                                 .SubDistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.District)
-                             ? ""
-                             : (_systemRepository.GetAll<DistrictEntity>()
-                                 .Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault()
-                                 .DistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.Province)
-                             ? ""
-                             : (_systemRepository.GetAll<ProvinceEntity>()
-                                 .Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault()
-                                 .ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
+        var orgAddress = (string.IsNullOrEmpty(query.Building) ? "" :"อาคาร " + (query.Building + " ")) +
+                         (string.IsNullOrEmpty(query.RoomNo) ? "" :"ห้อง " + (query.RoomNo + " ")) +
+                         (string.IsNullOrEmpty(query.Floor) ? "" :"ชั้น " + (query.Floor + " ")) +
+                         (string.IsNullOrEmpty(query.Village) ? "" :"หมู่บ้่าน " + (query.Village + " ")) +
+                         (string.IsNullOrEmpty(query.No) ? "" :"เลขที่ " + (query.No + " ")) +
+                         (string.IsNullOrEmpty(query.Moo) ? "" :"หมู่ " + (query.Moo + " ")) +
+                         (string.IsNullOrEmpty(query.Alley) ? "" :"ซอย " + (query.Alley + " ")) +
+                         (string.IsNullOrEmpty(query.Road) ? "" :"ถนน " + (query.Road + " ")) +
+                         (string.IsNullOrEmpty(query.SubDistrict) ? "" :"แขวง " + (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.District) ? "" :"เขต " + (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.Province) ? "" :"จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
 
         var queryCustomer = quotation.Customer;
-        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" : (queryCustomer.Building + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" : (queryCustomer.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" : (queryCustomer.Floor + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" : (queryCustomer.Village + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.No) ? "" : (queryCustomer.No + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" : (queryCustomer.Moo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" : (queryCustomer.Alley + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" : (queryCustomer.Road + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.SubDistrict)
-                             ? ""
-                             : (_systemRepository.GetAll<SubDistrictEntity>()
-                                 .Where(x => x.SubDistrictCode.ToString().Equals(queryCustomer.SubDistrict))
-                                 .FirstOrDefault().SubDistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.District)
-                             ? ""
-                             : (_systemRepository.GetAll<DistrictEntity>()
-                                 .Where(x => x.DistrictCode.ToString().Equals(queryCustomer.District)).FirstOrDefault()
-                                 .DistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Province)
-                             ? ""
-                             : (_systemRepository.GetAll<ProvinceEntity>()
-                                 .Where(x => x.ProvinceCode.ToString().Equals(queryCustomer.Province)).FirstOrDefault()
-                                 .ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" : queryCustomer.PostCode);
+        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" :"อาคาร " + (queryCustomer.Building + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" :"ห้อง " + (queryCustomer.RoomNo + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" :"ชั้น " + (queryCustomer.Floor + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" :"หมู่บ้่าน " + (queryCustomer.Village + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.No) ? "" :"เลขที่ " + (queryCustomer.No + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" :"หมู่ " + (queryCustomer.Moo + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" :"ซอย " + (queryCustomer.Alley + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" :"ถนน " + (queryCustomer.Road + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" :"แขวง " + (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(queryCustomer.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.District) ? "" :"เขต " + (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(queryCustomer.District)).FirstOrDefault().DistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" :"จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(queryCustomer.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" :"รหัสไปรษณีย์ " + queryCustomer.PostCode);
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }

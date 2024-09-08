@@ -122,18 +122,21 @@ namespace ERP.Services.API.Services.Organization
             businessRepository!.SetCustomOrgId(orgId);
             var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
-            result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : (query.Building + " ")) +
-                                (string.IsNullOrEmpty(query.RoomNo) ? "" : (query.RoomNo + " ")) +
-                                (string.IsNullOrEmpty(query.Floor) ? "" : (query.Floor + " ")) +
-                                (string.IsNullOrEmpty(query.Village) ? "" : (query.Village + " ")) +
-                                (string.IsNullOrEmpty(query.No) ? "" : (query.No + " ")) +
-                                (string.IsNullOrEmpty(query.Moo) ? "" : (query.Moo + " ")) +
-                                (string.IsNullOrEmpty(query.Alley) ? "" : (query.Alley + " ")) +
-                                (string.IsNullOrEmpty(query.Road) ? "" : (query.Road + " ")) +
-                                (string.IsNullOrEmpty(query.SubDistrict) ? "" : (systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.District) ? "" : (systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.Province) ? "" : (systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.PostCode) ? "" : query.PostCode);
+            result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" :"อาคาร " + (query.Building + " ")) +
+                                (string.IsNullOrEmpty(query.RoomNo) ? "" :"ห้อง " + (query.RoomNo + " ")) +
+                                (string.IsNullOrEmpty(query.Floor) ? "" :"ชั้น " + (query.Floor + " ")) +
+                                (string.IsNullOrEmpty(query.Village) ? "" :"หมู่บ้่าน " + (query.Village + " ")) +
+                                (string.IsNullOrEmpty(query.No) ? "" :"เลขที่ " + (query.No + " ")) +
+                                (string.IsNullOrEmpty(query.Moo) ? "" :"หมู่ " + (query.Moo + " ")) +
+                                (string.IsNullOrEmpty(query.Alley) ? "" :"ซอย " + (query.Alley + " ")) +
+                                (string.IsNullOrEmpty(query.Road) ? "" :"ถนน " + (query.Road + " ")) +
+                                (string.IsNullOrEmpty(query.SubDistrict) ? "" :"แขวง " + (systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.District) ? "" :"เขต " + (systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.Province) ? "" :"จังหวัด " + (systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
+            result.Url = query.Url;
+            result.HotLine = query.Hotline;
+            
             return result;
         }
 
