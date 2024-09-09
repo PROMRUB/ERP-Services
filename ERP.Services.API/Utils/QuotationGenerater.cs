@@ -184,7 +184,7 @@ namespace ERP.Services.API.Utils
                         {
                             column.Item().Text(text =>
                             {
-                                text.Span("รายละเอียดลูกค้า : Customer Decription")
+                                text.Span("รายละเอียดลูกค้า : Customer Description")
                                     .FontFamily("Prompt")
                                     .FontSize(10)
                                     .Bold()
@@ -587,7 +587,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().Padding(3).Text(text =>
                         {
-                            text.Span($"สามารถชำระเงินผ่านในนาม {_entity.Business.BusinessName}")
+                            text.Span($"สามารถชำระเงินผ่านธนาคารในนาม {_entity.Business.BusinessName}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.White)
@@ -907,7 +907,7 @@ namespace ERP.Services.API.Utils
                         // });
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"ลงชื่อูกค้าพร้อมประทับตรา")
+                            text.Span($"ลงชื่อลูกค้าพร้อมประทับตรา")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .SemiBold()
