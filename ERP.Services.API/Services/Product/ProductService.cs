@@ -77,7 +77,7 @@ namespace ERP.Services.API.Services.Product
                 x.ProductStatus == RecordStatus.Active.ToString()
                 && (string.IsNullOrWhiteSpace(keyword) ||
                     (!string.IsNullOrWhiteSpace(x.ProductCustomId) && x.ProductCustomId.Contains(keyword))
-                    // || (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.ToLower().Contains(keyword))
+                    || (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.ToLower().Contains(keyword))
                 )
             ).OrderBy(x => x.ProductCustomId);
             // var result = mapper.Map<List<ProductEntity>, List<ProductResponse>>(query);
