@@ -9,9 +9,23 @@ using Image = QuestPDF.Infrastructure.Image;
 namespace ERP.Services.API.Utils
 
 {
-    public class QuotationDocument(QuotationEntity entity,BusinessEntity business,string businessAddress,string customerAddress) : IDocument
+    public class QuotationDocument : IDocument
     {
-        public static Image LogoImage { get; } = Image.FromFile("logo.jpg");
+        private readonly QuotationEntity _entity;
+        private readonly BusinessEntity _business;
+        private readonly string _businessAddress;
+        private readonly string _customerAddress;
+        public string FileName { get; set; }
+
+        public QuotationDocument(QuotationEntity entity, BusinessEntity business, string businessAddress,
+            string customerAddress)
+        {
+            _entity = entity;
+            _business = business;
+            _businessAddress = businessAddress;
+            _customerAddress = customerAddress;
+            FileName = entity.QuotationNo;
+        }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -34,26 +48,23 @@ namespace ERP.Services.API.Utils
             {
                 container.Row(row =>
                 {
-                    row.ConstantItem(150);
-                    row.RelativeItem().AlignCenter().Column(column =>
-                    {
-                        column
-                            .Item()
-                            .Text(
-                                $"Hotline: 08 3096 5557/ 08 3096 5558/ 09 5785 2021")
-                            .FontFamily("Prompt")
-                            .FontSize(6)
-                            .Bold()
-                            .FontColor(Colors.Black);
-                    });
-
                     row.RelativeItem().AlignRight().Text(text =>
                     {
+                        text.Span(_entity.QuotationNo)
+                            .FontSize(6)
+                            .FontColor(Colors.Black)
+                            .FontFamily("Prompt");
+                        text.Span("    หน้าที่ :")
+                            .FontSize(6)
+                            .FontFamily("Prompt");
                         text.CurrentPageNumber()
+                            .FontSize(6)
                             .FontFamily("Prompt");
                         text.Span(" / ")
+                            .FontSize(6)
                             .FontFamily("Prompt");
                         text.TotalPages()
+                            .FontSize(6)
                             .FontFamily("Prompt");
                     });
                 });
@@ -68,23 +79,51 @@ namespace ERP.Services.API.Utils
                         column
                             .Item()
                             .Text(
-                                $"{business.BusinessName} {(business.BrnId == "00000" ? "(สำน\u0e31กงานใหญ\u0e48)" : "")}")
+                                $"{_business.BusinessName} {(_business.BrnId == "00000" ? "(สำน\u0e31กงานใหญ\u0e48)" : "")}")
                             .FontFamily("Prompt")
                             .FontSize(10)
                             .Bold()
                             .FontColor(Colors.Black);
 
-                        column.Spacing(5);
+                        column.Spacing(2);
 
                         column.Item()
                             .Text(text =>
                             {
                                 text.Span(
-                                        $"{businessAddress}")
+                                        $"{_businessAddress}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
                             });
+
+                        column.Item()
+                            .Text(text =>
+                            {
+                                text.Span(
+                                        $"Hotline : {_entity.Business.Hotline}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6)
+                                    ;
+                            });
+                        column.Item()
+                            .Text(text =>
+                            {
+                                text.Span(
+                                        $"www : {_entity.Business.Url}")
+                                    .FontFamily("Prompt")
+                                    .FontSize(6)
+                                    ;
+                            });
+
+                        column.Item().Text(text =>
+                        {
+                            text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {_business.TaxId})")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black);
+                            ;
+                        });
 
                         // column.Item().Text(text =>
                         // {
@@ -95,17 +134,11 @@ namespace ERP.Services.API.Utils
                         //     ;
                         // });
                     });
+
+
                     row.RelativeItem().Column(column =>
                     {
-                        column.Item().Image(LogoImage);
-                        column.Item().AlignRight().Text(text =>
-                        {
-                            text.Span($"(เลขประจำต\u0e31วผ\u0e39\u0e49เส\u0e35ยภาษ\u0e35 {business.TaxId})")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .FontColor(Colors.Black);
-                            ;
-                        });
+                        column.Item().Image(Image.FromFile($"images/{_entity.Business.Logo}"));
                     });
                 });
             }
@@ -117,10 +150,15 @@ namespace ERP.Services.API.Utils
                         column.Item().Element(ComponentNameSpace);
                         column.Item().Element(ComponentWarrantyHeader);
                         column.Item().Element(ComponentWarrantyDetail);
+                        column.Item().Element(ComponentRemark);
                         column.Item().Element(ComponentTable);
-                        column.Item().Element(ComponentSum);
+                        column.Item().Element(ComponentLine);
                         column.Item().Element(ComponentBank);
+                        column.Item().Element(ComponentSum);
+                        column.Item().Element(ComponentLineSum);
                         column.Item().Element(ComponentSignature);
+                        column.Item().Element(ComponentNote);
+                        // column.Item().Element(ComponentLineBottom);
                     }
                 );
             }
@@ -130,31 +168,14 @@ namespace ERP.Services.API.Utils
                 container.PaddingVertical(15).Column(column =>
                 {
                     column.Item().Row(row =>
-                    {
-                        row.RelativeItem().Column(column =>
                         {
-                            column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
-                        });
-                        row.RelativeItem().Column(column =>
-                        {
-                            column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
-                        });
-                        row.RelativeItem().Column(column =>
-                        {
-                            column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
-                        });
-                        row.RelativeItem().Column(column =>
-                        {
-                            column.Item().AlignRight().Text(text =>
+                            row.RelativeItem().Column(column =>
                             {
-                                text.Span("ใบเสนอราคา / QUOTATION")
-                                    .FontFamily("Prompt")
-                                    .FontSize(10)
-                                    .FontColor(Colors.Blue.Darken4);
-                                ;
+                                column.Item().Image(Image.FromFile($"images/Quotation_Line.png"));
                             });
-                        });
-                    });
+                        }
+                    );
+
 
                     column.Spacing(20);
                     column.Item().Row(column =>
@@ -163,44 +184,52 @@ namespace ERP.Services.API.Utils
                         {
                             column.Item().Text(text =>
                             {
+                                text.Span("รายละเอียดลูกค้า : Customer Description")
+                                    .FontFamily("Prompt")
+                                    .FontSize(10)
+                                    .Bold()
+                                    .FontColor(Colors.Black);
+                                column.Spacing(3);
+                            });
+                            column.Item().Text(text =>
+                            {
                                 text.Span("เร\u0e35ยน/ATTN:")
                                     .FontFamily("Prompt")
                                     .FontSize(10)
                                     .Bold()
                                     .FontColor(Colors.Black);
-                                column.Spacing(5);
+                                column.Spacing(3);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                    $"คุณ {entity.CustomerContact.DisplayName()}")
+                                        $"คุณ {_entity.CustomerContact.DisplayName()}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                        $"{entity.Customer.CusNameEng}")
+                                        $"{_entity.Customer.CusName}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
-                                        $"{customerAddress}")
+                                        $"{_customerAddress}")
                                     .FontFamily("Prompt")
                                     .FontSize(6);
                             });
                             column.Item().Text(text =>
                             {
-                                text.Span($"โทร: {entity.CustomerContact.TelNo} E-mail: {entity.CustomerContact.Email}")
+                                text.Span(
+                                        $"โทร: {_entity.CustomerContact.TelNo} E-mail: {_entity.CustomerContact.Email}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
                                 ;
                             });
-
-
                         });
 
                         column.ConstantItem(70);
@@ -209,7 +238,7 @@ namespace ERP.Services.API.Utils
                         {
                             column.Item().AlignRight().Text(text =>
                             {
-                                text.Span($"เลขท\u0e35\u0e48: {entity.QuotationNo ?? ""}")
+                                text.Span($"เลขท\u0e35\u0e48 / Quotation No: {_entity.QuotationNo ?? ""}")
                                     .FontFamily("Prompt")
                                     .FontSize(10)
                                     .Bold()
@@ -218,7 +247,7 @@ namespace ERP.Services.API.Utils
                             });
                             column.Item().AlignRight().Text(text =>
                             {
-                                text.Span($"ว\u0e31นท\u0e35\u0e48: {entity.QuotationDateTime:dd-MM-yyyy}")
+                                text.Span($"ว\u0e31นท\u0e35\u0e48 / Date: {_entity.QuotationDateTime:dd-MM-yyyy}")
                                     .FontFamily("Prompt")
                                     .FontSize(10)
                                     .FontColor(Colors.Black);
@@ -232,7 +261,43 @@ namespace ERP.Services.API.Utils
             {
                 container.Row(row =>
                 {
-                    row.ConstantItem(300);
+                    // row.ConstantItem(300);
+                    row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span("ชื่อโครงการ (Project)")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.White)
+                                ;
+                            ;
+                        });
+                    });
+                    row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span("เง\u0e37\u0e48อนไขการชำระเง\u0e34น (Payment Term)")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.White)
+                                ;
+                            ;
+                        });
+                    });
+                    // row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                    // {
+                    //     column.Item().AlignCenter().Padding(3).Text(text =>
+                    //     {
+                    //         text.Span("เง\u0e37\u0e48อนไขการชำระเง\u0e34น")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(6)
+                    //             .FontColor(Colors.White)
+                    //             ;
+                    //         ;
+                    //     });
+                    // });
                     row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
@@ -257,6 +322,18 @@ namespace ERP.Services.API.Utils
                             ;
                         });
                     });
+                    row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span("สกุลเงิน (Currency)")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.White)
+                                ;
+                            ;
+                        });
+                    });
                 });
             }
 
@@ -264,9 +341,97 @@ namespace ERP.Services.API.Utils
             {
                 container.Row(row =>
                 {
+                    // row.RelativeItem().Column(column =>
+                    // {
+                    //     column.Item().Padding(3).Text(text =>
+                    //     {
+                    //         text.Span(
+                    //                 $"บร\u0e34ษ\u0e31ทฯม\u0e35ความย\u0e34นด\u0e35เสนอราคาเพ\u0e37\u0e48อให\u0e49ท\u0e48านพ\u0e34จารณาด\u0e31งน\u0e35\u0e49 / We are pleased to submit you our quotation as follows")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(6)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //         ;
+                    //     });
+                    // });
+
+                    // row.ConstantItem(165);
                     row.RelativeItem().Column(column =>
                     {
-                        column.Item().Padding(3).Text(text =>
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"{_entity.Projects.FirstOrDefault()?.Project.ProjectName}")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                            ;
+                        });
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"{_entity.Projects.FirstOrDefault()?.PaymentCondition.ConditionDescription}")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                            ;
+                        });
+                    });
+
+                    row.RelativeItem().Column(column =>
+                    {
+                        var textEth =
+                            _entity.Projects.FirstOrDefault() != null &&
+                            _entity.Projects.FirstOrDefault().EthSaleMonth.HasValue
+                                ? _entity.Projects.FirstOrDefault().EthSaleMonth.Value.ToString("MM/yyyy")
+                                : "-";
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"{textEth}")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                            ;
+                        });
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"{_entity.Projects.FirstOrDefault()?.Warranty}" + " เดือน")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                            ;
+                        });
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"บาท (THB)")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                            ;
+                        });
+                    });
+                });
+            }
+
+            void ComponentRemark(IContainer container)
+            {
+                container.Row(row =>
+                {
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().Padding(10).Text(text =>
                         {
                             text.Span(
                                     $"บร\u0e34ษ\u0e31ทฯม\u0e35ความย\u0e34นด\u0e35เสนอราคาเพ\u0e37\u0e48อให\u0e49ท\u0e48านพ\u0e34จารณาด\u0e31งน\u0e35\u0e49 / We are pleased to submit you our quotation as follows")
@@ -277,26 +442,19 @@ namespace ERP.Services.API.Utils
                             ;
                         });
                     });
+                });
+            }
 
-                    row.ConstantItem(165);
-
-                    row.RelativeItem().Column(column =>
+            void ComponentNote(IContainer container)
+            {
+                container.Row(row =>
+                {
+                    row.RelativeItem().PaddingTop(20).Column(column =>
                     {
-                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        column.Item().Padding(10).Text(text =>
                         {
-                            text.Span($"{entity.Projects.FirstOrDefault()?.PaymentCondition.ConditionDescription}")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .FontColor(Colors.Black)
-                                ;
-                            ;
-                        });
-                    });
-                    row.RelativeItem().Column(column =>
-                    {
-                        column.Item().AlignCenter().Padding(3).Text(text =>
-                        {
-                            text.Span($"{entity.Projects.FirstOrDefault()?.Warranty}")
+                            text.Span(
+                                    $"หมายเหตุ (Remark) : {_entity.Remark}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
@@ -309,20 +467,25 @@ namespace ERP.Services.API.Utils
 
             void ComponentTable(IContainer container)
             {
-                var headerStyle = TextStyle.Default.FontSize(8).SemiBold();
+                var headerStyle = TextStyle.Default.FontSize(6).SemiBold();
 
 
                 container.Table(table =>
                 {
                     table.ColumnsDefinition(columns =>
                     {
-                        columns.ConstantColumn(25);
+                        columns.ConstantColumn(30);
+                        columns.ConstantColumn(60);
                         columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
+                        columns.ConstantColumn(50);
+                        columns.ConstantColumn(50);
+                        columns.ConstantColumn(50);
+                        columns.ConstantColumn(50);
+
+                        // columns.RelativeColumn();
+                        // columns.RelativeColumn();
+                        // columns.RelativeColumn();
+                        // columns.RelativeColumn();
                     });
 
                     table.Header(header =>
@@ -331,60 +494,220 @@ namespace ERP.Services.API.Utils
                             .BorderColor(Colors.Blue.Darken4);
 
                         header.Cell().Text("#")
-                                .FontFamily("Prompt");
+                            .FontFamily("Prompt");
                         header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)").Style(headerStyle)
-                                .FontFamily("Prompt");
+                            .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("รายการส\u0e34นค\u0e49า\n(DESCRIPTION)")
-                                .FontFamily("Prompt")
+                            .FontFamily("Prompt")
                             .Style(headerStyle);
                         header.Cell().AlignCenter().Text("หน\u0e48วย\n(UNIT)").Style(headerStyle)
-                                .FontFamily("Prompt");
+                            .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("จำนวน\n(QTY.)").Style(headerStyle)
-                                .FontFamily("Prompt");
-                        header.Cell().AlignCenter().AlignRight().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)").Style(headerStyle)
-                                .FontFamily("Prompt");
+                            .FontFamily("Prompt");
+                        header.Cell().AlignCenter().AlignRight().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)")
+                            .Style(headerStyle)
+                            .FontFamily("Prompt");
                         header.Cell().AlignCenter().AlignRight().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle)
-                                .FontFamily("Prompt");
+                            .FontFamily("Prompt");
 
 
                         header.Cell().ColumnSpan(7).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Blue.Darken4);
                     });
 
                     var i = 1;
-                    foreach (var product in entity.Products)
+                    foreach (var product in _entity.Products.OrderBy(x => x.Order))
                     {
                         table.Cell().Element(CellStyle).Text(i++)
-                                .FontFamily("Prompt").FontSize(6);
+                            .FontFamily("Prompt").FontSize(6);
                         table.Cell().Element(CellStyle).Text(product.Product.ProductCustomId)
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignCenter().Text("E.A")
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignCenter().Text(product.Quantity)
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.AmountBeforeVat.ToString("#,###.00"))
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.00"))
-                                .FontFamily("Prompt").FontSize(8);
+                            .FontFamily("Prompt").FontSize(8);
 
                         static IContainer CellStyle(IContainer container) => container
                             .PaddingVertical(5);
+                        // .LineHorizontal(Colors.Blue.Darken4);
                     }
                 });
             }
 
+            void ComponentLine(IContainer container)
+            {
+                container.PaddingTop(20).Row(row =>
+                {
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                });
+            }
+
+            void ComponentLineBottom(IContainer container)
+            {
+                var padding = 110 - 10 * _entity.Products.Count;
+                container.PaddingTop(padding).Row(row =>
+                {
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                    row.RelativeItem().Column(column =>
+                    {
+                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
+                    });
+                });
+            }
+
+
+            void ComponentBank(IContainer container)
+            {
+                container.PaddingTop(20).Row(row =>
+                {
+                    row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                    {
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span($"สามารถชำระเงินผ่านธนาคารในนาม {_entity.Business.BusinessName}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span(
+                                    $"{_entity.PaymentAccountEntity.BankEntity.BankTHName} {_entity.PaymentAccountEntity.BankBranchEntity.BankBranchTHName}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span(
+                                    $"บ\u0e31ญช\u0e35: {_entity.PaymentAccountEntity.AccountType} เลขท\u0e35\u0e48: {_entity.PaymentAccountEntity.PaymentAccountNo}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span($"ชื่อบัญชี: {_entity.PaymentAccountEntity.PaymentAccountName}")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .FontColor(Colors.White)
+                                ;
+                        });
+                    });
+
+                    row.ConstantItem(330);
+
+                    // row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
+                    // {
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"รวมเง\u0e34น (SUB TOTAL)")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    //
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"รวมท\u0e31\u0e49งหมด (GRAND TOTAL)")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    // });
+                    //
+                    // row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
+                    // {
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"{_entity.AmountBeforeVat:#,###.00}")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    //     // column.Item().AlignRight().Padding(3).Text(text =>
+                    //     // {
+                    //     //     text.Span($"{entity.SumOfDiscount:#,###:##}")
+                    //     //         .FontFamily("Prompt")
+                    //     //         .FontSize(8)
+                    //     //         .FontColor(Colors.Black)
+                    //     //         ;
+                    //     // });
+                    //     // column.Item().AlignRight().Padding(3).Text(text =>
+                    //     // {
+                    //     //     text.Span($"{entity.AmountBeforeVat:#,###:##}")
+                    //     //         .FontFamily("Prompt")
+                    //     //         .FontSize(8)
+                    //     //         .FontColor(Colors.Black)
+                    //     //         ;
+                    //     // });
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"{_entity.Vat:#,###.00}")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    //     column.Item().AlignRight().PaddingTop(1).Text(text =>
+                    //     {
+                    //         text.Span($"{(_entity.Price + _entity.Vat):#,###.00}")
+                    //             .FontFamily("Prompt")
+                    //             .FontSize(8)
+                    //             .FontColor(Colors.Black)
+                    //             ;
+                    //     });
+                    // });
+                });
+            }
             void ComponentSum(IContainer container)
             {
-                container.PaddingTop(40).Row(row =>
+                container.PaddingTop(-95).Row(row =>
                 {
-                    row.Spacing(20);
+                  
 
-                    row.ConstantItem(300);
+                    row.ConstantItem(330);
 
-                    row.RelativeItem().AlignRight().Column(column =>
+                    row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
                     {
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
                             text.Span($"รวมเง\u0e34น (SUB TOTAL)")
                                 .FontFamily("Prompt")
@@ -392,23 +715,8 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        // column.Item().AlignRight().Padding(3).Text(text =>
-                        // {
-                        //     text.Span($"ส\u0e48วนลด (DISCOUNT)")
-                        //         .FontFamily("Prompt")
-                        //         .FontSize(8)
-                        //         .FontColor(Colors.Black)
-                        //         ;
-                        // });
-                        // column.Item().AlignRight().Padding(3).Text(text =>
-                        // {
-                        //     text.Span($"ม\u0e39ลค\u0e48าส\u0e34นค\u0e49า/บร\u0e34การ (SUB TOTAL)")
-                        //         .FontFamily("Prompt")
-                        //         .FontSize(8)
-                        //         .FontColor(Colors.Black)
-                        //         ;
-                        // });
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                    
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
                             text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
                                 .FontFamily("Prompt")
@@ -416,7 +724,7 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
                             text.Span($"รวมท\u0e31\u0e49งหมด (GRAND TOTAL)")
                                 .FontFamily("Prompt")
@@ -425,12 +733,12 @@ namespace ERP.Services.API.Utils
                                 ;
                         });
                     });
-
-                    row.RelativeItem().AlignRight().Column(column =>
+                    
+                    row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
                     {
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
-                            text.Span($"{entity.AmountBeforeVat:#,###.00}")
+                            text.Span($"{_entity.AmountBeforeVat:#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -452,17 +760,17 @@ namespace ERP.Services.API.Utils
                         //         .FontColor(Colors.Black)
                         //         ;
                         // });
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
-                            text.Span($"{entity.Vat:#,###.00}")
+                            text.Span($"{_entity.Vat:#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignRight().Padding(1).Text(text =>
+                        column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
-                            text.Span($"{(entity.Price + entity.Vat):#,###.00}")
+                            text.Span($"{(_entity.Price + _entity.Vat):#,###.00}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .FontColor(Colors.Black)
@@ -472,111 +780,33 @@ namespace ERP.Services.API.Utils
                 });
             }
 
-            void ComponentBank(IContainer container)
+            void ComponentLineSum(IContainer container)
             {
-                container.Padding(10).Row(row =>
-                {
-                    row.RelativeItem().Background(Colors.Blue.Darken4).Column(column =>
+                
+                container
+                    .PaddingTop(10)
+                    .Row(row =>
                     {
-                        column.Item().Padding(3).Text(text =>
+                        row.ConstantItem(330);
+
+                        row.RelativeItem().Column(column =>
                         {
-                            text.Span($"KBANK (พ\u0e31ฒนาการ 29)")
-                                .FontFamily("Prompt")
-                                .FontSize(10)
-                                .FontColor(Colors.White)
-                                ;
-                        });
-                        column.Item().Padding(3).Text(text =>
-                        {
-                            text.Span(
-                                    $"บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.White)
-                                ;
-                        });
-                        column.Item().Padding(3).Text(text =>
-                        {
-                            text.Span($"บ\u0e31ญช\u0e35: กระแสรายว\u0e31น เลขท\u0e35\u0e48: 727-1-02814-2")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .FontColor(Colors.White)
-                                ;
+                            column.Item()
+                                .LineHorizontal(1).LineColor(Colors.Blue.Darken4);
                         });
                     });
-
-                    row.ConstantItem(30);
-
-                    row.RelativeItem().Column(column =>
-                    {
-                        column.Item().LineHorizontal(1).LineColor(Colors.Blue.Darken4);
-                    });
-                });
             }
 
             void ComponentSignature(IContainer container)
             {
-                container.PaddingTop(-60).Row(row =>
+                container.PaddingTop(20).Row(row =>
                 {
-                    row.ConstantItem(300);
-                    row.RelativeItem().AlignCenter().Column(column =>
-                    {
-                        column.Item().Padding(3).Text(text =>
-                        {
-                            text.Span($"ส\u0e31\u0e48งซ\u0e37\u0e49อโดย / ORDERED by")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
+                    // row.ConstantItem(300);
 
-                        column.Item().PaddingTop(50).LineHorizontal(1);
-                        column.Item().Padding(3).AlignCenter().Text(text =>
-                        {
-                            text.Span($"{entity.SalePerson.DisplayNameTH()}")
-                                .FontFamily("Prompt")
-                                .FontSize(8)
-                                .SemiBold()
-                                .FontColor(Colors.Black)
-                                .LineHeight(1)
-                                ;
-                        });
-                        // column.Item().Padding(3).AlignCenter().Text(text =>
-                        // {
-                        //     text.Span($"(WITCHAYADA APIN)")
-                        //         .FontSize(8)
-                        //         .SemiBold()
-                        //         .FontColor(Colors.Black)
-                        //         .LineHeight(1)
-                        //         ;
-                        // });
-                        column.Item().Padding(3).AlignCenter().Text(text =>
-                        {
-                            text.Span($"{entity.SalePerson.TelNo}")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .SemiBold()
-                                .FontColor(Colors.Black)
-                                .LineHeight(1)
-                                ;
-                        });
-                        column.Item().Padding(3).AlignCenter().Text(text =>
-                        {
-                            text.Span($"{entity.SalePerson.email}")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .SemiBold()
-                                .FontColor(Colors.Black)
-                                .LineHeight(1)
-                                ;
-                        });
-                    });
-
-                    row.ConstantItem(30);
 
                     row.RelativeItem().AlignCenter().Column(column =>
                     {
-                        column.Item().Padding(3).Text(text =>
+                        column.Item().AlignCenter().Padding(3).Text(text =>
                         {
                             text.Span($"จ\u0e31ดทำโดย / ARRANGED by")
                                 .FontFamily("Prompt")
@@ -585,10 +815,10 @@ namespace ERP.Services.API.Utils
                                 ;
                         });
 
-                        column.Item().PaddingTop(50).LineHorizontal(1);
+                        column.Item().PaddingTop(77).LineHorizontal(1);
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{entity.IssuedByUser.DisplayNameTH()}")
+                            text.Span($"{_entity.IssuedByUser.DisplayNameTH()}")
                                 .FontFamily("Prompt")
                                 .FontSize(8)
                                 .SemiBold()
@@ -607,7 +837,7 @@ namespace ERP.Services.API.Utils
                         // });
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{entity.IssuedByUser.TelNo}")
+                            text.Span($"{_entity.IssuedByUser.TelNo}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
@@ -617,7 +847,77 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{entity.IssuedByUser.email}")
+                            text.Span($"{_entity.IssuedByUser.email}")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .SemiBold()
+                                .FontColor(Colors.Black)
+                                .LineHeight(1)
+                                ;
+                        });
+                    });
+                    row.ConstantItem(30);
+                    row.RelativeItem().AlignCenter().Column(column =>
+                    {
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"ข้าพเจ้าตกลงสั่งซื้อตามรายการ")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                        });
+                        column.Item().AlignCenter().Padding(3).Text(text =>
+                        {
+                            text.Span($"และเงื่อนไขทั้งหมด")
+                                .FontFamily("Prompt")
+                                .FontSize(6)
+                                .FontColor(Colors.Black)
+                                ;
+                        });
+
+                        column.Item().Padding(3).Text(text =>
+                        {
+                            text.Span($"We agree & accept order you as in this quotation")
+                                .FontFamily("Prompt")
+                                .FontSize(4)
+                                .FontColor(Colors.Black)
+                                ;
+                        });
+
+                        column.Item().PaddingTop(50).LineHorizontal(1);
+                        // column.Item().Padding(3).AlignCenter().Text(text =>
+                        // {
+                        //     text.Span($"{entity.SalePerson.DisplayNameTH()}")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(8)
+                        //         .SemiBold()
+                        //         .FontColor(Colors.Black)
+                        //         .LineHeight(1)
+                        //         ;
+                        // });
+                        // column.Item().Padding(3).AlignCenter().Text(text =>
+                        // {
+                        //     text.Span($"(WITCHAYADA APIN)")
+                        //         .FontSize(8)
+                        //         .SemiBold()
+                        //         .FontColor(Colors.Black)
+                        //         .LineHeight(1)
+                        //         ;
+                        // });
+                        column.Item().Padding(3).AlignCenter().Text(text =>
+                        {
+                            text.Span($"ลงชื่อลูกค้าพร้อมประทับตรา")
+                                .FontFamily("Prompt")
+                                .FontSize(8)
+                                .SemiBold()
+                                .FontColor(Colors.Black)
+                                .LineHeight(1)
+                                ;
+                        });
+                        column.Item().Padding(3).AlignCenter().Text(text =>
+                        {
+                            text.Span($"Customer Signature with Company Seal")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()

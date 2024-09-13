@@ -18,7 +18,12 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "IsDev": "true"
+        "IsDev": "true",
+        "PostgreSQL_Host": "localhost",
+        "PostgreSQL_Database": "erp-dev",
+        "PostgreSQL_User": "postgres",
+        "PostgreSQL_Password": "Initial1!",
+        "ERP_EMAIL": "thanakarn.klangkasame@gmail.com"
       }
     },
     "Docker": {

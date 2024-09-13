@@ -58,7 +58,7 @@ namespace ERP.Services.API.Services.Condition
                 BusinessId = x.BusinessId,
                 ConditionDescription = x.ConditionDescription,
                 OrderBy = x.OrderBy,
-                ConditionStatus = x.ConditionStatus
+                ConditionStatus = x.ConditionStatus == "Active" ? "ปกติ" : ""
             });
 
             return await PagedList<ConditionResponse>.Create(result, page, pageSize);

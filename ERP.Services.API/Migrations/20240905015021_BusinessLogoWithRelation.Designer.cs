@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240905015021_BusinessLogoWithRelation")]
+    partial class BusinessLogoWithRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,9 +181,6 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("text")
                         .HasColumnName("floor");
 
-                    b.Property<string>("Hotline")
-                        .HasColumnType("text");
-
                     b.Property<string>("Logo")
                         .HasColumnType("text")
                         .HasColumnName("logo");
@@ -220,9 +220,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("TaxId")
                         .HasColumnType("text")
                         .HasColumnName("tax_id");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("text");
 
                     b.Property<string>("Village")
                         .HasColumnType("text")
@@ -368,10 +365,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("CusDescription")
                         .HasColumnType("text")
                         .HasColumnName("cus_description");
-
-                    b.Property<string>("CusFullAddress")
-                        .HasColumnType("text")
-                        .HasColumnName("cus_full_address");
 
                     b.Property<string>("CusName")
                         .HasColumnType("text")

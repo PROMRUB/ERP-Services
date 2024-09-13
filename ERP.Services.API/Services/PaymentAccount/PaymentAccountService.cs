@@ -39,8 +39,27 @@ namespace ERP.Services.API.Services.PaymentAccount
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId).Where(x => x.AccountStatus == RecordStatus.Active.ToString()).OrderBy(x => x.BankId).ToListAsync();
-            var result = mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(query);
+            var query = await paymentAccountRepository.GetPaymentAccountByBusiness((Guid)organization.OrgId, businessId)
+                .Include(x => x.BankEntity)
+                .Include(x => x.BankBranchEntity)
+                .Where(x => x.AccountStatus == RecordStatus.Active.ToString())
+                .OrderBy(x => x.BankId)
+                .ToListAsync();
+            var result = query.Select(x => new PaymentAccountResponse
+                {
+                    PaymentAccountId = x.PaymentAccountId,
+                    OrgId = x.OrgId,
+                    PaymentAccountName = x.PaymentAccountName,
+                    AccountType = x.AccountType,
+                    AccountBank = x.BankId,
+                    AccountBankName = x.BankEntity.BankTHName,
+                    AccountBrn = x.BankBranchId,
+                    AccountBankBrn = x.BankBranchEntity.BankBranchTHName,
+                    PaymentAccountNo = x.PaymentAccountNo,
+                    AccountStatus = x.AccountStatus
+                })
+                .ToList();
+            // var result = mapper.Map<List<PaymentAccountEntity>, List<PaymentAccountResponse>>(query);
             var bankQuery = await systemConfigRepository.GetAll<BankEntity>().ToListAsync();
             foreach (var item in result)
             {
@@ -80,7 +99,7 @@ namespace ERP.Services.API.Services.PaymentAccount
                 AccountBankName = x.BankEntity.BankTHName,
                 AccountBankBrn = x.BankBranchEntity.BankBranchTHName,
                 PaymentAccountNo = x.PaymentAccountNo,
-                AccountStatus = x.AccountStatus
+                AccountStatus = x.AccountStatus == "Active" ? "ปกติ" : "รออนุมติ"
             });
 
             var paged = await PagedList<PaymentAccountResponse>.Create(result, page, pageSize);

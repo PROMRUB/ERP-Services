@@ -25,7 +25,7 @@
         public string? PostCode { get; set; }
         public string? Website { get; set; }
         public string? CusStatus { get; set; }
-
+        public bool? IsApprove { get; set; }
      
     }
 }

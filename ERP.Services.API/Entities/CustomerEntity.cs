@@ -66,6 +66,8 @@ namespace ERP.Services.API.Entities
 
         [Column("cus_status")] public string? CusStatus { get; set; }
 
+        [Column("cus_full_address")] public string? CusFullAddress { get; set; }
+
         public string Address()
         {
             var address = "";

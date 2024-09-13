@@ -94,6 +94,9 @@ namespace ERP.Services.API.Entities
         [Column("logo")]
         public string? Logo { get; set; }
 
+        public string? Url { get; set; }
+        public string? Hotline { get; set; }
+
         public string Address()
         {
             var address = "";

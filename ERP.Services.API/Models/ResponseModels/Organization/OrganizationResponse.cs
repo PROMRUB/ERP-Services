@@ -9,5 +9,7 @@
         public string? OrgName { get; set; }
         public string? OrgDescription { get; set; }
         public string? OrgAddress { get; set; }
+        public string? HotLine { get; set; }
+        public string? Url { get; set; }
     }
 }
