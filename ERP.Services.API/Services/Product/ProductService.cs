@@ -70,13 +70,14 @@ namespace ERP.Services.API.Services.Product
         public async Task<PagedList<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,
             string keyword, int page, int pageSize)
         {
+            keyword = keyword.ToLower();
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
             var query = productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x =>
                 x.ProductStatus == RecordStatus.Active.ToString()
                 && (string.IsNullOrWhiteSpace(keyword) ||
-                    (!string.IsNullOrWhiteSpace(x.ProductCustomId) && x.ProductCustomId.Contains(keyword))
+                    (!string.IsNullOrWhiteSpace(x.ProductCustomId) && x.ProductCustomId.ToLower().Contains(keyword))
                     || (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.ToLower().Contains(keyword))
                 )
             ).OrderBy(x => x.ProductCustomId);

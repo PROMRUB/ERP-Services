@@ -69,8 +69,8 @@ namespace ERP.Services.API.Services.Customer
                 .Where(x => x.CusStatus != RecordStatus.InActive.ToString()
                             && (string.IsNullOrWhiteSpace(keyword) ||
                                 (!string.IsNullOrWhiteSpace(x.CusName) && x.CusName.ToLower().Contains(keyword))
-                                || (!string.IsNullOrWhiteSpace(x.CusNameEng) &&
-                                    x.CusNameEng.ToLower().Contains(keyword))
+                                // || (!string.IsNullOrWhiteSpace(x.CusNameEng) &&
+                                //     x.CusNameEng.ToLower().Contains(keyword))
                                 // || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
                                 //     x.CusCustomId.ToLower().Contains(keyword))
                             )

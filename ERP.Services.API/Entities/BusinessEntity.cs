@@ -96,6 +96,8 @@ namespace ERP.Services.API.Entities
 
         public string? Url { get; set; }
         public string? Hotline { get; set; }
+        public string? Email { get; set; }
+        public string? Tel { get; set; }
 
         public string Address()
         {
