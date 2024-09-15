@@ -52,12 +52,20 @@ namespace ERP.Services.API.Services.Project
         
         public async Task<PagedList<ProjectResponse>> GetProjectListByBusiness(string orgId, Guid businessId,string keyword,int page,int pageSize)
         {
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+            }
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
             var query =  projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()
                                                                 && (string.IsNullOrEmpty(keyword) ||
-                                                                    x.ProjectName.Contains(keyword)))
+                                                                    (!string.IsNullOrWhiteSpace(x.ProjectName) && x.ProjectName.ToLower().Contains(keyword))
+                                                                    || (!string.IsNullOrWhiteSpace(x.ProjectCustomId) && x.ProjectCustomId.ToLower().Contains(keyword))
+                                                                    )
+                                                                
+                                                                )
                 .OrderBy(x => x.ProjectCustomId);
                 
             // var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);
