@@ -8,7 +8,7 @@ public class QuotationProductEntityConfiguration : IEntityTypeConfiguration<Quot
 {
     public void Configure(EntityTypeBuilder<QuotationProductEntity> builder)
     {
-        builder.HasKey(b => new { b.QuotationId, b.ProductId });
+        // builder.HasKey(b => new { b.QuotationId, b.ProductId });
         builder.HasOne(x => x.Quotation)
             .WithMany(x => x.Products)
             .HasForeignKey(x => x.QuotationId);
