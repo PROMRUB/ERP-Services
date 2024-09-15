@@ -70,7 +70,10 @@ namespace ERP.Services.API.Services.Product
         public async Task<PagedList<ProductResponse>> GetProductListByBusiness(string orgId, Guid businessId,
             string keyword, int page, int pageSize)
         {
-            keyword = keyword.ToLower();
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                keyword = keyword.ToLower();
+            }
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
             var query = productRepository.GetProductByBusiness((Guid)organization.OrgId, businessId)
