@@ -527,10 +527,11 @@ namespace ERP.Services.API.Utils
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignCenter().Text(product.Quantity)
                             .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignRight().Text(product.AmountBeforeVat.ToString("#,###.00"))
-                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.Amount.ToString("#,###.00"))
                             .FontFamily("Prompt").FontSize(8);
+                        table.Cell().Element(CellStyle).AlignRight().Text(product.AmountBeforeVat.ToString("#,###.00"))
+                            .FontFamily("Prompt").FontSize(8);
+                      
 
                         static IContainer CellStyle(IContainer container) => container
                             .PaddingVertical(5);
