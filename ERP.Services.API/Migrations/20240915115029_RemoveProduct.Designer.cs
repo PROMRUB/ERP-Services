@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915115029_RemoveProduct")]
+    partial class RemoveProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1047,62 +1050,6 @@ namespace ERP.Services.API.Migrations
                     b.ToTable("Quotation");
                 });
 
-            modelBuilder.Entity("ERP.Services.API.Entities.QuotationProductEntity", b =>
-                {
-                    b.Property<Guid?>("QuotationProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("quotation_product_id");
-
-                    b.Property<float>("Amount")
-                        .HasColumnType("real")
-                        .HasColumnName("amount");
-
-                    b.Property<decimal>("AmountBeforeVat")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_before_vat");
-
-                    b.Property<float>("Discount")
-                        .HasColumnType("real")
-                        .HasColumnName("discount");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer")
-                        .HasColumnName("order");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real")
-                        .HasColumnName("price");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_id");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
-
-                    b.Property<Guid>("QuotationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("quotation_id");
-
-                    b.Property<decimal>("RealPriceMsrp")
-                        .HasColumnType("numeric")
-                        .HasColumnName("real_price_msrp");
-
-                    b.Property<decimal>("SumOfDiscount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("sum_of_discount");
-
-                    b.HasKey("QuotationProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("QuotationId");
-
-                    b.ToTable("QuotationProduct");
-                });
-
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProjectEntity", b =>
                 {
                     b.Property<Guid>("QuotationId")
@@ -1378,25 +1325,6 @@ namespace ERP.Services.API.Migrations
                     b.Navigation("SalePerson");
                 });
 
-            modelBuilder.Entity("ERP.Services.API.Entities.QuotationProductEntity", b =>
-                {
-                    b.HasOne("ERP.Services.API.Entities.ProductEntity", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ERP.Services.API.Entities.QuotationEntity", "Quotation")
-                        .WithMany("Products")
-                        .HasForeignKey("QuotationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Quotation");
-                });
-
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProjectEntity", b =>
                 {
                     b.HasOne("ERP.Services.API.Entities.ConditionEntity", "PaymentCondition")
@@ -1424,8 +1352,6 @@ namespace ERP.Services.API.Migrations
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationEntity", b =>
                 {
-                    b.Navigation("Products");
-
                     b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
