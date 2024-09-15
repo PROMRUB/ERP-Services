@@ -68,7 +68,7 @@ namespace ERP.Services.API.Services.Customer
             var query = customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusStatus != RecordStatus.InActive.ToString()
                             && (string.IsNullOrWhiteSpace(keyword) ||
-                                (!string.IsNullOrWhiteSpace(x.CusName) && x.CusName.ToLower().Contains(keyword))
+                                (!string.IsNullOrWhiteSpace(x.DisplayName) && x.DisplayName.ToLower().Contains(keyword))
                                 // || (!string.IsNullOrWhiteSpace(x.CusNameEng) &&
                                 //     x.CusNameEng.ToLower().Contains(keyword))
                                 // || (!string.IsNullOrWhiteSpace(x.CusCustomId) &&
@@ -105,7 +105,7 @@ namespace ERP.Services.API.Services.Customer
                 CusNameEng = x.CusNameEng,
                 DisplayName = x.DisplayName,
                 TaxId = x.TaxId,
-                BrnId = x.BrnId,
+                BrnId = x.BrnId == "00000" ? "สาขาใหญ่" : x.BrnId,
                 Building = x.Building,
                 RoomNo = x.RoomNo,
                 Floor = x.Floor,
