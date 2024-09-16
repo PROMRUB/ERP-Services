@@ -48,25 +48,65 @@ namespace ERP.Services.API.Utils
             {
                 container.Row(row =>
                 {
-                    row.RelativeItem().AlignRight().Text(text =>
+                    row.RelativeItem().AlignLeft().Text(text =>
                     {
+                        text.Span("Hotline : " + _entity.Business.Hotline )
+                            .FontSize(8)
+                            .FontColor(Colors.Black)
+                            .FontFamily("Prompt");
+                        text.Span("    " + _entity.Business.Url)
+                            .FontSize(8)
+                            .FontColor(Colors.Black)
+                            .FontFamily("Prompt");
+                        
+                        text.Span("            ")
+                            .FontSize(8)
+                            .FontColor(Colors.Black)
+                            .FontFamily("Prompt");
+                        
                         text.Span(_entity.QuotationNo)
-                            .FontSize(6)
+                            .FontSize(8)
                             .FontColor(Colors.Black)
                             .FontFamily("Prompt");
                         text.Span("    หน้าที่ :")
-                            .FontSize(6)
+                            .FontSize(8)
                             .FontFamily("Prompt");
                         text.CurrentPageNumber()
-                            .FontSize(6)
+                            .FontSize(8)
                             .FontFamily("Prompt");
                         text.Span(" / ")
-                            .FontSize(6)
+                            .FontSize(8)
                             .FontFamily("Prompt");
                         text.TotalPages()
-                            .FontSize(6)
+                            .FontSize(8)
                             .FontFamily("Prompt");
                     });
+                    // row.RelativeItem().AlignCenter().Text(text =>
+                    // {
+                    //     text.Span(_entity.Business.Url)
+                    //         .FontSize(8)
+                    //         .FontColor(Colors.Black)
+                    //         .FontFamily("Prompt");
+                    // });
+                    // row.RelativeItem().AlignRight().Text(text =>
+                    // {
+                    //     text.Span(_entity.QuotationNo)
+                    //         .FontSize(8)
+                    //         .FontColor(Colors.Black)
+                    //         .FontFamily("Prompt");
+                    //     text.Span("    หน้าที่ :")
+                    //         .FontSize(8)
+                    //         .FontFamily("Prompt");
+                    //     text.CurrentPageNumber()
+                    //         .FontSize(8)
+                    //         .FontFamily("Prompt");
+                    //     text.Span(" / ")
+                    //         .FontSize(8)
+                    //         .FontFamily("Prompt");
+                    //     text.TotalPages()
+                    //         .FontSize(8)
+                    //         .FontFamily("Prompt");
+                    // });
                 });
             }
 
@@ -101,7 +141,7 @@ namespace ERP.Services.API.Utils
                             .Text(text =>
                             {
                                 text.Span(
-                                        $"Hotline : {_entity.Business.Hotline}")
+                                        $"โทรศัพท์ : {_entity.Business.Tel}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
@@ -110,7 +150,7 @@ namespace ERP.Services.API.Utils
                             .Text(text =>
                             {
                                 text.Span(
-                                        $"www : {_entity.Business.Url}")
+                                        $"E-Mail : {_entity.Business.Email}")
                                     .FontFamily("Prompt")
                                     .FontSize(6)
                                     ;
@@ -186,7 +226,7 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span("รายละเอียดลูกค้า : Customer Description")
                                     .FontFamily("Prompt")
-                                    .FontSize(10)
+                                    .FontSize(8)
                                     .Bold()
                                     .FontColor(Colors.Black);
                                 column.Spacing(3);
@@ -195,7 +235,7 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span("เร\u0e35ยน/ATTN:")
                                     .FontFamily("Prompt")
-                                    .FontSize(10)
+                                    .FontSize(8)
                                     .Bold()
                                     .FontColor(Colors.Black);
                                 column.Spacing(3);
@@ -205,28 +245,28 @@ namespace ERP.Services.API.Utils
                                 text.Span(
                                         $"คุณ {_entity.CustomerContact.DisplayName()}")
                                     .FontFamily("Prompt")
-                                    .FontSize(6);
+                                    .FontSize(8);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
                                         $"{_entity.Customer.CusName}")
                                     .FontFamily("Prompt")
-                                    .FontSize(6);
+                                    .FontSize(8);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
                                         $"{_customerAddress}")
                                     .FontFamily("Prompt")
-                                    .FontSize(6);
+                                    .FontSize(8);
                             });
                             column.Item().Text(text =>
                             {
                                 text.Span(
                                         $"โทร: {_entity.CustomerContact.TelNo} E-mail: {_entity.CustomerContact.Email}")
                                     .FontFamily("Prompt")
-                                    .FontSize(6)
+                                    .FontSize(8)
                                     ;
                                 ;
                             });
@@ -240,7 +280,7 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span($"เลขท\u0e35\u0e48 / Quotation No: {_entity.QuotationNo ?? ""}")
                                     .FontFamily("Prompt")
-                                    .FontSize(10)
+                                    .FontSize(8)
                                     .Bold()
                                     .FontColor(Colors.Black);
                                 column.Spacing(5);
@@ -249,7 +289,7 @@ namespace ERP.Services.API.Utils
                             {
                                 text.Span($"ว\u0e31นท\u0e35\u0e48 / Date: {_entity.QuotationDateTime:dd-MM-yyyy}")
                                     .FontFamily("Prompt")
-                                    .FontSize(10)
+                                    .FontSize(8)
                                     .FontColor(Colors.Black);
                             });
                         });
@@ -302,7 +342,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span("กำหนดส\u0e48งส\u0e34นค\u0e49า (DELIVERY DATE)")
+                            text.Span("กำหนดส\u0e48งส\u0e34นค\u0e49า (Delivery Date)")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)
@@ -314,7 +354,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span("การร\u0e31บประก\u0e31น (WARRANTY)")
+                            text.Span("การร\u0e31บประก\u0e31น (Warranty)")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)
@@ -456,7 +496,7 @@ namespace ERP.Services.API.Utils
                             text.Span(
                                     $"หมายเหตุ (Remark) : {_entity.Remark}")
                                 .FontFamily("Prompt")
-                                .FontSize(6)
+                                .FontSize(8)
                                 .FontColor(Colors.Black)
                                 ;
                             ;
@@ -494,20 +534,28 @@ namespace ERP.Services.API.Utils
                             .BorderColor(Colors.Blue.Darken4);
 
                         header.Cell().Text("#")
+                            .FontSize(6)
                             .FontFamily("Prompt");
-                        header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)").Style(headerStyle)
+                        header.Cell().Text("รห\u0e31สส\u0e34นค\u0e49า\n(PRODUCT ID.)")
+                            .FontSize(6)
+                            .Style(headerStyle)
                             .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("รายการส\u0e34นค\u0e49า\n(DESCRIPTION)")
+                            .FontSize(6)
                             .FontFamily("Prompt")
                             .Style(headerStyle);
                         header.Cell().AlignCenter().Text("หน\u0e48วย\n(UNIT)").Style(headerStyle)
+                            .FontSize(6)
                             .FontFamily("Prompt");
                         header.Cell().AlignCenter().Text("จำนวน\n(QTY.)").Style(headerStyle)
+                            .FontSize(6)
                             .FontFamily("Prompt");
                         header.Cell().AlignCenter().AlignRight().Text("ราคา/หน\u0e48วย\n(UNIT/PRICE)")
+                            .FontSize(6)
                             .Style(headerStyle)
                             .FontFamily("Prompt");
                         header.Cell().AlignCenter().AlignRight().Text("จำนวนเง\u0e34น\n(AMOUNT)").Style(headerStyle)
+                            .FontSize(6)
                             .FontFamily("Prompt");
 
 
@@ -518,7 +566,7 @@ namespace ERP.Services.API.Utils
                     foreach (var product in _entity.Products.OrderBy(x => x.Order))
                     {
                         table.Cell().Element(CellStyle).Text(i++)
-                            .FontFamily("Prompt").FontSize(6);
+                            .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).Text(product.Product.ProductCustomId)
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
@@ -622,7 +670,7 @@ namespace ERP.Services.API.Utils
                         });
                     });
 
-                    row.ConstantItem(330);
+                    row.ConstantItem(300);
 
                     // row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
                     // {
@@ -809,19 +857,22 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span($"จ\u0e31ดทำโดย / ARRANGED by")
+                            text.Span($"จ\u0e31ดทำโดย / Arranged by")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
                         });
 
-                        column.Item().PaddingTop(77).LineHorizontal(1);
+                        column.Item().AlignCenter().Width(100).Height(100).Image(Image.FromFile($"images/{_entity.SalePersonId}.png"));
+                            
+
+                        column.Item().PaddingTop(-23).LineHorizontal(1);
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{_entity.IssuedByUser.DisplayNameTH()}")
+                            text.Span($"{_entity.SalePerson.DisplayNameTH()}")
                                 .FontFamily("Prompt")
-                                .FontSize(8)
+                                .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
                                 .LineHeight(1)
@@ -838,7 +889,7 @@ namespace ERP.Services.API.Utils
                         // });
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{_entity.IssuedByUser.TelNo}")
+                            text.Span($"{_entity.SalePerson.TelNo}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
@@ -848,7 +899,7 @@ namespace ERP.Services.API.Utils
                         });
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{_entity.IssuedByUser.email}")
+                            text.Span($"{_entity.SalePerson.email}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
@@ -862,31 +913,33 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span($"ข้าพเจ้าตกลงสั่งซื้อตามรายการ")
+                            text.Span($"ข้าพเจ้าตกลงสั่งซื้อตามรายการและเงื่อนไขทั้งหมด")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        column.Item().AlignCenter().Padding(3).Text(text =>
-                        {
-                            text.Span($"และเงื่อนไขทั้งหมด")
-                                .FontFamily("Prompt")
-                                .FontSize(6)
-                                .FontColor(Colors.Black)
-                                ;
-                        });
+                        // column.Item().AlignCenter().Padding(3).Text(text =>
+                        // {
+                        //     text.Span($"และเงื่อนไขทั้งหมด")
+                        //         .FontFamily("Prompt")
+                        //         .FontSize(6)
+                        //         .FontColor(Colors.Black)
+                        //         ;
+                        // });
 
                         column.Item().Padding(3).Text(text =>
                         {
-                            text.Span($"We agree & accept order you as in this quotation")
+                            text.Span($"We agree & accept to order you as in this quotation")
                                 .FontFamily("Prompt")
-                                .FontSize(4)
+                                .FontSize(6)
                                 .FontColor(Colors.Black)
                                 ;
                         });
+                        
 
-                        column.Item().PaddingTop(50).LineHorizontal(1);
+
+                        column.Item().PaddingTop(61).LineHorizontal(1);
                         // column.Item().Padding(3).AlignCenter().Text(text =>
                         // {
                         //     text.Span($"{entity.SalePerson.DisplayNameTH()}")
@@ -910,7 +963,7 @@ namespace ERP.Services.API.Utils
                         {
                             text.Span($"ลงชื่อลูกค้าพร้อมประทับตรา")
                                 .FontFamily("Prompt")
-                                .FontSize(8)
+                                .FontSize(6)
                                 .SemiBold()
                                 .FontColor(Colors.Black)
                                 .LineHeight(1)
