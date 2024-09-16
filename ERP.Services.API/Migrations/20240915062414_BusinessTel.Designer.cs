@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915062414_BusinessTel")]
+    partial class BusinessTel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -374,10 +377,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("CusDescription")
                         .HasColumnType("text")
                         .HasColumnName("cus_description");
-
-                    b.Property<string>("CusFullAddress")
-                        .HasColumnType("text")
-                        .HasColumnName("cus_full_address");
 
                     b.Property<string>("CusName")
                         .HasColumnType("text")
@@ -1053,10 +1052,13 @@ namespace ERP.Services.API.Migrations
 
             modelBuilder.Entity("ERP.Services.API.Entities.QuotationProductEntity", b =>
                 {
-                    b.Property<Guid?>("QuotationProductId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("QuotationId")
                         .HasColumnType("uuid")
-                        .HasColumnName("quotation_product_id");
+                        .HasColumnName("quotation_id");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
 
                     b.Property<float>("Amount")
                         .HasColumnType("real")
@@ -1078,17 +1080,9 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("real")
                         .HasColumnName("price");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_id");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
                         .HasColumnName("quantity");
-
-                    b.Property<Guid>("QuotationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("quotation_id");
 
                     b.Property<decimal>("RealPriceMsrp")
                         .HasColumnType("numeric")
@@ -1098,11 +1092,12 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("sum_of_discount");
 
-                    b.HasKey("QuotationProductId");
+                    b.HasKey("QuotationId", "ProductId");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("QuotationId");
+                    b.HasIndex("QuotationId", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("QuotationProduct");
                 });

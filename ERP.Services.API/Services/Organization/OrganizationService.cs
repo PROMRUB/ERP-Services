@@ -136,6 +136,8 @@ namespace ERP.Services.API.Services.Organization
                                 (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
             result.Url = query.Url;
             result.HotLine = query.Hotline;
+            result.Tel = query.Tel;
+            result.Email = query.Email;
             
             return result;
         }

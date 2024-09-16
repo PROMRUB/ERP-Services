@@ -312,7 +312,16 @@ public class QuotationService : IQuotationService
         quotation.RealPriceMsrp = result.RealPriceMsrp;
         quotation.Update();
 
-        await _quotationRepository.Context()!.SaveChangesAsync();
+        try
+        {
+            await _quotationRepository.Context()!.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
 
         if (quotation.Status == "อนุมัติ")
         {

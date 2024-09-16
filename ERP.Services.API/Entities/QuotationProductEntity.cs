@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace ERP.Services.API.Entities;
 
 [Table("QuotationProduct")]
-[Index(nameof(QuotationId), nameof(ProductId), IsUnique = true)]
 public class QuotationProductEntity
 {
+    [Column("quotation_product_id")]
+    public Guid? QuotationProductId { get; set; }
     [Column("quotation_id")] public Guid QuotationId { get; set; }
     public QuotationEntity Quotation { get; set; }
     [Column("product_id")] public Guid ProductId { get; set; }
