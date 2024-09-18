@@ -50,7 +50,7 @@ namespace ERP.Services.API.Utils
                 {
                     row.RelativeItem().AlignLeft().Text(text =>
                     {
-                        text.Span("Hotline : " + _entity.Business.Hotline )
+                        text.Span("Hotline : " + _entity.Business.Hotline)
                             .FontSize(8)
                             .FontColor(Colors.Black)
                             .FontFamily("Prompt");
@@ -58,12 +58,12 @@ namespace ERP.Services.API.Utils
                             .FontSize(8)
                             .FontColor(Colors.Black)
                             .FontFamily("Prompt");
-                        
+
                         text.Span("            ")
                             .FontSize(8)
                             .FontColor(Colors.Black)
                             .FontFamily("Prompt");
-                        
+
                         text.Span(_entity.QuotationNo)
                             .FontSize(8)
                             .FontColor(Colors.Black)
@@ -579,10 +579,10 @@ namespace ERP.Services.API.Utils
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignRight().Text(product.AmountBeforeVat.ToString("#,###.00"))
                             .FontFamily("Prompt").FontSize(8);
-                      
+
 
                         static IContainer CellStyle(IContainer container) => container
-                            .PaddingVertical(5);
+                            .PaddingVertical(8);
                         // .LineHorizontal(Colors.Blue.Darken4);
                     }
                 });
@@ -746,12 +746,11 @@ namespace ERP.Services.API.Utils
                     // });
                 });
             }
+
             void ComponentSum(IContainer container)
             {
                 container.PaddingTop(-95).Row(row =>
                 {
-                  
-
                     row.ConstantItem(330);
 
                     row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
@@ -764,7 +763,7 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                    
+
                         column.Item().AlignRight().PaddingTop(1).Text(text =>
                         {
                             text.Span($"ภาษ\u0e35ม\u0e39ลค\u0e48าเพ\u0e34\u0e48ม (VAT) 7%")
@@ -782,7 +781,7 @@ namespace ERP.Services.API.Utils
                                 ;
                         });
                     });
-                    
+
                     row.RelativeItem().AlignRight().PaddingTop(50).Column(column =>
                     {
                         column.Item().AlignRight().PaddingTop(1).Text(text =>
@@ -831,7 +830,6 @@ namespace ERP.Services.API.Utils
 
             void ComponentLineSum(IContainer container)
             {
-                
                 container
                     .PaddingTop(10)
                     .Row(row =>
@@ -864,8 +862,9 @@ namespace ERP.Services.API.Utils
                                 ;
                         });
 
-                        column.Item().AlignCenter().Width(100).Height(100).Image(Image.FromFile($"images/{_entity.SalePersonId}.png"));
-                            
+                        column.Item().AlignCenter().Width(100).Height(100)
+                            .Image(Image.FromFile($"images/{_entity.SalePersonId}.png"));
+
 
                         column.Item().PaddingTop(-23).LineHorizontal(1);
                         column.Item().Padding(3).AlignCenter().Text(text =>
@@ -897,9 +896,30 @@ namespace ERP.Services.API.Utils
                                 .LineHeight(1)
                                 ;
                         });
+
+                        var business = _entity.Business.BusinessName;
+                        var email = "";
+
+                        var arrOfEmail = _entity.SalePerson.email?.Split("|");
+
+                        if (business ==
+                            "บร\u0e34ษ\u0e31ท แปซ\u0e34ฟ\u0e34ค เทคโนโลย\u0e35 ด\u0e34สตร\u0e34บ\u0e34วช\u0e31\u0e48น จำก\u0e31ด")
+                        {
+                            email = arrOfEmail?.FirstOrDefault(x => x.Contains("ptdthai"));
+                        }
+                        else if (business ==
+                                 "บร\u0e34ษ\u0e31ท ซ\u0e35เค\u0e35ยว โซล\u0e39ช\u0e31\u0e48น เอเซ\u0e35ย จำก\u0e31ด")
+                        {
+                            email = arrOfEmail?.FirstOrDefault(x => x.Contains("securesolutionsasia"));
+                        }
+                        else if (business == "บร\u0e34ษ\u0e31ท ไซเบอร\u0e4c มาสเตอร\u0e4cส จำก\u0e31ด")
+                        {
+                            email = arrOfEmail?.FirstOrDefault(x => x.Contains("cybermasters"));
+                        }
+
                         column.Item().Padding(3).AlignCenter().Text(text =>
                         {
-                            text.Span($"{_entity.SalePerson.email}")
+                            text.Span($"{email}")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .SemiBold()
@@ -936,7 +956,6 @@ namespace ERP.Services.API.Utils
                                 .FontColor(Colors.Black)
                                 ;
                         });
-                        
 
 
                         column.Item().PaddingTop(61).LineHorizontal(1);
