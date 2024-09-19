@@ -46,12 +46,12 @@ namespace ERP.Services.API.Services.User
 
             var userQuery = repository.GetUserProfiles().ToList();
 
-            var userId = !role.Equals("All") && !role.Contains("SaleManager")
+            var userId = !role.Equals("All") && (!role.Contains("SaleManager") || !role.Contains("Admin"))
                 ? userPrincipalHandler.Id
                 : (Guid?)null;
             var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!).ToList();
 
-            if (!role.Equals("All") && !role.Contains("SaleManager"))
+            if (!role.Equals("All") && (!role.Contains("SaleManager") || !role.Contains("Admin")))
             {
                 businessQuery = businessQuery.Where(x => x.Role!.Contains(role)).ToList();
             }
