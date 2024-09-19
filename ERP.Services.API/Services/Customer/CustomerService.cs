@@ -121,7 +121,7 @@ namespace ERP.Services.API.Services.Customer
                 Website = x.Website,
                 IsApprove = x.CusStatus == RecordStatus.Approve.ToString(),
                 CusStatus = x.CusStatus.Equals(RecordStatus.Waiting.ToString()) ? "รอตรวจสอบ"
-                    : x.CusStatus.Equals(RecordStatus.Active.ToString()) ? "ปกติ" 
+                    : x.CusStatus.Equals(RecordStatus.Active.ToString()) ? "ปกติ"
                     : x.CusStatus.Equals(RecordStatus.Approve.ToString()) ? "ตรวจสอบแล้ว" : ""
             });
 
@@ -146,22 +146,22 @@ namespace ERP.Services.API.Services.Customer
             map.Moo = (string.IsNullOrEmpty(result.Moo) ? "" : "หมู่ " + (result.Moo + " "));
             map.Alley = (string.IsNullOrEmpty(result.Alley) ? "" : "ซอย " + (result.Alley + " "));
             map.Road = (string.IsNullOrEmpty(result.Road) ? "" : "ถนน " + (result.Road + " "));
-            // map.SubDistrict = (string.IsNullOrEmpty(result.SubDistrict)
-            //     ? ""
-            //     : "แขวง " + (systemConfigRepository.GetAll<SubDistrictEntity>()
-            //         .Where(x => x.SubDistrictCode.ToString().Equals(result.SubDistrict)).FirstOrDefault()
-            //         .SubDistrictNameTh + " "));
-            // map.District = (string.IsNullOrEmpty(result.District)
-            //     ? ""
-            //     : "เขต " + (systemConfigRepository.GetAll<DistrictEntity>()
-            //         .Where(x => x.DistrictCode.ToString().Equals(result.District)).FirstOrDefault()
-            //         .DistrictNameTh + " "));
-            // map.Province = (string.IsNullOrEmpty(result.Province)
-            //     ? ""
-            //     : "จังหวัด " + (systemConfigRepository.GetAll<ProvinceEntity>()
-            //         .Where(x => x.ProvinceCode.ToString().Equals(result.Province)).FirstOrDefault()
-            //         .ProvinceNameTh + " "));
-            // map.PostCode = (string.IsNullOrEmpty(result.PostCode) ? "" : "รหัสไปรษณีย์ " + result.PostCode);
+            map.SubDistrict = (string.IsNullOrEmpty(result.SubDistrict) && result.SubDistrict.Contains("แขวง")
+                ? ""
+                : "แขวง " + (systemConfigRepository.GetAll<SubDistrictEntity>()
+                    .Where(x => x.SubDistrictCode.ToString().Equals(result.SubDistrict)).FirstOrDefault()
+                    .SubDistrictNameTh + " "));
+            map.District = (string.IsNullOrEmpty(result.District) && result.District.Contains("เขต")
+                ? ""
+                : "เขต " + (systemConfigRepository.GetAll<DistrictEntity>()
+                    .Where(x => x.DistrictCode.ToString().Equals(result.District)).FirstOrDefault()
+                    .DistrictNameTh + " "));
+            map.Province = (string.IsNullOrEmpty(result.Province) && result.Province.Contains("จังหวัด")
+                ? ""
+                : "จังหวัด " + (systemConfigRepository.GetAll<ProvinceEntity>()
+                    .Where(x => x.ProvinceCode.ToString().Equals(result.Province)).FirstOrDefault()
+                    .ProvinceNameTh + " "));
+            map.PostCode = (string.IsNullOrEmpty(result.PostCode) && result.PostCode.Contains("จังหวัด") ? "" : "รหัสไปรษณีย์ " + result.PostCode);
 
             map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
             return map;
