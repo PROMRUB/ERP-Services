@@ -138,14 +138,14 @@ namespace ERP.Services.API.Services.Customer
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusId == customerId).FirstOrDefaultAsync();
             var map = mapper.Map<CustomerEntity, CustomerResponse>(result);
-            map.Building = (string.IsNullOrEmpty(result.Building) ? "" : "อาคาร " + (result.Building + " "));
-            map.RoomNo = (string.IsNullOrEmpty(result.RoomNo) ? "" : "ห้อง " + (result.RoomNo + " "));
-            map.Floor = (string.IsNullOrEmpty(result.Floor) ? "" : "ชั้น " + (result.Floor + " "));
-            map.Village = (string.IsNullOrEmpty(result.Village) ? "" : "หมู่บ้่าน " + (result.Village + " "));
-            map.No = (string.IsNullOrEmpty(result.No) ? "" : "เลขที่ " + (result.No + " "));
-            map.Moo = (string.IsNullOrEmpty(result.Moo) ? "" : "หมู่ " + (result.Moo + " "));
-            map.Alley = (string.IsNullOrEmpty(result.Alley) ? "" : "ซอย " + (result.Alley + " "));
-            map.Road = (string.IsNullOrEmpty(result.Road) ? "" : "ถนน " + (result.Road + " "));
+            // map.Building = (string.IsNullOrEmpty(result.Building) ? "" : "อาคาร " + (result.Building + " "));
+            // map.RoomNo = (string.IsNullOrEmpty(result.RoomNo) ? "" : "ห้อง " + (result.RoomNo + " "));
+            // map.Floor = (string.IsNullOrEmpty(result.Floor) ? "" : "ชั้น " + (result.Floor + " "));
+            // map.Village = (string.IsNullOrEmpty(result.Village) ? "" : "หมู่บ้่าน " + (result.Village + " "));
+            // map.No = (string.IsNullOrEmpty(result.No) ? "" : "เลขที่ " + (result.No + " "));
+            // map.Moo = (string.IsNullOrEmpty(result.Moo) ? "" : "หมู่ " + (result.Moo + " "));
+            // map.Alley = (string.IsNullOrEmpty(result.Alley) ? "" : "ซอย " + (result.Alley + " "));
+            // map.Road = (string.IsNullOrEmpty(result.Road) ? "" : "ถนน " + (result.Road + " "));
             // var a = string.IsNullOrEmpty(result.SubDistrict) && !result.SubDistrict.Contains("แขวง");
             // var b = (systemConfigRepository.GetAll<SubDistrictEntity>()
             //     .Where(x => x.SubDistrictCode.ToString().Equals(result.SubDistrict)).FirstOrDefault()
