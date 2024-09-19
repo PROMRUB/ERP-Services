@@ -53,7 +53,7 @@ namespace ERP.Services.API.Services.User
 
             if (!role.Equals("All") && (!role.Contains("SaleManager") && !role.Contains("Admin")))
             {
-                businessQuery = businessQuery.Where(x => x.Role!.Contains(role)).ToList();
+                businessQuery = businessQuery.Where(x => x.Role!.Contains(role) && org.OrgId == x.OrgId).ToList();
             }
 
             foreach (var item in businessQuery)
