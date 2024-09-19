@@ -138,7 +138,7 @@ namespace ERP.Services.API.Services.Customer
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusId == customerId).FirstOrDefaultAsync();
             var map = mapper.Map<CustomerEntity, CustomerResponse>(result);
-            if (map.Province.Contains("จังหวัด"))
+            if (!map.Province.Contains("จังหวัด"))
             {
                 map.Building = (string.IsNullOrEmpty(result.Building) ? "" : "อาคาร " + (result.Building + " "));
             map.RoomNo = (string.IsNullOrEmpty(result.RoomNo) ? "" : "ห้อง " + (result.RoomNo + " "));
