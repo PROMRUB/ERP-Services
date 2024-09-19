@@ -148,10 +148,6 @@ namespace ERP.Services.API.Services.Customer
             map.Moo = (string.IsNullOrEmpty(result.Moo) ? "" : "หมู่ " + (result.Moo + " "));
             map.Alley = (string.IsNullOrEmpty(result.Alley) ? "" : "ซอย " + (result.Alley + " "));
             map.Road = (string.IsNullOrEmpty(result.Road) ? "" : "ถนน " + (result.Road + " "));
-            var a = string.IsNullOrEmpty(result.SubDistrict) && !result.SubDistrict.Contains("แขวง");
-            var b = (systemConfigRepository.GetAll<SubDistrictEntity>()
-                .Where(x => x.SubDistrictCode.ToString().Equals(result.SubDistrict)).FirstOrDefault()
-                .SubDistrictNameTh + " ");
             map.SubDistrict = string.IsNullOrEmpty(result.SubDistrict) && !result.SubDistrict.Contains("แขวง")
                 ? ""
                 : "แขวง " + (systemConfigRepository.GetAll<SubDistrictEntity>()
