@@ -664,18 +664,18 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
 
         var queryCustomer = quotation.Customer;
-        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" :"อาคาร " + (queryCustomer.Building + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" :"ห้อง " + (queryCustomer.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" :"ชั้น " + (queryCustomer.Floor + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" :"หมู่บ้่าน " + (queryCustomer.Village + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.No) ? "" :"เลขที่ " + (queryCustomer.No + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" :"หมู่ " + (queryCustomer.Moo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" :"ซอย " + (queryCustomer.Alley + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" :"ถนน " + (queryCustomer.Road + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" :"แขวง " + (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(queryCustomer.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.District) ? "" :"เขต " + (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(queryCustomer.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" :"จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(queryCustomer.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" :"รหัสไปรษณีย์ " + queryCustomer.PostCode);
+        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" :" " + (queryCustomer.Building + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" :" " + (queryCustomer.RoomNo + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" :" " + (queryCustomer.Floor + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" :" " + (queryCustomer.Village + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.No) ? "" :" " + (queryCustomer.No + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" :" " + (queryCustomer.Moo + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" :" " + (queryCustomer.Alley + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" :" " + (queryCustomer.Road + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" :queryCustomer.SubDistrict +
+                         (string.IsNullOrEmpty(queryCustomer.District) ? "" :" " + queryCustomer.District +
+                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" :" " + "จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" :" " + queryCustomer.PostCode)));
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
