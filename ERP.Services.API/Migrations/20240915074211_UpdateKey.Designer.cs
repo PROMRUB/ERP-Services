@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915074211_UpdateKey")]
+    partial class UpdateKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -374,10 +377,6 @@ namespace ERP.Services.API.Migrations
                     b.Property<string>("CusDescription")
                         .HasColumnType("text")
                         .HasColumnName("cus_description");
-
-                    b.Property<string>("CusFullAddress")
-                        .HasColumnType("text")
-                        .HasColumnName("cus_full_address");
 
                     b.Property<string>("CusName")
                         .HasColumnType("text")
@@ -1102,7 +1101,8 @@ namespace ERP.Services.API.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("QuotationId");
+                    b.HasIndex("QuotationId", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("QuotationProduct");
                 });

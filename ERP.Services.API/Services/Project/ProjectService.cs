@@ -20,24 +20,31 @@ namespace ERP.Services.API.Services.Project
         private readonly IOrganizationRepository organizationRepository;
         private readonly IProjectRepository projectRepository;
         private readonly UserPrincipalHandler userPrincipalHandler;
+        private readonly IBusinessRepository _businessRepository;
 
         public ProjectService(IMapper mapper,
             IOrganizationRepository organizationRepository,
             IProjectRepository projectRepository,
-            UserPrincipalHandler userPrincipalHandler)
+            UserPrincipalHandler userPrincipalHandler,
+            IBusinessRepository businessRepository)
         {
             this.mapper = mapper;
             this.organizationRepository = organizationRepository;
             this.projectRepository = projectRepository;
             this.userPrincipalHandler = userPrincipalHandler;
+            _businessRepository = businessRepository;
         }
 
         public async Task<List<ProjectResponse>> GetProjectListByBusiness(string orgId, Guid businessId)
         {
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
-            var query = await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
-                .Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProjectCustomId)
+            var role = await _businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
+                .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
+            var query =  await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
+                .Where(x => (x.UserId == userPrincipalHandler.Id || (role != null && !string.IsNullOrWhiteSpace(role.Role) && 
+                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director")))) 
+                            && x.ProjectStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProjectCustomId)
                 .ToListAsync();
             var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);
             foreach (var item in result)
@@ -52,12 +59,25 @@ namespace ERP.Services.API.Services.Project
         
         public async Task<PagedList<ProjectResponse>> GetProjectListByBusiness(string orgId, Guid businessId,string keyword,int page,int pageSize)
         {
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+            }
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
+            var role = await _businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
+                .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
             var query =  projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
-                .Where(x => x.UserId == userPrincipalHandler.Id && x.ProjectStatus == RecordStatus.Active.ToString()
-                                                                && (string.IsNullOrEmpty(keyword) ||
-                                                                    x.ProjectName.Contains(keyword)))
+                .Where(x => (x.UserId == userPrincipalHandler.Id || (role != null && !string.IsNullOrWhiteSpace(role.Role) && 
+                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director")))) 
+                            
+                            && x.ProjectStatus == RecordStatus.Active.ToString()
+                            && (string.IsNullOrEmpty(keyword) ||
+                                (!string.IsNullOrWhiteSpace(x.ProjectName) && x.ProjectName.ToLower().Contains(keyword))
+                                || (!string.IsNullOrWhiteSpace(x.ProjectCustomId) && x.ProjectCustomId.ToLower().Contains(keyword))
+                            )
+                                                                
+                                                                )
                 .OrderBy(x => x.ProjectCustomId);
                 
             // var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);

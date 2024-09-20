@@ -79,6 +79,24 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpGet]
+        [Route("org/{id}/action/GetCustomerInformationWithWord/{businessId}/{customerId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetCustomerInformationWithWord(string id, Guid businessId, Guid customerId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await customerService.GetCustomerInformationWithWordByIdAsync(id, businessId, customerId);
+                return Ok(ResponseHandler.Response<CustomerResponse>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         [HttpPost]
         [Route("org/{id}/action/CreateCustomer")]
