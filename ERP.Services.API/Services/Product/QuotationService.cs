@@ -725,8 +725,8 @@ public class QuotationService : IQuotationService
 
         SendSmtpEmailSender Email = new SendSmtpEmailSender(senderName, senderEmail);
 
-        string toEmail = saleName;
-        string toName = saleEmail;
+        string toEmail = saleEmail;
+        string toName = saleName;
         SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(toEmail, toName);
 
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
