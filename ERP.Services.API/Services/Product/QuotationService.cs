@@ -515,7 +515,8 @@ public class QuotationService : IQuotationService
                 .OrderByDescending(x => x.QuotationNo)
             ;
 
-        if (user != null && !string.IsNullOrWhiteSpace(user.Role) && user.Role.Contains("SaleManager"))
+        if (user != null && !string.IsNullOrWhiteSpace(user.Role) &&
+            (user.Role.Contains("SaleManager") || user.Role.Contains("Director")))
         {
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)
@@ -664,18 +665,7 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
 
         var queryCustomer = quotation.Customer;
-        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" :" " + (queryCustomer.Building + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" :" " + (queryCustomer.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" :" " + (queryCustomer.Floor + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" :" " + (queryCustomer.Village + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.No) ? "" :" " + (queryCustomer.No + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" :" " + (queryCustomer.Moo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" :" " + (queryCustomer.Alley + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" :" " + (queryCustomer.Road + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" :queryCustomer.SubDistrict +
-                         (string.IsNullOrEmpty(queryCustomer.District) ? "" :" " + queryCustomer.District +
-                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" :" " + "จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" :" " + queryCustomer.PostCode)));
+        var cusAddress = queryCustomer.CusFullAddress;
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
@@ -735,8 +725,8 @@ public class QuotationService : IQuotationService
 
         SendSmtpEmailSender Email = new SendSmtpEmailSender(senderName, senderEmail);
 
-        string toEmail = saleName;
-        string toName = saleEmail;
+        string toEmail = saleEmail;
+        string toName = saleName;
         SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(toEmail, toName);
 
         List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
@@ -808,8 +798,9 @@ public class QuotationService : IQuotationService
 
         string HtmlContent = $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34เสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48าท\u0e35\u0e48ถ\u0e39กกำหนด<br/>" +
                              $"เร\u0e35ยน ผ\u0e39\u0e49ท\u0e35\u0e48เก\u0e35\u0e48ยวข\u0e49องท\u0e38กท\u0e48าน</br>" +
-                             $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {entity.QuotationNo ?? "-"} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
-                             $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
+                             $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49ม\u0e35ความจำเป\u0e47นบางประการท\u0e35\u0e48จะต\u0e49องเสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48า" +
+                             $"ราคาต\u0e48ำส\u0e38ดซ\u0e36\u0e48งได\u0e49ถ\u0e39กกำหนดไว\u0e49ในระบบเพ\u0e37\u0e48อใช\u0e49เฉพาะก\u0e31บเอกสารใบเสนอราคาเลขท\u0e35\u0e48: " +
+                             $"{entity.QuotationNo}" +
                              $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
                              $"{entity.SalePerson.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {entity.QuotationNo ?? "-"}";
