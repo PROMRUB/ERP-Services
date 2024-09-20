@@ -664,18 +664,7 @@ public class QuotationService : IQuotationService
                          (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
 
         var queryCustomer = quotation.Customer;
-        var cusAddress = (string.IsNullOrEmpty(queryCustomer.Building) ? "" :" " + (queryCustomer.Building + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.RoomNo) ? "" :" " + (queryCustomer.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Floor) ? "" :" " + (queryCustomer.Floor + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Village) ? "" :" " + (queryCustomer.Village + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.No) ? "" :" " + (queryCustomer.No + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Moo) ? "" :" " + (queryCustomer.Moo + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Alley) ? "" :" " + (queryCustomer.Alley + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.Road) ? "" :" " + (queryCustomer.Road + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.SubDistrict) ? "" :queryCustomer.SubDistrict +
-                         (string.IsNullOrEmpty(queryCustomer.District) ? "" :" " + queryCustomer.District +
-                         (string.IsNullOrEmpty(queryCustomer.Province) ? "" :" " + "จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(queryCustomer.PostCode) ? "" :" " + queryCustomer.PostCode)));
+        var cusAddress = queryCustomer.CusFullAddress;
 
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }

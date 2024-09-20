@@ -204,8 +204,7 @@ namespace ERP.Services.API.Services.Customer
                     .Where(x => x.ProvinceCode.ToString().Equals(result.Province)).FirstOrDefault()
                     .ProvinceNameTh + " "));
             map.PostCode = (string.IsNullOrEmpty(result.PostCode) && !result.PostCode.Contains("รหัสไปรษณีย์") ? "" : "รหัสไปรษณีย์ " + result.PostCode);
-           
-            
+            map.FullAddress = result.CusFullAddress;
 
             map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
             return map;

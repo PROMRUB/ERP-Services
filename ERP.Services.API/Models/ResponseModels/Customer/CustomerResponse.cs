@@ -26,6 +26,6 @@
         public string? Website { get; set; }
         public string? CusStatus { get; set; }
         public bool? IsApprove { get; set; }
-     
+        public string? FullAddress { get; set; }
     }
 }
