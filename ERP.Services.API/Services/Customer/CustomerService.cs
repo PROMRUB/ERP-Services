@@ -405,7 +405,7 @@ namespace ERP.Services.API.Services.Customer
             var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
                 .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
             List<CustomerContactEntity> result = new List<CustomerContactEntity>();
-            if (!role!.Role!.Contains("SaleManager"))
+            if (!role!.Role!.Contains("SaleManager") && !role!.Role!.Contains("Director"))
             {
                 result = await customerRepository
                     .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)
