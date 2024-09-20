@@ -515,7 +515,7 @@ public class QuotationService : IQuotationService
                 .OrderByDescending(x => x.QuotationNo)
             ;
 
-        if (user != null && !string.IsNullOrWhiteSpace(user.Role) && user.Role.Contains("SaleManager"))
+        if (user != null && !string.IsNullOrWhiteSpace(user.Role) && user.Role.Contains("SaleManager") && user.Role.Contains("Director"))
         {
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)
