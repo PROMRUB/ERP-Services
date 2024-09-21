@@ -509,7 +509,7 @@ public class QuotationService : IQuotationService
                 .Where(x => 
                     // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                     //         || 
-                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword)|| x.QuotationNo == keyword)
+                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword)|| x.QuotationNo.ToLower() == keyword)
                             // || (string.IsNullOrWhiteSpace(keyword) ||
                             //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
                            )
@@ -525,7 +525,7 @@ public class QuotationService : IQuotationService
                     // (
                     // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
                                 // || 
-                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword) || x.QuotationNo == keyword)
+                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) || x.QuotationNo.ToLower() == keyword)
                                 // || (string.IsNullOrWhiteSpace(keyword) ||
                                     // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
                                )
