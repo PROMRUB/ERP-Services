@@ -506,12 +506,13 @@ public class QuotationService : IQuotationService
         var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
-                .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                            || (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
-                            || (string.IsNullOrWhiteSpace(keyword) ||
-                                x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
-                            (string.IsNullOrWhiteSpace(keyword) ||
-                             x.QuotationNo.Contains(keyword)))
+                .Where(x => 
+                    // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
+                    //         || 
+                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword)|| x.QuotationNo.ToLower() == keyword)
+                            // || (string.IsNullOrWhiteSpace(keyword) ||
+                            //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
+                           )
                 .OrderByDescending(x => x.QuotationNo)
             ;
 
@@ -520,12 +521,14 @@ public class QuotationService : IQuotationService
         {
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)
-                    .Where(x => (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                                && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.Contains(keyword))
-                                && (string.IsNullOrWhiteSpace(keyword) ||
-                                    x.Products.Any(p => p.Product.ProductName.Contains(keyword))) &&
-                                (string.IsNullOrWhiteSpace(keyword) ||
-                                 x.QuotationNo.Contains(keyword)))
+                    .Where(x =>
+                    // (
+                    // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
+                                // || 
+                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) || x.QuotationNo.ToLower() == keyword)
+                                // || (string.IsNullOrWhiteSpace(keyword) ||
+                                    // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
+                               )
                     .OrderByDescending(x => x.QuotationNo)
                 ;
         }
