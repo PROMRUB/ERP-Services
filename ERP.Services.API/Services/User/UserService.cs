@@ -87,6 +87,11 @@ namespace ERP.Services.API.Services.User
                     continue;
                 }
 
+                if (!item.Role.Contains("SalesRepresentative"))
+                {
+                    continue;
+                }
+
                 List<string> roles = item.Role
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(k => k.Trim())
