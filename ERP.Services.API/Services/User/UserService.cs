@@ -62,7 +62,13 @@ namespace ERP.Services.API.Services.User
 
             foreach (var item in businessQuery)
             {
-                var user = userQuery.Where(x => x.OrgUserId == item.UserId).FirstOrDefault();
+                var user = userQuery.FirstOrDefault(x => x.OrgUserId == item.UserId);
+
+                if (user == null)
+                {
+                    continue;
+                }
+                
                 var orgUser = new OrganizationUserResponse
                 {
                     OrgUserId = user.OrgUserId,
