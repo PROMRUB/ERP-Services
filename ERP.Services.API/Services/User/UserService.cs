@@ -46,11 +46,13 @@ namespace ERP.Services.API.Services.User
 
             var userQuery = repository.GetUserProfiles().ToList();
 
-            var userId = !role.Equals("All") &&
-                         (!role.Contains("SaleManager") && !role.Contains("Admin") && !role.Contains("Director"))
-                ? userPrincipalHandler.Id
-                : (Guid?)null;
-            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!).ToList();
+            var userId = 
+                // (!role.Contains("SaleManager") && !role.Contains("Admin") && !role.Contains("Director"))
+                // ? userPrincipalHandler.Id
+                // : 
+                (Guid?)null;
+            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!)
+                .Where(x => x.BusinessId == businessId).ToList();
 
             if (!role.Equals("All") &&
                 (!role.Contains("SaleManager") && !role.Contains("Admin") && !role.Contains("Director")))
@@ -60,7 +62,13 @@ namespace ERP.Services.API.Services.User
 
             foreach (var item in businessQuery)
             {
-                var user = userQuery.Where(x => x.OrgUserId == item.UserId).FirstOrDefault();
+                var user = userQuery.FirstOrDefault(x => x.OrgUserId == item.UserId);
+
+                if (user == null)
+                {
+                    continue;
+                }
+                
                 var orgUser = new OrganizationUserResponse
                 {
                     OrgUserId = user.OrgUserId,
@@ -79,6 +87,11 @@ namespace ERP.Services.API.Services.User
                     continue;
                 }
 
+                if (!item.Role.Contains("SalesRepresentative"))
+                {
+                    continue;
+                }
+
                 List<string> roles = item.Role
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(k => k.Trim())
@@ -86,6 +99,8 @@ namespace ERP.Services.API.Services.User
                 orgUser.Role = roles.Distinct().ToList();
                 result.Add(orgUser);
             }
+
+            result = result.OrderBy(x => x.Firstname).ToList();
 
             return result;
         }
