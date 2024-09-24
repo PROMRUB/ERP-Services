@@ -323,19 +323,19 @@ public class QuotationService : IQuotationService
         }
 
 
-        if (quotation.Status == "อนุมัติ")
-        {
-            try
-            {
-                await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
-                    quotation.SalePerson.email);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                throw e;
-            }
-        }
+        // if (quotation.Status == "อนุมัติ")
+        // {
+        //     try
+        //     {
+        //         await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
+        //             quotation.SalePerson.email);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine(e.Message);
+        //         throw e;
+        //     }
+        // }
 
         return MapEntityToResponse(quotation);
     }
@@ -345,8 +345,8 @@ public class QuotationService : IQuotationService
         return Task.FromResult(new List<QuotationStatus>()
         {
             new() { Status = "เสนอราคา" },
-            new() { Status = "อนุมัติ" },
-            new() { Status = "ไม่อนุมัติ" },
+            new() { Status = "ปิดการขาย" },
+            new() { Status = "ยกเลิก" },
         });
     }
 
@@ -803,7 +803,7 @@ public class QuotationService : IQuotationService
                              $"เร\u0e35ยน ผ\u0e39\u0e49ท\u0e35\u0e48เก\u0e35\u0e48ยวข\u0e49องท\u0e38กท\u0e48าน</br>" +
                              $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49ม\u0e35ความจำเป\u0e47นบางประการท\u0e35\u0e48จะต\u0e49องเสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48า" +
                              $"ราคาต\u0e48ำส\u0e38ดซ\u0e36\u0e48งได\u0e49ถ\u0e39กกำหนดไว\u0e49ในระบบเพ\u0e37\u0e48อใช\u0e49เฉพาะก\u0e31บเอกสารใบเสนอราคาเลขท\u0e35\u0e48: " +
-                             $"{entity.QuotationNo}" +
+                             $"{entity.QuotationNo}<br/><br/><br/>" +
                              $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
                              $"{entity.SalePerson.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {entity.QuotationNo ?? "-"}";

@@ -50,7 +50,8 @@ namespace ERP.Services.API.Services.User
                          (!role.Contains("SaleManager") && !role.Contains("Admin") && !role.Contains("Director"))
                 ? userPrincipalHandler.Id
                 : (Guid?)null;
-            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!).ToList();
+            var businessQuery = businessRepository.GetUserBusinessList(userId, (Guid)org.OrgId!)
+                .Where(x => x.BusinessId == businessId).ToList();
 
             if (!role.Equals("All") &&
                 (!role.Contains("SaleManager") && !role.Contains("Admin") && !role.Contains("Director")))
