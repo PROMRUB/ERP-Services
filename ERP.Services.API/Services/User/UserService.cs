@@ -100,6 +100,8 @@ namespace ERP.Services.API.Services.User
                 result.Add(orgUser);
             }
 
+            result = result.OrderBy(x => x.Firstname).ToList();
+
             return result;
         }
 
