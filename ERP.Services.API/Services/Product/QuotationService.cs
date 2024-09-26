@@ -517,7 +517,8 @@ public class QuotationService : IQuotationService
             ;
 
         if (user != null && !string.IsNullOrWhiteSpace(user.Role) &&
-            (user.Role.Contains("SaleManager") || user.Role.Contains("Director")))
+            (user.Role.Contains("SaleManager") || user.Role.Contains("Director")
+                                               || user.Role.Contains("Admin")))
         {
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)

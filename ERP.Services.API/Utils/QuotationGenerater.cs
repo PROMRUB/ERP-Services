@@ -571,7 +571,7 @@ namespace ERP.Services.API.Utils
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
                             .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignCenter().Text("E.A")
+                        table.Cell().Element(CellStyle).AlignCenter().Text("EA")
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignCenter().Text(product.Quantity)
                             .FontFamily("Prompt").FontSize(8);
