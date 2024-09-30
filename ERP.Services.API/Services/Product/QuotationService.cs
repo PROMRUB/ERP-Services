@@ -303,7 +303,7 @@ public class QuotationService : IQuotationService
 
         quotation.CustomerId = resource.CustomerId;
         quotation.CustomerContactId = resource.ContactPersonId;
-        quotation.QuotationDateTime = DateTime.UtcNow;
+        // quotation.QuotationDateTime = DateTime.UtcNow;
         quotation.SalePersonId = resource.SalesPersonId;
         quotation.IssuedById = resource.IssuedById;
         quotation.Remark = resource.Remark;
