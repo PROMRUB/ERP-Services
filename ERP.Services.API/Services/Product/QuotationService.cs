@@ -62,6 +62,11 @@ public class QuotationService : IQuotationService
         {
             Name = "amornrat.t@securesolutionsasia.com",
             Email = "amornrat.t@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "kkunayothin@gmail.com",
+            Email = "kkunayothin@gmail.com"
         }
     };
 
