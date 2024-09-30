@@ -47,6 +47,21 @@ public class QuotationService : IQuotationService
         {
             Name = "kitsada.t@securesolutionsasia.com",
             Email = "kitsada.t@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "bancherd@cybertracx.com",
+            Email = "bancherd@cybertracx.com"
+        },
+        new EmailInformation()
+        {
+            Name = "muankhwan.u@securesolutionsasia.com",
+            Email = "muankhwan.u@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "amornrat.t@securesolutionsasia.com",
+            Email = "amornrat.t@securesolutionsasia.com"
         }
     };
 
@@ -506,13 +521,14 @@ public class QuotationService : IQuotationService
         var query = _quotationRepository.GetQuotationQuery()
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
-                .Where(x => 
-                    // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                    //         || 
-                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword)|| x.QuotationNo.ToLower() == keyword)
-                            // || (string.IsNullOrWhiteSpace(keyword) ||
-                            //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
-                           )
+                .Where(x =>
+                        // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
+                        //         || 
+                        (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                         x.QuotationNo.ToLower() == keyword)
+                    // || (string.IsNullOrWhiteSpace(keyword) ||
+                    //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
+                )
                 .OrderByDescending(x => x.QuotationNo)
             ;
 
@@ -523,13 +539,14 @@ public class QuotationService : IQuotationService
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)
                     .Where(x =>
-                    // (
-                    // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                                // || 
-                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) || x.QuotationNo.ToLower() == keyword)
-                                // || (string.IsNullOrWhiteSpace(keyword) ||
-                                    // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
-                               )
+                            // (
+                            // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
+                            // || 
+                            (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                             x.QuotationNo.ToLower() == keyword)
+                        // || (string.IsNullOrWhiteSpace(keyword) ||
+                        // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
+                    )
                     .OrderByDescending(x => x.QuotationNo)
                 ;
         }
@@ -655,18 +672,30 @@ public class QuotationService : IQuotationService
 
         var query = business;
 
-        var orgAddress = (string.IsNullOrEmpty(query.Building) ? "" :"อาคาร " + (query.Building + " ")) +
-                         (string.IsNullOrEmpty(query.RoomNo) ? "" :"ห้อง " + (query.RoomNo + " ")) +
-                         (string.IsNullOrEmpty(query.Floor) ? "" :"ชั้น " + (query.Floor + " ")) +
-                         (string.IsNullOrEmpty(query.Village) ? "" :"หมู่บ้่าน " + (query.Village + " ")) +
-                         (string.IsNullOrEmpty(query.No) ? "" :"เลขที่ " + (query.No + " ")) +
-                         (string.IsNullOrEmpty(query.Moo) ? "" :"หมู่ " + (query.Moo + " ")) +
-                         (string.IsNullOrEmpty(query.Alley) ? "" :"ซอย " + (query.Alley + " ")) +
-                         (string.IsNullOrEmpty(query.Road) ? "" :"ถนน " + (query.Road + " ")) +
-                         (string.IsNullOrEmpty(query.SubDistrict) ? "" :"แขวง " + (_systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.District) ? "" :"เขต " + (_systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.Province) ? "" :"จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                         (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
+        var orgAddress = (string.IsNullOrEmpty(query.Building) ? "" : "อาคาร " + (query.Building + " ")) +
+                         (string.IsNullOrEmpty(query.RoomNo) ? "" : "ห้อง " + (query.RoomNo + " ")) +
+                         (string.IsNullOrEmpty(query.Floor) ? "" : "ชั้น " + (query.Floor + " ")) +
+                         (string.IsNullOrEmpty(query.Village) ? "" : "หมู่บ้่าน " + (query.Village + " ")) +
+                         (string.IsNullOrEmpty(query.No) ? "" : "เลขที่ " + (query.No + " ")) +
+                         (string.IsNullOrEmpty(query.Moo) ? "" : "หมู่ " + (query.Moo + " ")) +
+                         (string.IsNullOrEmpty(query.Alley) ? "" : "ซอย " + (query.Alley + " ")) +
+                         (string.IsNullOrEmpty(query.Road) ? "" : "ถนน " + (query.Road + " ")) +
+                         (string.IsNullOrEmpty(query.SubDistrict)
+                             ? ""
+                             : "แขวง " + (_systemRepository.GetAll<SubDistrictEntity>()
+                                 .Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault()
+                                 .SubDistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.District)
+                             ? ""
+                             : "เขต " + (_systemRepository.GetAll<DistrictEntity>()
+                                 .Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault()
+                                 .DistrictNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.Province)
+                             ? ""
+                             : "จังหวัด " + (_systemRepository.GetAll<ProvinceEntity>()
+                                 .Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault()
+                                 .ProvinceNameTh + " ")) +
+                         (string.IsNullOrEmpty(query.PostCode) ? "" : "รหัสไปรษณีย์ " + query.PostCode);
 
         var queryCustomer = quotation.Customer;
         var cusAddress = queryCustomer.CusFullAddress;
@@ -677,7 +706,7 @@ public class QuotationService : IQuotationService
     public async Task DeleteAll()
     {
         var query = await _quotationRepository.GetQuotationQuery().ToListAsync();
-        
+
         _quotationRepository.DeleteAll(query);
 
         await _quotationRepository.Context().SaveChangesAsync();
@@ -800,13 +829,14 @@ public class QuotationService : IQuotationService
             To.Add(smtpEmailTo);
         }
 
-        string HtmlContent = $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34เสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48าท\u0e35\u0e48ถ\u0e39กกำหนด<br/>" +
-                             $"เร\u0e35ยน ผ\u0e39\u0e49ท\u0e35\u0e48เก\u0e35\u0e48ยวข\u0e49องท\u0e38กท\u0e48าน</br>" +
-                             $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49ม\u0e35ความจำเป\u0e47นบางประการท\u0e35\u0e48จะต\u0e49องเสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48า" +
-                             $"ราคาต\u0e48ำส\u0e38ดซ\u0e36\u0e48งได\u0e49ถ\u0e39กกำหนดไว\u0e49ในระบบเพ\u0e37\u0e48อใช\u0e49เฉพาะก\u0e31บเอกสารใบเสนอราคาเลขท\u0e35\u0e48: " +
-                             $"{entity.QuotationNo}<br/><br/><br/>" +
-                             $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
-                             $"{entity.SalePerson.DisplayNameTH()}<br/>";
+        string HtmlContent =
+            $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34เสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48าท\u0e35\u0e48ถ\u0e39กกำหนด<br/>" +
+            $"เร\u0e35ยน ผ\u0e39\u0e49ท\u0e35\u0e48เก\u0e35\u0e48ยวข\u0e49องท\u0e38กท\u0e48าน</br>" +
+            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49ม\u0e35ความจำเป\u0e47นบางประการท\u0e35\u0e48จะต\u0e49องเสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48า" +
+            $"ราคาต\u0e48ำส\u0e38ดซ\u0e36\u0e48งได\u0e49ถ\u0e39กกำหนดไว\u0e49ในระบบเพ\u0e37\u0e48อใช\u0e49เฉพาะก\u0e31บเอกสารใบเสนอราคาเลขท\u0e35\u0e48: " +
+            $"{entity.QuotationNo}<br/><br/><br/>" +
+            $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
+            $"{entity.SalePerson.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {entity.QuotationNo ?? "-"}";
 
         try
