@@ -315,7 +315,7 @@ namespace ERP.Services.API.Services.Product
                                 product.ProductName = productName;
                                 product.MSRP = msrp;
                                 product.LwPrice = lwPrice;
-                                items.Add(product);
+                                productRepository.UpdateProduct(product);
                             }
                         }
                     }
