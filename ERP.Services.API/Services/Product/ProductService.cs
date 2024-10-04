@@ -236,7 +236,7 @@ namespace ERP.Services.API.Services.Product
                                 CustomCatId = worksheet.Cells[row, 1].Text,
                                 ParentCatId = worksheet.Cells[row, 2].Text,
                                 CategoryName = worksheet.Cells[row, 3].Text,
-                                CategoryStatus = RecordStatus.Active.ToString()
+                                CategoryStatus = RecordStatus.InActive.ToString()
                             });
                         }
 
@@ -266,47 +266,54 @@ namespace ERP.Services.API.Services.Product
 
             var items = new List<ProductEntity>();
 
-            using (var stream = new MemoryStream())
+            try
             {
-                request.CopyTo(stream);
-                stream.Position = 0;
-                using (var package = new ExcelPackage(stream))
+                using (var stream = new MemoryStream())
                 {
-                    var worksheet = package.Workbook.Worksheets[0];
+                    request.CopyTo(stream);
+                    stream.Position = 0;
 
-                    for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                    using (var package = new ExcelPackage(stream))
                     {
-                        var category = await productRepository
-                            .GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
-                            .Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 1].Text)).FirstOrDefaultAsync();
-                        var subCategory = await productRepository
-                            .GetProductCategoryByBusiness((Guid)organization.OrgId, businessId)
-                            .Where(x => x.CustomCatId.Equals(worksheet.Cells[row, 2].Text)).FirstOrDefaultAsync();
-                        items.Add(new ProductEntity
+                        var worksheet = package.Workbook.Worksheets[0];
+
+                        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            ProductId = Guid.NewGuid(),
-                            OrgId = organization.OrgId,
-                            BusinessId = businessId,
-                            ProductCatId = category == null ? Guid.Empty : category.ProductCatId,
-                            ProductSubCatId = subCategory == null ? Guid.Empty : subCategory.ProductCatId,
-                            ProductCustomId = worksheet.Cells[row, 3].Text,
-                            ProductName = worksheet.Cells[row, 4].Text,
-                            MSRP = decimal.Parse(worksheet.Cells[row, 5].Text),
-                            LwPrice = decimal.Parse(worksheet.Cells[row, 6].Text),
-                            ProductStatus = RecordStatus.Active.ToString()
-                        });
+                            string customId = worksheet.Cells[row, 3]?.Text ?? string.Empty;
+                            string productName = worksheet.Cells[row, 4]?.Text ?? string.Empty;
+
+                            decimal msrp = 0;
+                            decimal.TryParse(worksheet.Cells[row, 5]?.Text, out msrp);
+
+                            decimal lwPrice = 0;
+                            decimal.TryParse(worksheet.Cells[row, 6]?.Text, out lwPrice);
+
+                            var product = new ProductEntity
+                            {
+                                ProductId = Guid.NewGuid(),
+                                OrgId = organization.OrgId,
+                                BusinessId = businessId,
+                                ProductCatId = Guid.Empty,
+                                ProductSubCatId = Guid.Empty,
+                                ProductCustomId = customId,
+                                ProductName = productName,
+                                MSRP = msrp,
+                                LwPrice = lwPrice,
+                                ProductStatus = RecordStatus.Active.ToString()
+                            };
+
+                            items.Add(product);
+                        }
                     }
-
-                    stream.Dispose();
                 }
+                productRepository.AddProducts(items);
+                productRepository.Commit();
             }
-
-            foreach (var item in items)
+            catch (Exception)
             {
-                productRepository.AddProduct(item);
+                throw;
             }
 
-            productRepository.Commit();
         }
     }
 }

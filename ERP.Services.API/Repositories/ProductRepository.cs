@@ -2,6 +2,7 @@
 using ERP.Services.API.Enum;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.PromServiceDbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Repositories
 {
@@ -52,6 +53,23 @@ namespace ERP.Services.API.Repositories
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public void AddProducts(List<ProductEntity> products)
+        {
+            if (products == null || !products.Any())
+            {
+                throw new ArgumentException("Product list is empty or null.", nameof(products));
+            }
+
+            try
+            {
+                context.Products.AddRange(products); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while adding products: {ex.Message}");
             }
         }
 

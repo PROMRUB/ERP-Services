@@ -11,6 +11,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<ProductEntity> GetProductListQueryable();
         public void AddProductCategory(ProductCategoryEntity query);
         public void AddProduct(ProductEntity query);
+        public void AddProducts(List<ProductEntity> products);
         public void UpdateProductCategory(ProductCategoryEntity query);
         public void UpdateProduct(ProductEntity query);
         public void DeleteProductCategory(ProductCategoryEntity query);

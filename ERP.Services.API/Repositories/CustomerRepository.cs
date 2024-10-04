@@ -32,6 +32,11 @@ namespace ERP.Services.API.Repositories
             context.Customers!.Add(query);
         }
 
+        public void CreateCustomers(List<CustomerEntity> query)
+        {
+            context.Customers!.AddRange(query);
+        }
+
         public void UpdateCustomer(CustomerEntity query)
         {
             context.Customers!.Update(query);
