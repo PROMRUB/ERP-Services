@@ -43,7 +43,7 @@ namespace ERP.Services.API.Services.Project
                 .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
             var query =  await projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => (x.UserId == userPrincipalHandler.Id || (role != null && !string.IsNullOrWhiteSpace(role.Role) && 
-                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director")))) 
+                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director") || role.Role.Contains("Admin")))) 
                             && x.ProjectStatus == RecordStatus.Active.ToString()).OrderBy(x => x.ProjectCustomId)
                 .ToListAsync();
             var result = mapper.Map<List<ProjectEntity>, List<ProjectResponse>>(query);
@@ -69,7 +69,7 @@ namespace ERP.Services.API.Services.Project
                 .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
             var query =  projectRepository.GetProjectByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => (x.UserId == userPrincipalHandler.Id || (role != null && !string.IsNullOrWhiteSpace(role.Role) && 
-                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director")))) 
+                                                                     (role.Role.Contains("Manager") || role.Role.Contains("Director")|| role.Role.Contains("Admin")))) 
                             
                             && x.ProjectStatus == RecordStatus.Active.ToString()
                             && (string.IsNullOrEmpty(keyword) ||

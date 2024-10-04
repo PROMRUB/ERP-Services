@@ -474,7 +474,7 @@ namespace ERP.Services.API.Utils
                         column.Item().Padding(10).Text(text =>
                         {
                             text.Span(
-                                    $"บร\u0e34ษ\u0e31ทฯม\u0e35ความย\u0e34นด\u0e35เสนอราคาเพ\u0e37\u0e48อให\u0e49ท\u0e48านพ\u0e34จารณาด\u0e31งน\u0e35\u0e49 / We are pleased to submit you our quotation as follows")
+                                    $"บร\u0e34ษ\u0e31ทฯ ม\u0e35ความย\u0e34นด\u0e35เสนอราคาเพ\u0e37\u0e48อให\u0e49ท\u0e48านพ\u0e34จารณาด\u0e31งน\u0e35\u0e49 / We are pleased to submit you our quotation as follows")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.Black)
@@ -571,7 +571,7 @@ namespace ERP.Services.API.Utils
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignLeft().Text(product.Product.ProductName)
                             .FontFamily("Prompt").FontSize(8);
-                        table.Cell().Element(CellStyle).AlignCenter().Text("E.A")
+                        table.Cell().Element(CellStyle).AlignCenter().Text("EA")
                             .FontFamily("Prompt").FontSize(8);
                         table.Cell().Element(CellStyle).AlignCenter().Text(product.Quantity)
                             .FontFamily("Prompt").FontSize(8);

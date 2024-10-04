@@ -34,9 +34,9 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_User")))
 
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PostgreSQL_Password")))
     throw new ArgumentNullException(string.Format("{0} is Null", "PostgreSQL_Password"));
-//
-// if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ERP_EMAIL")))
-//     throw new ArgumentNullException(string.Format("{0} is Null", "ERP_EMAIL"));
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ERP_EMAIL")))
+    throw new ArgumentNullException(string.Format("{0} is Null", "ERP_EMAIL"));
 
 var log = new LoggerConfiguration()
     .WriteTo.Console()
@@ -52,9 +52,9 @@ cfg["PostgreSQL:Host"] = Environment.GetEnvironmentVariable("PostgreSQL_Host")!;
 cfg["PostgreSQL:Database"] = Environment.GetEnvironmentVariable("PostgreSQL_Database")!;
 cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
 cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
-// cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
+cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
 
-
+ 
 Configuration.Default.ApiKey.Add("api-key",
     Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
@@ -62,8 +62,8 @@ Configuration.Default.ApiKey.Add("api-key",
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var connStr =
-     //$"Host=119.13.29.117;Port=2022; Database=erp; Username=postgres; Password=yoouhCyodbow-jg0up";
-     $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
+    // $"Host=119.13.29.117;Port=2022; Database=erp; Username=postgres; Password=yoouhCyodbow-jg0up";
+    $"Host={cfg["PostgreSQL:Host"]}; Database={cfg["PostgreSQL:Database"]}; Username={cfg["PostgreSQL:User"]}; Password={cfg["PostgreSQL:Password"]}";
 builder.Services.AddDbContext<PromDbContext>(
     options =>
     {

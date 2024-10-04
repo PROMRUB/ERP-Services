@@ -204,8 +204,7 @@ namespace ERP.Services.API.Services.Customer
                     .Where(x => x.ProvinceCode.ToString().Equals(result.Province)).FirstOrDefault()
                     .ProvinceNameTh + " "));
             map.PostCode = (string.IsNullOrEmpty(result.PostCode) && !result.PostCode.Contains("รหัสไปรษณีย์") ? "" : "รหัสไปรษณีย์ " + result.PostCode);
-           
-            
+            map.FullAddress = result.CusFullAddress;
 
             map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
             return map;
@@ -440,7 +439,7 @@ namespace ERP.Services.API.Services.Customer
             var role = await businessRepository.GetUserBusinessList(userPrincipalHandler.Id, (Guid)organization.OrgId!)
                 .Where(x => x.BusinessId == businessId).FirstOrDefaultAsync();
             List<CustomerContactEntity> result = new List<CustomerContactEntity>();
-            if (!role!.Role!.Contains("SaleManager"))
+            if (!role!.Role!.Contains("SaleManager") && !role!.Role!.Contains("Director") && !role!.Role!.Contains("Admin"))
             {
                 result = await customerRepository
                     .GetCustomerContactByCustomer((Guid)organization.OrgId, businessId, cusId)

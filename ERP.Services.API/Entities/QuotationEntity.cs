@@ -57,7 +57,7 @@ public class QuotationEntity
 
     public void SubmitStatus(string status)
     {
-        EditTime += 1;
+        // EditTime += 1;
         QuotationDateTime = DateTime.UtcNow;
         Status = status;
 
