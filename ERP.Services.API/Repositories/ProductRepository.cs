@@ -2,12 +2,14 @@
 using ERP.Services.API.Enum;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.PromServiceDbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP.Services.API.Repositories
 {
     public class ProductRepository : BaseRepository, IProductRepository
     {
-        public ProductRepository(PromDbContext context) {
+        public ProductRepository(PromDbContext context)
+        {
             this.context = context;
         }
 
@@ -27,12 +29,21 @@ namespace ERP.Services.API.Repositories
                 x.ProductName.ToLower().Contains(keyword) || x.ProductCustomId.Contains(keyword));
         }
 
+        public IQueryable<ProductEntity> GetProductByCustomId(Guid orgId, Guid businessId, string keyword)
+        {
+            return context.Products.Where(x =>
+                x.OrgId == orgId && x.
+                BusinessId == businessId && 
+                x.ProductCustomId.Equals(keyword));
+        }
+
         public IQueryable<ProductEntity> GetProductListQueryable()
         {
             return context.Products;
         }
 
-        public void AddProductCategory(ProductCategoryEntity query) {
+        public void AddProductCategory(ProductCategoryEntity query)
+        {
             try
             {
                 context.ProductCategories.Add(query);
@@ -52,6 +63,23 @@ namespace ERP.Services.API.Repositories
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public void AddProducts(List<ProductEntity> products)
+        {
+            if (products == null || !products.Any())
+            {
+                throw new ArgumentException("Product list is empty or null.", nameof(products));
+            }
+
+            try
+            {
+                context.Products.AddRange(products);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while adding products: {ex.Message}");
             }
         }
 

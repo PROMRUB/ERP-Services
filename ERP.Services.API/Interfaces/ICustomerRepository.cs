@@ -9,6 +9,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<CustomerEntity> GetCustomerByBusiness(Guid orgId, Guid bussinessId);
         public IQueryable<CustomerEntity> GetCustomerById(Guid bussinessId);
         public void CreateCustomer(CustomerEntity query);
+        public void CreateCustomers(List<CustomerEntity> query);
         public void UpdateCustomer(CustomerEntity query);
         public void DeleteCustomer(CustomerEntity query);
         public Task<CustomerNumberEntity> CustomerNumberAsync(Guid orgId, Guid businessId, string alphabet, int mode);

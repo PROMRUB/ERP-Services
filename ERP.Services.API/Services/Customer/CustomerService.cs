@@ -241,6 +241,15 @@ namespace ERP.Services.API.Services.Customer
             }
         }
 
+        string CleanText(string text, string[] patternsToRemove)
+        {
+            foreach (var pattern in patternsToRemove)
+            {
+                text = text.Replace(pattern, "");
+            }
+            return text;
+        }
+
         public async Task ImportExcel(string orgId, Guid businessId, IFormFile request)
         {
             try
@@ -252,87 +261,112 @@ namespace ERP.Services.API.Services.Customer
 
                 var items = new List<CustomerEntity>();
 
-                var subDistricts = await systemConfigRepository.GetAll<SubDistrictEntity>().ToListAsync();
-                var districts = await systemConfigRepository.GetAll<DistrictEntity>().ToListAsync();
-                var provinces = await systemConfigRepository.GetAll<ProvinceEntity>().ToListAsync();
+                var subDistrictsTask = systemConfigRepository.GetAll<SubDistrictEntity>().ToListAsync();
+                var districtsTask = systemConfigRepository.GetAll<DistrictEntity>().ToListAsync();
+                var provincesTask = systemConfigRepository.GetAll<ProvinceEntity>().ToListAsync();
+
+                await Task.WhenAll(subDistrictsTask, districtsTask, provincesTask);
+
+                var subDistricts = await subDistrictsTask;
+                var districts = await districtsTask;
+                var provinces = await provincesTask;
+
+                string[] subDistrictPatterns = { "แขวง", "ตำบล" };
+                string[] districtPatterns = { "เขต", "อำเภอ" };
+                string[] provincePatterns = { "จังหวัด" };
+
                 using (var stream = new MemoryStream())
                 {
                     request.CopyTo(stream);
                     stream.Position = 0;
+
                     using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets[0];
-
+                        
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
+                            string taxId = worksheet.Cells[row, 3]?.Text ?? "";
+                            string brnId = worksheet.Cells[row, 4]?.Text ?? "";
+                            string cusNameEng = worksheet.Cells[row, 5]?.Text ?? "";
+
                             items.Add(new CustomerEntity
                             {
                                 BusinessId = businessId,
                                 CusType = (worksheet.Cells[row, 2].Text).Contains("น")
                                     ? BusinessType.Corporate.ToString()
                                     : BusinessType.Individual.ToString(),
-                                TaxId = worksheet.Cells[row, 3].Text,
-                                BrnId = worksheet.Cells[row, 4].Text,
-                                CusNameEng = worksheet.Cells[row, 5].Text,
-                                CusName = worksheet.Cells[row, 6].Text,
-                                DisplayName = worksheet.Cells[row, 7].Text,
-                                Website = worksheet.Cells[row, 8].Text,
-                                Building = worksheet.Cells[row, 9].Text,
-                                RoomNo = worksheet.Cells[row, 11].Text,
-                                Floor = worksheet.Cells[row, 12].Text,
-                                Village = worksheet.Cells[row, 13].Text,
-                                No = worksheet.Cells[row, 14].Text,
-                                Moo = worksheet.Cells[row, 15].Text,
-                                Alley = worksheet.Cells[row, 16].Text,
-                                Road = worksheet.Cells[row, 17].Text,
-                                SubDistrict = worksheet.Cells[row, 18].Text.Replace("แขวง", "").Replace("ตำบล", ""),
-                                District = worksheet.Cells[row, 19].Text.Replace("เขต", "").Replace("อำเภอ", ""),
-                                Province = worksheet.Cells[row, 20].Text.Replace("จังหวัด", ""),
-                                PostCode = worksheet.Cells[row, 21].Text,
+                                TaxId = taxId,
+                                BrnId = brnId,
+                                CusNameEng = cusNameEng,
+                                CusName = worksheet.Cells[row, 6]?.Text ?? "",
+                                DisplayName = worksheet.Cells[row, 7]?.Text ?? "",
+                                Website = worksheet.Cells[row, 8]?.Text ?? "",
+                                Building = worksheet.Cells[row, 9]?.Text ?? "",
+                                RoomNo = worksheet.Cells[row, 11]?.Text ?? "",
+                                Floor = worksheet.Cells[row, 12]?.Text ?? "",
+                                Village = worksheet.Cells[row, 13]?.Text ?? "",
+                                No = worksheet.Cells[row, 14]?.Text ?? "",
+                                Moo = worksheet.Cells[row, 15]?.Text ?? "",
+                                Alley = worksheet.Cells[row, 16]?.Text ?? "",
+                                Road = worksheet.Cells[row, 17]?.Text ?? "",
+                                SubDistrict = CleanText(worksheet.Cells[row, 18].Text, subDistrictPatterns),
+                                District = CleanText(worksheet.Cells[row, 19].Text, districtPatterns),
+                                Province = CleanText(worksheet.Cells[row, 20].Text, provincePatterns),
                                 OrgId = organization.OrgId,
                                 CusStatus = RecordStatus.Waiting.ToString(),
                                 CusCreatedDate = DateTime.UtcNow
                             });
                         }
-
-                        stream.Dispose();
                     }
                 }
 
+                var regex = new Regex("[^a-zA-Z0-9]+", RegexOptions.Compiled);
+
                 foreach (var item in items)
                 {
-                    string cleanedCusNameEng = Regex.Replace(item.CusNameEng, "[^a-zA-Z0-9]+", "");
+                    string cleanedCusNameEng = regex.Replace(item.CusNameEng ?? "", "");
+
                     var customer = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
-                        .Where(x => x.TaxId.Equals(item.TaxId) && x.BrnId.Equals(item.BrnId)).FirstOrDefaultAsync();
+                        .Where(x => x.TaxId.Equals(item.TaxId) && x.BrnId.Equals(item.BrnId))
+                        .FirstOrDefaultAsync();
+
                     if (customer == null && !string.IsNullOrEmpty(cleanedCusNameEng))
                     {
                         selectedItem = item.TaxId;
                         char firstCharacter = cleanedCusNameEng.ToUpper().FirstOrDefault();
-                        var runNo = await customerRepository.CustomerNumberAsync((Guid)organization.OrgId,
-                            (Guid)businessId, firstCharacter.ToString(), 0);
-                        item.CusCustomId = "C." + runNo.Character + "-" + runNo.Allocated.Value.ToString("D5") + ".D";
-                        item.SubDistrict = string.IsNullOrEmpty(item.SubDistrict)
+
+                        var runNo = await customerRepository.CustomerNumberAsync((Guid)organization.OrgId, (Guid)businessId, firstCharacter.ToString(), 0);
+                        item.CusCustomId = $"C.{runNo.Character}-{runNo.Allocated.Value.ToString("D5")}.D";
+
+                        // Optimize by calculating uppercase only once
+                        var upperSubDistrict = item.SubDistrict?.ToUpper() ?? "";
+                        item.SubDistrict = string.IsNullOrEmpty(upperSubDistrict)
                             ? ""
                             : subDistricts.FirstOrDefault(p =>
-                                    p.SubDistrictNameTh.ToUpper().Contains(item.SubDistrict.ToUpper()) ||
-                                    p.SubDistrictNameEn.ToUpper().Contains(item.SubDistrict.ToUpper()))?.SubDistrictCode
+                                    p.SubDistrictNameTh.ToUpper().Contains(upperSubDistrict) ||
+                                    p.SubDistrictNameEn.ToUpper().Contains(upperSubDistrict))?.SubDistrictCode
                                 .ToString() ?? "";
-                        item.District = string.IsNullOrEmpty(item.District)
+
+                        var upperDistrict = item.District?.ToUpper() ?? "";
+                        item.District = string.IsNullOrEmpty(upperDistrict)
                             ? ""
                             : districts.FirstOrDefault(p =>
-                                    p.DistrictNameTh.ToUpper().Contains(item.District.ToUpper()) ||
-                                    p.DistrictNameEn.ToUpper().Contains(item.District.ToUpper()))?.DistrictCode
+                                    p.DistrictNameTh.ToUpper().Contains(upperDistrict) ||
+                                    p.DistrictNameEn.ToUpper().Contains(upperDistrict))?.DistrictCode
                                 .ToString() ?? "";
-                        item.Province = string.IsNullOrEmpty(item.Province)
+
+                        var upperProvince = item.Province?.ToUpper() ?? "";
+                        item.Province = string.IsNullOrEmpty(upperProvince)
                             ? ""
                             : provinces.FirstOrDefault(p =>
-                                    p.ProvinceNameTh.ToUpper().Contains(item.Province.ToUpper()) ||
-                                    p.ProvinceNameEn.ToUpper().Contains(item.Province.ToUpper()))?.ProvinceCode
+                                    p.ProvinceNameTh.ToUpper().Contains(upperProvince) ||
+                                    p.ProvinceNameEn.ToUpper().Contains(upperProvince))?.ProvinceCode
                                 .ToString() ?? "";
-                        customerRepository.CreateCustomer(item);
                     }
                 }
 
+                customerRepository.CreateCustomers(items);
                 customerRepository.Commit();
             }
             catch (Exception)
