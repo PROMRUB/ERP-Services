@@ -280,41 +280,44 @@ namespace ERP.Services.API.Services.Product
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
                             string customId = worksheet.Cells[row, 1]?.Text.Trim() ?? string.Empty;
-                            string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
-
-                            decimal msrp = 0;
-                            decimal.TryParse(worksheet.Cells[row, 3]?.Text, out msrp);
-
-                            decimal lwPrice = 0;
-                            decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
-
-                            var product = await productRepository.GetProductByCustomId((Guid)organization.OrgId!, businessId, customId).FirstOrDefaultAsync();
-
-                            if (product == null)
+                            if (string.IsNullOrEmpty(customId))
                             {
+                                string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
 
-                                var newProduct = new ProductEntity
+                                decimal msrp = 0;
+                                decimal.TryParse(worksheet.Cells[row, 3]?.Text, out msrp);
+
+                                decimal lwPrice = 0;
+                                decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
+
+                                var product = await productRepository.GetProductByCustomId((Guid)organization.OrgId!, businessId, customId).FirstOrDefaultAsync();
+
+                                if (product == null)
                                 {
-                                    ProductId = Guid.NewGuid(),
-                                    OrgId = organization.OrgId,
-                                    BusinessId = businessId,
-                                    ProductCatId = Guid.Empty,
-                                    ProductSubCatId = Guid.Empty,
-                                    ProductCustomId = customId,
-                                    ProductName = productName,
-                                    MSRP = msrp,
-                                    LwPrice = lwPrice,
-                                    ProductStatus = RecordStatus.Active.ToString()
-                                };
 
-                                items.Add(newProduct);
-                            }
-                            else
-                            {
-                                product.ProductName = productName;
-                                product.MSRP = msrp;
-                                product.LwPrice = lwPrice;
-                                productRepository.UpdateProduct(product);
+                                    var newProduct = new ProductEntity
+                                    {
+                                        ProductId = Guid.NewGuid(),
+                                        OrgId = organization.OrgId,
+                                        BusinessId = businessId,
+                                        ProductCatId = Guid.Empty,
+                                        ProductSubCatId = Guid.Empty,
+                                        ProductCustomId = customId,
+                                        ProductName = productName,
+                                        MSRP = msrp,
+                                        LwPrice = lwPrice,
+                                        ProductStatus = RecordStatus.Active.ToString()
+                                    };
+
+                                    items.Add(newProduct);
+                                }
+                                else
+                                {
+                                    product.ProductName = productName;
+                                    product.MSRP = msrp;
+                                    product.LwPrice = lwPrice;
+                                    productRepository.UpdateProduct(product);
+                                }
                             }
                         }
                     }
