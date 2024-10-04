@@ -233,7 +233,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id) || request == null)
                     throw new ArgumentException("1101");
                 await productService.ImportProduct(id, businessId, request);
                 return Ok(ResponseHandler.Response("1000", null));
