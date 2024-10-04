@@ -279,30 +279,44 @@ namespace ERP.Services.API.Services.Product
 
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            string customId = worksheet.Cells[row, 3]?.Text ?? string.Empty;
-                            string productName = worksheet.Cells[row, 4]?.Text ?? string.Empty;
+                            string customId = worksheet.Cells[row, 1]?.Text ?? string.Empty;
+                            string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
+
 
                             decimal msrp = 0;
-                            decimal.TryParse(worksheet.Cells[row, 5]?.Text, out msrp);
+                            decimal.TryParse(worksheet.Cells[row, 3]?.Text, out msrp);
 
                             decimal lwPrice = 0;
-                            decimal.TryParse(worksheet.Cells[row, 6]?.Text, out lwPrice);
+                            decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
 
-                            var product = new ProductEntity
+                            var product = await productRepository.GetProductList(customId).FirstOrDefaultAsync();
+
+                            if (product == null)
                             {
-                                ProductId = Guid.NewGuid(),
-                                OrgId = organization.OrgId,
-                                BusinessId = businessId,
-                                ProductCatId = Guid.Empty,
-                                ProductSubCatId = Guid.Empty,
-                                ProductCustomId = customId,
-                                ProductName = productName,
-                                MSRP = msrp,
-                                LwPrice = lwPrice,
-                                ProductStatus = RecordStatus.Active.ToString()
-                            };
 
-                            items.Add(product);
+                                var newProduct = new ProductEntity
+                                {
+                                    ProductId = Guid.NewGuid(),
+                                    OrgId = organization.OrgId,
+                                    BusinessId = businessId,
+                                    ProductCatId = Guid.Empty,
+                                    ProductSubCatId = Guid.Empty,
+                                    ProductCustomId = customId,
+                                    ProductName = productName,
+                                    MSRP = msrp,
+                                    LwPrice = lwPrice,
+                                    ProductStatus = RecordStatus.Active.ToString()
+                                };
+
+                                items.Add(newProduct);
+                            }
+                            else
+                            {
+                                product.ProductName = productName;
+                                product.MSRP = msrp;
+                                product.LwPrice = lwPrice;
+                                items.Add(product);
+                            }
                         }
                     }
                 }
