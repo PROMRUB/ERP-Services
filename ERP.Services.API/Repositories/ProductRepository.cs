@@ -28,6 +28,11 @@ namespace ERP.Services.API.Repositories
                 x.ProductName.ToLower().Contains(keyword) || x.ProductCustomId.Contains(keyword));
         }
 
+        public IQueryable<ProductEntity> GetProductByCustomId(string keyword)
+        {
+            return context.Products.Where(x => x.ProductCustomId.Equals(keyword));
+        }
+
         public IQueryable<ProductEntity> GetProductListQueryable()
         {
             return context.Products;

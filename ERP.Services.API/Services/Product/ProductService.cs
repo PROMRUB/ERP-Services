@@ -279,9 +279,8 @@ namespace ERP.Services.API.Services.Product
 
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
-                            string customId = worksheet.Cells[row, 1]?.Text ?? string.Empty;
+                            string customId = worksheet.Cells[row, 1]?.Text.Trim() ?? string.Empty;
                             string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
-
 
                             decimal msrp = 0;
                             decimal.TryParse(worksheet.Cells[row, 3]?.Text, out msrp);
@@ -289,7 +288,7 @@ namespace ERP.Services.API.Services.Product
                             decimal lwPrice = 0;
                             decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
 
-                            var product = await productRepository.GetProductList(customId).FirstOrDefaultAsync();
+                            var product = await productRepository.GetProductByCustomId(customId).FirstOrDefaultAsync();
 
                             if (product == null)
                             {
