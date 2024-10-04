@@ -8,7 +8,8 @@ namespace ERP.Services.API.Repositories
 {
     public class ProductRepository : BaseRepository, IProductRepository
     {
-        public ProductRepository(PromDbContext context) {
+        public ProductRepository(PromDbContext context)
+        {
             this.context = context;
         }
 
@@ -28,9 +29,12 @@ namespace ERP.Services.API.Repositories
                 x.ProductName.ToLower().Contains(keyword) || x.ProductCustomId.Contains(keyword));
         }
 
-        public IQueryable<ProductEntity> GetProductByCustomId(string keyword)
+        public IQueryable<ProductEntity> GetProductByCustomId(Guid orgId, Guid businessId, string keyword)
         {
-            return context.Products.Where(x => x.ProductCustomId.Equals(keyword));
+            return context.Products.Where(x =>
+                x.OrgId == orgId && x.
+                BusinessId == businessId && 
+                x.ProductCustomId.Equals(keyword));
         }
 
         public IQueryable<ProductEntity> GetProductListQueryable()
@@ -38,7 +42,8 @@ namespace ERP.Services.API.Repositories
             return context.Products;
         }
 
-        public void AddProductCategory(ProductCategoryEntity query) {
+        public void AddProductCategory(ProductCategoryEntity query)
+        {
             try
             {
                 context.ProductCategories.Add(query);
@@ -70,7 +75,7 @@ namespace ERP.Services.API.Repositories
 
             try
             {
-                context.Products.AddRange(products); 
+                context.Products.AddRange(products);
             }
             catch (Exception ex)
             {

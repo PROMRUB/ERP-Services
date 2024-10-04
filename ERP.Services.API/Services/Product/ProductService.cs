@@ -288,7 +288,7 @@ namespace ERP.Services.API.Services.Product
                             decimal lwPrice = 0;
                             decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
 
-                            var product = await productRepository.GetProductByCustomId(customId).FirstOrDefaultAsync();
+                            var product = await productRepository.GetProductByCustomId((Guid)organization.OrgId!, businessId, customId).FirstOrDefaultAsync();
 
                             if (product == null)
                             {
@@ -319,7 +319,10 @@ namespace ERP.Services.API.Services.Product
                         }
                     }
                 }
-                productRepository.AddProducts(items);
+                if(items.Count > 0)
+                {
+                    productRepository.AddProducts(items);
+                }
                 productRepository.Commit();
             }
             catch (Exception)
