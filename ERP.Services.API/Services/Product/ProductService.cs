@@ -280,7 +280,7 @@ namespace ERP.Services.API.Services.Product
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
                             string customId = worksheet.Cells[row, 1]?.Text.Trim() ?? string.Empty;
-                            if (string.IsNullOrEmpty(customId))
+                            if (!string.IsNullOrEmpty(customId))
                             {
                                 string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
 
