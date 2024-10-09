@@ -425,8 +425,8 @@ namespace ERP.Services.API.Utils
                     {
                         var textEth =
                             _entity.Projects.FirstOrDefault() != null &&
-                            _entity.Projects.FirstOrDefault().EthSaleMonth.HasValue
-                                ? _entity.Projects.FirstOrDefault().EthSaleMonth.Value.ToString("MM/yyyy")
+                            _entity.Projects.FirstOrDefault().LeadTime != 0
+                                ? _entity.Projects.FirstOrDefault().LeadTime.ToString()
                                 : "-";
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
