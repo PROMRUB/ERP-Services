@@ -38,31 +38,31 @@ public class QuotationService : IQuotationService
 
     public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
     {
-        new EmailInformation()
-        {
-            Name = "ว\u0e34ชญาดา อภ\u0e34ญ",
-            Email = "witchayada.a@securesolutionsasia.com"
-        },
-        new EmailInformation()
-        {
-            Name = "kitsada.t@securesolutionsasia.com",
-            Email = "kitsada.t@securesolutionsasia.com"
-        },
-        new EmailInformation()
-        {
-            Name = "bancherd@cybertracx.com",
-            Email = "bancherd@cybertracx.com"
-        },
-        new EmailInformation()
-        {
-            Name = "muankhwan.u@securesolutionsasia.com",
-            Email = "muankhwan.u@securesolutionsasia.com"
-        },
-        new EmailInformation()
-        {
-            Name = "amornrat.t@securesolutionsasia.com",
-            Email = "amornrat.t@securesolutionsasia.com"
-        },
+        // new EmailInformation()
+        // {
+        //     Name = "ว\u0e34ชญาดา อภ\u0e34ญ",
+        //     Email = "witchayada.a@securesolutionsasia.com"
+        // },
+        // new EmailInformation()
+        // {
+        //     Name = "kitsada.t@securesolutionsasia.com",
+        //     Email = "kitsada.t@securesolutionsasia.com"
+        // },
+        // new EmailInformation()
+        // {
+        //     Name = "bancherd@cybertracx.com",
+        //     Email = "bancherd@cybertracx.com"
+        // },
+        // new EmailInformation()
+        // {
+        //     Name = "muankhwan.u@securesolutionsasia.com",
+        //     Email = "muankhwan.u@securesolutionsasia.com"
+        // },
+        // new EmailInformation()
+        // {
+        //     Name = "amornrat.t@securesolutionsasia.com",
+        //     Email = "amornrat.t@securesolutionsasia.com"
+        // },
         new EmailInformation()
         {
             Name = "kkunayothin@gmail.com",
@@ -733,12 +733,14 @@ public class QuotationService : IQuotationService
             To.Add(smtpEmailTo);
         }
 
+        var link = $"<a href 'https://sales.prom.co.th/erp/quotation/form/{quotation.QuotationId}'></a>";
+
         string HtmlContent =
             $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา<br/>" +
             $"เร\u0e35ยน " +
             // $"{managerName}</br>" +
-            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {quotation.QuotationNo ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
-            $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
+            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {link ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
+            $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n<br/><br/><br/>\n" +
             $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
             $"{quotation.IssuedByUser.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {quotation.QuotationNo ?? "-"}";
