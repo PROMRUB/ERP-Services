@@ -27,5 +27,6 @@ namespace ERP.Services.API.Models.RequestModels.Customer
         public string? PostCode { get; set; }
         public string? Website { get; set; }
         public bool? IsApprove { get; set; }
+        public string? FullAddress { get; set; }
     }
 }

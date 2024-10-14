@@ -138,35 +138,7 @@ namespace ERP.Services.API.Services.Customer
             var result = await customerRepository.GetCustomerByBusiness((Guid)organization.OrgId, businessId)
                 .Where(x => x.CusId == customerId).FirstOrDefaultAsync();
             var map = mapper.Map<CustomerEntity, CustomerResponse>(result);
-            // if (!map.Province.Contains("จังหวัด"))
-            // {
-            //     map.Building = (string.IsNullOrEmpty(result.Building) ? "" : "อาคาร " + (result.Building + " "));
-            // map.RoomNo = (string.IsNullOrEmpty(result.RoomNo) ? "" : "ห้อง " + (result.RoomNo + " "));
-            // map.Floor = (string.IsNullOrEmpty(result.Floor) ? "" : "ชั้น " + (result.Floor + " "));
-            // map.Village = (string.IsNullOrEmpty(result.Village) ? "" : "หมู่บ้่าน " + (result.Village + " "));
-            // map.No = (string.IsNullOrEmpty(result.No) ? "" : "เลขที่ " + (result.No + " "));
-            // map.Moo = (string.IsNullOrEmpty(result.Moo) ? "" : "หมู่ " + (result.Moo + " "));
-            // map.Alley = (string.IsNullOrEmpty(result.Alley) ? "" : "ซอย " + (result.Alley + " "));
-            // map.Road = (string.IsNullOrEmpty(result.Road) ? "" : "ถนน " + (result.Road + " "));
-            // map.SubDistrict = string.IsNullOrEmpty(result.SubDistrict) && !result.SubDistrict.Contains("แขวง")
-            //     ? ""
-            //     : "แขวง " + (systemConfigRepository.GetAll<SubDistrictEntity>()
-            //         .Where(x => x.SubDistrictCode.ToString().Equals(result.SubDistrict)).FirstOrDefault()
-            //         .SubDistrictNameTh + " ");
-            // map.District = string.IsNullOrEmpty(result.District) && !result.District.Contains("เขต")
-            //     ? ""
-            //     : "เขต " + (systemConfigRepository.GetAll<DistrictEntity>()
-            //         .Where(x => x.DistrictCode.ToString().Equals(result.District)).FirstOrDefault()
-            //         .DistrictNameTh + " ");
-            // map.Province = (string.IsNullOrEmpty(result.Province) && !result.Province.Contains("จังหวัด")
-            //     ? ""
-            //     : "จังหวัด " + (systemConfigRepository.GetAll<ProvinceEntity>()
-            //         .Where(x => x.ProvinceCode.ToString().Equals(result.Province)).FirstOrDefault()
-            //         .ProvinceNameTh + " "));
-            // map.PostCode = (string.IsNullOrEmpty(result.PostCode) && !result.PostCode.Contains("รหัสไปรษณีย์") ? "" : "รหัสไปรษณีย์ " + result.PostCode);
-            // }
-            
-
+            map.FullAddress = result.CusFullAddress;
             map.IsApprove = result.CusStatus == RecordStatus.Approve.ToString();
             return map;
         } 
@@ -226,6 +198,7 @@ namespace ERP.Services.API.Services.Customer
                 }
 
                 var query = mapper.Map<CustomerRequest, CustomerEntity>(request);
+                query.CusFullAddress = request.FullAddress;
                 string cleanedCusNameEng = Regex.Replace(request.CusNameEng, "[^a-zA-Z0-9]+", "");
                 char firstCharacter = cleanedCusNameEng.ToUpper().FirstOrDefault();
                 var runNo = await customerRepository.CustomerNumberAsync((Guid)organization.OrgId,
@@ -368,6 +341,7 @@ namespace ERP.Services.API.Services.Customer
             query.SubDistrict = request.SubDistrict;
             query.PostCode = request.PostCode;
             query.Website = request.Website;
+            query.CusFullAddress = request.FullAddress;
             if (request.IsApprove.HasValue && request.IsApprove.Value)
             {
                 query.CusStatus = RecordStatus.Approve.ToString();
