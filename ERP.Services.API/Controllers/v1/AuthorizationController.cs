@@ -1,13 +1,8 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Authorization;
-using ERP.Services.API.Models.RequestModels.Organization;
 using ERP.Services.API.Models.RequestModels.User;
-using ERP.Services.API.Services.User;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ERP.Services.API.Controllers.v1
 {
