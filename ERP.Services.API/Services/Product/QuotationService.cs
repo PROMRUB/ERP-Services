@@ -38,31 +38,31 @@ public class QuotationService : IQuotationService
 
     public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
     {
-        // new EmailInformation()
-        // {
-        //     Name = "ว\u0e34ชญาดา อภ\u0e34ญ",
-        //     Email = "witchayada.a@securesolutionsasia.com"
-        // },
-        // new EmailInformation()
-        // {
-        //     Name = "kitsada.t@securesolutionsasia.com",
-        //     Email = "kitsada.t@securesolutionsasia.com"
-        // },
-        // new EmailInformation()
-        // {
-        //     Name = "bancherd@cybertracx.com",
-        //     Email = "bancherd@cybertracx.com"
-        // },
-        // new EmailInformation()
-        // {
-        //     Name = "muankhwan.u@securesolutionsasia.com",
-        //     Email = "muankhwan.u@securesolutionsasia.com"
-        // },
-        // new EmailInformation()
-        // {
-        //     Name = "amornrat.t@securesolutionsasia.com",
-        //     Email = "amornrat.t@securesolutionsasia.com"
-        // },
+        new EmailInformation()
+        {
+            Name = "ว\u0e34ชญาดา อภ\u0e34ญ",
+            Email = "witchayada.a@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "kitsada.t@securesolutionsasia.com",
+            Email = "kitsada.t@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "bancherd@cybertracx.com",
+            Email = "bancherd@cybertracx.com"
+        },
+        new EmailInformation()
+        {
+            Name = "muankhwan.u@securesolutionsasia.com",
+            Email = "muankhwan.u@securesolutionsasia.com"
+        },
+        new EmailInformation()
+        {
+            Name = "amornrat.t@securesolutionsasia.com",
+            Email = "amornrat.t@securesolutionsasia.com"
+        },
         new EmailInformation()
         {
             Name = "kkunayothin@gmail.com",
