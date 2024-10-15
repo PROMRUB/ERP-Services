@@ -342,7 +342,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span("กำหนดส\u0e48งส\u0e34นค\u0e49า (Delivery Date)")
+                            text.Span("สั่งสินค้านาน (Lead Time)")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)

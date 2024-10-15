@@ -50,11 +50,6 @@ public class QuotationService : IQuotationService
         },
         new EmailInformation()
         {
-            Name = "bancherd@cybertracx.com",
-            Email = "bancherd@cybertracx.com"
-        },
-        new EmailInformation()
-        {
             Name = "muankhwan.u@securesolutionsasia.com",
             Email = "muankhwan.u@securesolutionsasia.com"
         },
@@ -63,11 +58,6 @@ public class QuotationService : IQuotationService
             Name = "amornrat.t@securesolutionsasia.com",
             Email = "amornrat.t@securesolutionsasia.com"
         },
-        new EmailInformation()
-        {
-            Name = "kkunayothin@gmail.com",
-            Email = "kkunayothin@gmail.com"
-        }
     };
 
     // public string Email { get; set; } = "witchayada.a@securesolutionsasia.com";
