@@ -10,7 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationResource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationResource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,14 +24,20 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/08379906ca8b4db5aca88e6ebdbd9b74138e00/74/e905ddb6/Configuration.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9237e8206f3d4b3cb18d319f1f259cc343800/71/0edda351/ElementExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/178aecdd59619631ddc75757dbe859adfa94ecc8356c593dbb137a81b49268/PageExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1af6ffa8cee75f0266ceb188fc7b4dd49b4673386a5681842e9a8867259ed52/ISystemClock.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/393e5c61f45111b96c555e0fc4998665295af303db45491f25c21c20739d53/RelationalDatabaseFacadeExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5c512bcddfe0a529da5f525cbf8fcaee3ce40e1a4706acad85a9544fbe42af/ModelBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6282eddf0cbff177221e9c5ab044b50181e477485cb393e47c56c2e99427/Color.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/62f98a4fc46c8fef806bb258d37ae0d8fd677d4bd7dd8eaf7a329cc4b7577271/ImageExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/93598dfc9d24c35f4ff14fb8454143cba8517549b4bed1c795a76343ca333c1b/GenerateExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9c9b30526ff8fe363be59b87459d62a356917d70568f2f95d96618c3bae909e/SmtpClient.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9d8d9168e869e84cc15cf5d6a237774c4cd6b78aaf41fed5a7fdf948111d185d/DocumentMetadata.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d47d5d45a93739f4a2e3857535f6d33fbf3ac96b2f0eb1a8629af5c5a1fc9/AuthenticationHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/db7395f4add94e6d10e515b3e55373f2821f8323de7dc8e314d78feefacf5584/ActionMethodExecutor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9922f617e20d8c11b74c37fa79633a46a5cb7d64d2beea1a2812e6ed1475/FileStreamResult.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eccc5ea223261813a39651dba73c3b5c4ef2d4934eb1dccaa03c5a602ac49ea8/TriggersDbContextOptionsExtensions.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -133,6 +140,29 @@
       <workItem from="1720619041710" duration="48390000" />
       <workItem from="1721128860062" duration="14000" />
       <workItem from="1721129066551" duration="3783000" />
+      <workItem from="1723969133575" duration="651000" />
+      <workItem from="1724115578616" duration="2215000" />
+      <workItem from="1724331025669" duration="2580000" />
+      <workItem from="1724384691743" duration="1278000" />
+      <workItem from="1724632020399" duration="1256000" />
+      <workItem from="1724718911516" duration="9864000" />
+      <workItem from="1724857512614" duration="95469000" />
+      <workItem from="1726213345599" duration="23423000" />
+      <workItem from="1726723259408" duration="15079000" />
+      <workItem from="1726842760367" duration="13562000" />
+      <workItem from="1727413430784" duration="7207000" />
+      <workItem from="1727944401791" duration="1158000" />
+      <workItem from="1728360562342" duration="3691000" />
+      <workItem from="1728446733994" duration="482000" />
+      <workItem from="1728889022911" duration="4227000" />
+      <workItem from="1728901101367" duration="12000" />
+      <workItem from="1728965998451" duration="1319000" />
+      <workItem from="1729043472133" duration="46000" />
+      <workItem from="1729066616841" duration="619000" />
+      <workItem from="1729930207720" duration="1505000" />
+      <workItem from="1730080722065" duration="10000" />
+      <workItem from="1730081387109" duration="202000" />
+      <workItem from="1730369655208" duration="1979000" />
     </task>
     <servers />
   </component>
@@ -148,43 +178,30 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ERP.Services.API/PromServiceDbContext/QuottionNoTrigger.cs</url>
-          <line>10</line>
-          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/PromServiceDbContext/QuottionNoTrigger.cs" initialLine="10" containingFunctionPresentation="Method 'BeforeSave'">
+          <url>file://$PROJECT_DIR$/ERP.Services.API/Controllers/v1/ConditionController.cs</url>
+          <line>45</line>
+          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Controllers/v1/ConditionController.cs" initialLine="45" containingFunctionPresentation="Method 'GetConditionListWithPaging'">
             <startOffsets>
-              <option value="389" />
+              <option value="1682" />
             </startOffsets>
             <endOffsets>
-              <option value="390" />
+              <option value="1683" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="45" />
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ERP.Services.API/Authentications/BearerAuthenticationRepo.cs</url>
-          <line>23</line>
-          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Authentications/BearerAuthenticationRepo.cs" initialLine="23" containingFunctionPresentation="Method 'Authenticate'">
+          <url>file://$PROJECT_DIR$/ERP.Services.API/Utils/QuotationGenerater.cs</url>
+          <line>612</line>
+          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Utils/QuotationGenerater.cs" initialLine="579" containingFunctionPresentation="Local function 'ComponentLineBottom'">
             <startOffsets>
-              <option value="920" />
+              <option value="26767" />
             </startOffsets>
             <endOffsets>
-              <option value="921" />
+              <option value="27415" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/ERP.Services.API/Authentications/AuthenticationHandlerProxy.cs</url>
-          <line>48</line>
-          <properties documentPath="$PROJECT_DIR$/ERP.Services.API/Authentications/AuthenticationHandlerProxy.cs" initialLine="48" containingFunctionPresentation="Method 'AuthenticateBearer'">
-            <startOffsets>
-              <option value="1865" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1866" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="58" />
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -103,19 +103,32 @@ public class QuotationService : IQuotationService
             return null;
         }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
-    public List<QuotationProductResource> MapProductEntityToResource(List<QuotationProductEntity> entities)
+    public async Task<List<QuotationProductResource>> MapProductEntityToResource(List<QuotationProductEntity> entities)
     {
-        return entities.Select(x => new QuotationProductResource
+        var list = new List<QuotationProductResource>();
+        foreach (var product in entities)
         {
-            Amount = x.Amount,
-            ProductId = x.ProductId,
-            Quantity = x.Quantity,
-            Discount = Convert.ToInt32(x.Discount),
-            Order = x.Order
-        }).ToList();
+            var selected = await _productRepository.GetProductListQueryable()
+                .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+
+            
+            var p = new QuotationProductResource()
+            {
+                Amount = product.Amount,
+                ProductId = product.ProductId,
+                Quantity = product.Quantity,
+                Discount = Convert.ToInt32(product.Discount),
+                Order = product.Order,
+                IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount
+            };
+    
+            list.Add(p);
+        }
+
+        return list;
     }
 
     public List<QuotationProjectResource> MapProjectEntityToResource(List<QuotationProjectEntity> entities)
@@ -132,7 +145,7 @@ public class QuotationService : IQuotationService
         }).ToList();
     }
 
-    public QuotationResource MapEntityToResponse(QuotationEntity quotation)
+    public async Task<QuotationResource> MapEntityToResponse(QuotationEntity quotation)
     {
         try
         {
@@ -148,7 +161,7 @@ public class QuotationService : IQuotationService
                 IssuedById = quotation.IssuedById,
                 BusinessId = quotation.BusinessId,
                 Status = quotation.Status,
-                Products = MapProductEntityToResource(quotation.Products),
+                Products = await MapProductEntityToResource(quotation.Products),
                 Projects = MapProjectEntityToResource(quotation.Projects),
                 Remark = quotation.Remark,
                 PaymentAccountId = quotation.PaymentId
@@ -271,7 +284,7 @@ public class QuotationService : IQuotationService
                 throw new Exception("not quotation exist");
             }
 
-            var response = MapEntityToResponse(entity);
+            var response = await MapEntityToResponse(entity);
 
             return response;
         }
@@ -347,7 +360,7 @@ public class QuotationService : IQuotationService
         //     }
         // }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
     public Task<List<QuotationStatus>> QuotationStatus()
@@ -373,7 +386,7 @@ public class QuotationService : IQuotationService
 
         await _quotationRepository.Context()!.SaveChangesAsync();
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
 
@@ -431,15 +444,6 @@ public class QuotationService : IQuotationService
 
             var realPrice = (decimal)selected.MSRP * product.Quantity;
             realPriceMsrp += realPrice;
-
-
-            // if (product.Discount > 0)
-            // {
-            //     var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
-            //     sumOfDiscount += dis;
-            //
-            //     product.SumOfDiscount = dis;
-            // }
 
             var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
             sumOfDiscount += (decimal)dis;
@@ -594,7 +598,7 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
     public async Task<QuotationResource> ApproveSalePrice(Guid id)
