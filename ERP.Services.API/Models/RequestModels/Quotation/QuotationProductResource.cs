@@ -7,4 +7,5 @@ public class QuotationProductResource
     public float Discount { get; set; }
     public float Amount { get; set; }
     public int Order { get; set; }
+    public bool IsApproved { get; set; }
 }
