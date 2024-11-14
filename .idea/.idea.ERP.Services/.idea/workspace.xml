@@ -11,7 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Controllers/v1/QuotationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Controllers/v1/QuotationController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Models/ResponseModels/Quotation/QuotationResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Models/ResponseModels/Quotation/QuotationResponse.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -163,6 +164,8 @@
       <workItem from="1730080722065" duration="10000" />
       <workItem from="1730081387109" duration="202000" />
       <workItem from="1730369655208" duration="1979000" />
+      <workItem from="1730434643313" duration="378000" />
+      <workItem from="1731557234823" duration="2813000" />
     </task>
     <servers />
   </component>

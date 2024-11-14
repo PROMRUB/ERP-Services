@@ -144,7 +144,7 @@ namespace ERP.Services.API.Controllers.v1
 
         public record PaymentAccountById(string OrgId, Guid BusinessId, Guid PaymentAccountId);
 
-        public record BaseParameter(string? Keyword, Guid BusinessId, int Page, int PageSize);
+        public record BaseParameter(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalePersonId,string? Status, int Page, int PageSize);
 
         [HttpGet("payment_account")]
         [MapToApiVersion("1")]

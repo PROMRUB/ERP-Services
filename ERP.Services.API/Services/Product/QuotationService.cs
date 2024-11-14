@@ -570,7 +570,7 @@ public class QuotationService : IQuotationService
                 IssuedByUserId = x.IssuedById,
                 IssuedByUserName = x.IssuedByUser.Username ?? "-",
                 SalePersonId = x.SalePersonId,
-                SalePersonIName = x.SalePerson.FirstNameTh ?? "-",
+                SalePersonName = x.SalePerson.FirstNameTh ?? "-",
                 Status = x.Status,
                 Products = null,
                 ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
