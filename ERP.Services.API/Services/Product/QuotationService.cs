@@ -512,12 +512,12 @@ public class QuotationService : IQuotationService
             keyword = keyword.ToLower();
         }
 
-        // DateTime? start = !string.IsNullOrEmpty(startDate)
-        //     ? DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
-        //     : null;
-        //
+        DateTime? start = !string.IsNullOrEmpty(startDate)
+            ? DateTime.SpecifyKind(DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture), DateTimeKind.Utc)
+            : null;
+        
         // DateTime? end = !string.IsNullOrEmpty(startDate)
-        //     ? DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
+        //     ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture), DateTimeKind.Utc)
         //     : null;
 
         var userId = _userPrincipalHandler.Id;
@@ -526,6 +526,7 @@ public class QuotationService : IQuotationService
             .FirstOrDefault(x => x.UserId == userId);
 
         var query = _quotationRepository.GetQuotationQuery()
+                .Include(x => x.Projects)
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
                 .Where(x =>
@@ -548,12 +549,13 @@ public class QuotationService : IQuotationService
                                                || user.Role.Contains("Admin")))
         {
             query = _quotationRepository.GetQuotationQuery()
+                    .Include(x => x.Projects)
                     .Where(x => x.BusinessId == businessId)
                     .Where(x =>
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        // && ((start == null || x.QuotationDateTime <= start)
+                        && ((start == null || x.QuotationDateTime <= start))
                         //     || (end== null || x.QuotationDateTime >= end)
                         //     || (start != null && end != null && x.QuotationDateTime >= start &&
                         //         x.QuotationDateTime <= end))
