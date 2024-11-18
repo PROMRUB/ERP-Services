@@ -533,10 +533,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                && ((start == null || x.QuotationDateTime <= start)
-                            || (end== null || x.QuotationDateTime >= end)
-                            || (start != null && end != null && x.QuotationDateTime >= start &&
-                                x.QuotationDateTime <= end))
+                // && ((start == null || x.QuotationDateTime <= start)
+                //             || (end== null || x.QuotationDateTime >= end)
+                //             || (start != null && end != null && x.QuotationDateTime >= start &&
+                //                 x.QuotationDateTime <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                 
@@ -555,10 +555,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        && ((start == null || x.QuotationDateTime <= start)
-                            || (end== null || x.QuotationDateTime >= end)
-                            || (x.QuotationDateTime >= start &&
-                                x.QuotationDateTime <= end))
+                        // && ((start == null || x.QuotationDateTime <= start)
+                        //     || (end== null || x.QuotationDateTime >= end)
+                        //     || (x.QuotationDateTime >= start &&
+                        //         x.QuotationDateTime <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                 
