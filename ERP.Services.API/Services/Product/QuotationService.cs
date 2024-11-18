@@ -516,9 +516,9 @@ public class QuotationService : IQuotationService
             ? DateTime.SpecifyKind(DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture), DateTimeKind.Utc)
             : null;
         
-        // DateTime? end = !string.IsNullOrEmpty(startDate)
-        //     ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture), DateTimeKind.Utc)
-        //     : null;
+        DateTime? end = !string.IsNullOrEmpty(startDate)
+            ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture), DateTimeKind.Utc)
+            : null;
 
         var userId = _userPrincipalHandler.Id;
 
@@ -533,10 +533,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                // && ((start == null || x.QuotationDateTime <= start)
-                //             || (end== null || x.QuotationDateTime >= end)
-                //             || (start != null && end != null && x.QuotationDateTime >= start &&
-                //                 x.QuotationDateTime <= end))
+                && ((start == null || x.QuotationDateTime <= start)
+                            || (end== null || x.QuotationDateTime >= end)
+                            || (start != null && end != null && x.QuotationDateTime >= start &&
+                                x.QuotationDateTime <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                 
@@ -555,10 +555,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        && ((start == null || x.QuotationDateTime <= start))
-                        //     || (end== null || x.QuotationDateTime >= end)
-                        //     || (start != null && end != null && x.QuotationDateTime >= start &&
-                        //         x.QuotationDateTime <= end))
+                        && ((start == null || x.QuotationDateTime <= start)
+                            || (end== null || x.QuotationDateTime >= end)
+                            || (x.QuotationDateTime >= start &&
+                                x.QuotationDateTime <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                 
