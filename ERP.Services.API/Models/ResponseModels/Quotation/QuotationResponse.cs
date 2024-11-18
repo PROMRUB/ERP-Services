@@ -34,6 +34,6 @@ public class QuotationResponse
     public decimal AmountBeforeVat { get; set; }
     public string ProjectName { get; set; }
     public string EthSaleMonth { get; set; }
-    public int Profit { get; set; }
+    public decimal Profit { get; set; }
     public bool IsSpecialPrice { get; set; }
 }

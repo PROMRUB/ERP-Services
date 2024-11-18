@@ -164,7 +164,7 @@ public class QuotationService : IQuotationService
                 Products = await MapProductEntityToResource(quotation.Products),
                 Projects = MapProjectEntityToResource(quotation.Projects),
                 Remark = quotation.Remark,
-                PaymentAccountId = quotation.PaymentId
+                PaymentAccountId = quotation.PaymentId,
             };
 
             if (quotation.Projects != null && quotation.Projects.Any())
@@ -257,6 +257,7 @@ public class QuotationService : IQuotationService
 
             quotation.Products = result.QuotationProductEntities;
 
+            quotation.Profit = result.Profit;
             quotation.Price = result.Price;
             quotation.Vat = result.Vat;
             quotation.Amount = result.Amount;
@@ -426,6 +427,8 @@ public class QuotationService : IQuotationService
         decimal realPriceMsrp = 0;
         decimal sumOfDiscount = 0;
         decimal amountBeforeVat = 0;
+        decimal profit = 0;
+        bool isSpecialPrice = false;
 
         var products = MutateResourceProduct(resource);
 
@@ -451,8 +454,13 @@ public class QuotationService : IQuotationService
 
             product.AmountBeforeVat = realPrice - product.SumOfDiscount;
             product.RealPriceMsrp = realPrice;
-
+            
             response.QuotationProductEntities.Add(product);
+
+            if (!isSpecialPrice)
+            {
+                isSpecialPrice = (decimal)product.Amount < selected.LwPrice;
+            }
         }
 
         amountBeforeVat = realPriceMsrp - sumOfDiscount;
@@ -462,7 +470,10 @@ public class QuotationService : IQuotationService
         amount = price * (decimal)1.07;
         vat = amount - price;
 
+        profit = (100 * amountBeforeVat) / realPriceMsrp;
 
+        response.IsSpecialPrice = isSpecialPrice;
+        response.Profit = profit;
         response.Amount = amount;
         response.Vat = vat;
         response.Price = price;
@@ -521,10 +532,6 @@ public class QuotationService : IQuotationService
             : null;
 
         var userId = _userPrincipalHandler.Id;
-
-        var aa = _quotationRepository.GetQuotationQuery()
-            .Include(x => x.Projects)
-            .Where(x => x.BusinessId == businessId);
 
         var user = _businessRepository.GetUserBusinessQuery()
             .FirstOrDefault(x => x.UserId == userId);
@@ -602,6 +609,8 @@ public class QuotationService : IQuotationService
                 Amount = x.RealPriceMsrp - x.SumOfDiscount,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
+                Profit = x.Profit,
+                IsSpecialPrice = x.IsSpecialPrice
             })
             .ToList();
 
