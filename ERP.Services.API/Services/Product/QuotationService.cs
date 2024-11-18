@@ -505,12 +505,20 @@ public class QuotationService : IQuotationService
         return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
-    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize)
+    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize)
     {
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             keyword = keyword.ToLower();
         }
+
+        DateTime? start = string.IsNullOrEmpty(startDate)
+            ? DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
+            : null;
+        
+        DateTime? end = string.IsNullOrEmpty(startDate)
+            ? DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
+            : null;
 
         var userId = _userPrincipalHandler.Id;
 
@@ -521,12 +529,16 @@ public class QuotationService : IQuotationService
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
                 .Where(x =>
-                        // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                        //         || 
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
-                    // || (string.IsNullOrWhiteSpace(keyword) ||
-                    //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
+                        && (string.IsNullOrEmpty(status) || x.Status == status)
+                && ((start == null || x.QuotationDateTime <= start)
+                            || (end== null || x.QuotationDateTime >= end)
+                            || (start != null && end != null && x.QuotationDateTime >= start &&
+                                x.QuotationDateTime <= end))
+                        && (!customerId.HasValue || x.CustomerId == customerId)
+                        && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
+                
                 )
                 .OrderByDescending(x => x.QuotationNo)
             ;
@@ -538,13 +550,16 @@ public class QuotationService : IQuotationService
             query = _quotationRepository.GetQuotationQuery()
                     .Where(x => x.BusinessId == businessId)
                     .Where(x =>
-                            // (
-                            // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                            // || 
-                            (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                             x.QuotationNo.ToLower() == keyword)
-                        // || (string.IsNullOrWhiteSpace(keyword) ||
-                        // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
+                        (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                         x.QuotationNo.ToLower() == keyword)
+                        && (string.IsNullOrEmpty(status) || x.Status == status)
+                        && ((start == null || x.QuotationDateTime <= start)
+                            || (end== null || x.QuotationDateTime >= end)
+                            || (start != null && end != null && x.QuotationDateTime >= start &&
+                                x.QuotationDateTime <= end))
+                        && (!customerId.HasValue || x.CustomerId == customerId)
+                        && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
+                
                     )
                     .OrderByDescending(x => x.QuotationNo)
                 ;
@@ -588,7 +603,7 @@ public class QuotationService : IQuotationService
 
         return afterMutate;
     }
-
+    
     public async Task<QuotationResource> GetById(Guid id)
     {
         var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);

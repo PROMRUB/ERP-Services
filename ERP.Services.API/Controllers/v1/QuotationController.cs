@@ -15,7 +15,7 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class QuotationController(IQuotationService service) : BaseController
     {
-        public record QuotationKeyword(string? Keyword, Guid BusinessId, int Page = 1, int PageSize = 10);
+        public record QuotationKeyword(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalePersonId,string? Status, int Page = 1, int PageSize = 10);
 
         private readonly IQuotationService _service = service;
 
@@ -25,7 +25,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.Page,
+                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,resource.EndDate,resource.CustomerId,resource.ProjectId,resource.Profit,resource.IsSpecialPrice,resource.SalePersonId,resource.Status,resource.Page,
                     resource.PageSize);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
@@ -144,7 +144,7 @@ namespace ERP.Services.API.Controllers.v1
 
         public record PaymentAccountById(string OrgId, Guid BusinessId, Guid PaymentAccountId);
 
-        public record BaseParameter(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalePersonId,string? Status, int Page, int PageSize);
+        public record BaseParameter(string? Keyword, Guid BusinessId, int Page, int PageSize);
 
         [HttpGet("payment_account")]
         [MapToApiVersion("1")]
@@ -180,12 +180,12 @@ namespace ERP.Services.API.Controllers.v1
 
         [HttpGet("list")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> Get([FromQuery] BaseParameter query)
+        public async Task<IActionResult> Get([FromQuery] QuotationKeyword resource)
         {
             try
             {
-                var result = await service.GetByList(query.Keyword, query.BusinessId, query.Page, query.PageSize);
-                return Ok(ResponseHandler.Response<PagedList<QuotationResponse>>("1000", null, result));
+                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,resource.EndDate,resource.CustomerId,resource.ProjectId,resource.Profit,resource.IsSpecialPrice,resource.SalePersonId,resource.Status,resource.Page,
+                    resource.PageSize);                return Ok(ResponseHandler.Response<PagedList<QuotationResponse>>("1000", null, result));
             }
             catch (Exception ex)
             {
