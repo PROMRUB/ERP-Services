@@ -512,11 +512,11 @@ public class QuotationService : IQuotationService
             keyword = keyword.ToLower();
         }
 
-        DateTime? start = string.IsNullOrEmpty(startDate)
+        DateTime? start = !string.IsNullOrEmpty(startDate)
             ? DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
             : null;
         
-        DateTime? end = string.IsNullOrEmpty(startDate)
+        DateTime? end = !string.IsNullOrEmpty(startDate)
             ? DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture)
             : null;
 
