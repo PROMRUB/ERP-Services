@@ -551,8 +551,8 @@ public class QuotationService : IQuotationService
                         //         x.QuotationDateTime.Date <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
-                        // && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                        // && (!profit.HasValue || x.Profit >= profit)
+                        && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
+                        && (!profit.HasValue || x.Profit >= profit)
                 )
                 .OrderByDescending(x => x.QuotationNo)
             ;
@@ -574,8 +574,8 @@ public class QuotationService : IQuotationService
                         //         x.QuotationDateTime.Date <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
-                        // && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                        // && (!profit.HasValue || x.Profit >= profit)
+                        && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
+                        && (!profit.HasValue || x.Profit >= profit)
                     )
                     .OrderByDescending(x => x.QuotationNo)
                 ;
