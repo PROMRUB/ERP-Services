@@ -545,10 +545,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        && ((start == null || x.QuotationDateTime.Date >= start)
-                            && (end== null || x.QuotationDateTime.Date <= end)
-                            && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                                x.QuotationDateTime.Date <= end))
+                        // && ((start == null || x.QuotationDateTime.Date >= start)
+                        //     && (end== null || x.QuotationDateTime.Date <= end)
+                        //     && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                        //         x.QuotationDateTime.Date <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                         // && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
@@ -568,10 +568,10 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        && ((start == null || x.QuotationDateTime.Date >= start)
-                            && (end== null || x.QuotationDateTime.Date <= end)
-                            && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                                x.QuotationDateTime.Date <= end))
+                        // && ((start == null || x.QuotationDateTime.Date >= start)
+                        //     && (end== null || x.QuotationDateTime.Date <= end)
+                        //     && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                        //         x.QuotationDateTime.Date <= end))
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                         // && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
