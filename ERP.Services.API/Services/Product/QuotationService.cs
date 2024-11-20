@@ -517,7 +517,7 @@ public class QuotationService : IQuotationService
         return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
-    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize)
+    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize,bool? isGreaterThan)
     {
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -545,14 +545,15 @@ public class QuotationService : IQuotationService
                         (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
                          x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        // && ((start == null || x.QuotationDateTime.Date >= start)
-                        //     && (end== null || x.QuotationDateTime.Date <= end)
-                        //     && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                        //         x.QuotationDateTime.Date <= end))
+                        && ((start == null || x.QuotationDateTime.Date >= start)
+                            && (end== null || x.QuotationDateTime.Date <= end)
+                            // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                            //     x.QuotationDateTime.Date <= end)
+                            )
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                         && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                        && (!profit.HasValue || x.Profit >= profit)
+                        && (!profit.HasValue || !isGreaterThan.HasValue || (isGreaterThan.Value && x.Profit >= profit) || (!isGreaterThan.Value && x.Profit < profit))
                 )
                 .OrderByDescending(x => x.QuotationNo)
             ;
@@ -565,17 +566,22 @@ public class QuotationService : IQuotationService
                     .Include(x => x.Projects)
                     .Where(x => x.BusinessId == businessId)
                     .Where(x =>
-                        (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                         x.QuotationNo.ToLower() == keyword)
+                        (!salePersonId.HasValue || x.SalePersonId == salePersonId)
+                        &&(string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                           x.QuotationNo.ToLower() == keyword)
                         && (string.IsNullOrEmpty(status) || x.Status == status)
-                        // && ((start == null || x.QuotationDateTime.Date >= start)
-                        //     && (end== null || x.QuotationDateTime.Date <= end)
-                        //     && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                        //         x.QuotationDateTime.Date <= end))
+                        && ((start == null || x.QuotationDateTime.Date >= start)
+                            && (end== null || x.QuotationDateTime.Date <= end)
+                            // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                            //     x.QuotationDateTime.Date <= end)
+                            )
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
                         && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                        && (!profit.HasValue || x.Profit >= profit)
+                        && (!profit.HasValue || !isGreaterThan.HasValue
+                                             || (isGreaterThan.Value && x.Profit >= profit) 
+                                             || (!isGreaterThan.Value && x.Profit < profit)
+                                             )
                     )
                     .OrderByDescending(x => x.QuotationNo)
                 ;

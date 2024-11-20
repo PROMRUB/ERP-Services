@@ -20,7 +20,7 @@ public interface IQuotationService
     public Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId,
         Guid paymentAccountId);
 
-    public Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize);
+    public Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize,bool? isGreaterThan);
     public Task<QuotationResource> GetById(Guid id);
     public Task<QuotationResource> ApproveSalePrice(Guid id);
     public Task<QuotationResource> ApproveQuotation(Guid id);
