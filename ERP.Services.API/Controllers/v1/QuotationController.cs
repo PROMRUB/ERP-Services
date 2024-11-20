@@ -15,7 +15,7 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class QuotationController(IQuotationService service) : BaseController
     {
-        public record QuotationKeyword(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalePersonId,string? Status, int Page = 1, int PageSize = 10);
+        public record QuotationKeyword(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalePersonId,string? Status, int Page = 1, int PageSize = 10,bool? IsGreaterThan = null);
 
         private readonly IQuotationService _service = service;
 
