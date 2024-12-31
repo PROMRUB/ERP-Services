@@ -25,5 +25,6 @@ public interface IQuotationService
     public Task<QuotationResource> ApproveSalePrice(Guid id);
     public Task<QuotationResource> ApproveQuotation(Guid id);
     public Task<QuotationDocument> GeneratePDF(Guid id);
+    public Task SendGeneralMail(string to, string toName, string subject, string body);
     public Task DeleteAll();
 }
