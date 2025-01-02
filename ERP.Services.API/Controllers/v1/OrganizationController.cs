@@ -184,6 +184,24 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
+        [Route("org/{id}/action/GetUser")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetUser(string id, Guid businessId, string role)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await userService.GetUsers(id!, businessId, role);
+                return Ok(ResponseHandler.Response<List<OrganizationUserResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpGet]
         [Route("org/{id}/action/GetUser/{businessId}/{role}")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetUser(string id, Guid businessId, string role)
