@@ -33,13 +33,9 @@ public class QuotationEntity
     public OrganizationUserEntity IssuedByUser { get; set; }
     public List<QuotationProductEntity> Products { get; set; }
     public List<QuotationProjectEntity> Projects { get; set; }
-
     [Column("amount")] public decimal Amount { get; set; }
-
     [Column("vat")] public decimal Vat { get; set; }
-
     [Column("price")] public decimal Price { get; set; }
-
     [Column("is_approved")] public bool IsApproved { get; set; }
     [Column("account_no")] public Guid? PaymentId { get; set; }
     public PaymentAccountEntity PaymentAccountEntity { get; set; }
@@ -53,6 +49,8 @@ public class QuotationEntity
     [Column("amount_before_vat")] public decimal AmountBeforeVat { get; set; }
     [Column("sum_of_discount")] public decimal SumOfDiscount { get; set; }
     [Column("real_price_msrp")] public decimal RealPriceMsrp { get; set; }
+    [Column("profit")] public decimal Profit { get; set; }
+    [Column("is_special_price")] public bool IsSpecialPrice { get; set; }
 
 
     public void SubmitStatus(string status)

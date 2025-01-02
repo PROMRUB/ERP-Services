@@ -50,11 +50,6 @@ public class QuotationService : IQuotationService
         },
         new EmailInformation()
         {
-            Name = "bancherd@cybertracx.com",
-            Email = "bancherd@cybertracx.com"
-        },
-        new EmailInformation()
-        {
             Name = "muankhwan.u@securesolutionsasia.com",
             Email = "muankhwan.u@securesolutionsasia.com"
         },
@@ -63,11 +58,6 @@ public class QuotationService : IQuotationService
             Name = "amornrat.t@securesolutionsasia.com",
             Email = "amornrat.t@securesolutionsasia.com"
         },
-        new EmailInformation()
-        {
-            Name = "kkunayothin@gmail.com",
-            Email = "kkunayothin@gmail.com"
-        }
     };
 
     // public string Email { get; set; } = "witchayada.a@securesolutionsasia.com";
@@ -113,19 +103,32 @@ public class QuotationService : IQuotationService
             return null;
         }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
-    public List<QuotationProductResource> MapProductEntityToResource(List<QuotationProductEntity> entities)
+    public async Task<List<QuotationProductResource>> MapProductEntityToResource(List<QuotationProductEntity> entities)
     {
-        return entities.Select(x => new QuotationProductResource
+        var list = new List<QuotationProductResource>();
+        foreach (var product in entities)
         {
-            Amount = x.Amount,
-            ProductId = x.ProductId,
-            Quantity = x.Quantity,
-            Discount = Convert.ToInt32(x.Discount),
-            Order = x.Order
-        }).ToList();
+            var selected = await _productRepository.GetProductListQueryable()
+                .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+
+
+            var p = new QuotationProductResource()
+            {
+                Amount = product.Amount,
+                ProductId = product.ProductId,
+                Quantity = product.Quantity,
+                Discount = Convert.ToInt32(product.Discount),
+                Order = product.Order,
+                IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount
+            };
+
+            list.Add(p);
+        }
+
+        return list;
     }
 
     public List<QuotationProjectResource> MapProjectEntityToResource(List<QuotationProjectEntity> entities)
@@ -142,7 +145,7 @@ public class QuotationService : IQuotationService
         }).ToList();
     }
 
-    public QuotationResource MapEntityToResponse(QuotationEntity quotation)
+    public async Task<QuotationResource> MapEntityToResponse(QuotationEntity quotation)
     {
         try
         {
@@ -158,10 +161,10 @@ public class QuotationService : IQuotationService
                 IssuedById = quotation.IssuedById,
                 BusinessId = quotation.BusinessId,
                 Status = quotation.Status,
-                Products = MapProductEntityToResource(quotation.Products),
+                Products = await MapProductEntityToResource(quotation.Products),
                 Projects = MapProjectEntityToResource(quotation.Projects),
                 Remark = quotation.Remark,
-                PaymentAccountId = quotation.PaymentId
+                PaymentAccountId = quotation.PaymentId,
             };
 
             if (quotation.Projects != null && quotation.Projects.Any())
@@ -254,6 +257,7 @@ public class QuotationService : IQuotationService
 
             quotation.Products = result.QuotationProductEntities;
 
+            quotation.Profit = result.Profit;
             quotation.Price = result.Price;
             quotation.Vat = result.Vat;
             quotation.Amount = result.Amount;
@@ -281,7 +285,7 @@ public class QuotationService : IQuotationService
                 throw new Exception("not quotation exist");
             }
 
-            var response = MapEntityToResponse(entity);
+            var response = await MapEntityToResponse(entity);
 
             return response;
         }
@@ -357,7 +361,7 @@ public class QuotationService : IQuotationService
         //     }
         // }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
     public Task<List<QuotationStatus>> QuotationStatus()
@@ -366,6 +370,7 @@ public class QuotationService : IQuotationService
         {
             new() { Status = "เสนอราคา" },
             new() { Status = "ปิดการขาย" },
+            new() { Status = "อนุมัติ" },
             new() { Status = "ยกเลิก" },
         });
     }
@@ -383,7 +388,7 @@ public class QuotationService : IQuotationService
 
         await _quotationRepository.Context()!.SaveChangesAsync();
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
 
@@ -423,6 +428,8 @@ public class QuotationService : IQuotationService
         decimal realPriceMsrp = 0;
         decimal sumOfDiscount = 0;
         decimal amountBeforeVat = 0;
+        decimal profit = 0;
+        bool isSpecialPrice = false;
 
         var products = MutateResourceProduct(resource);
 
@@ -442,15 +449,6 @@ public class QuotationService : IQuotationService
             var realPrice = (decimal)selected.MSRP * product.Quantity;
             realPriceMsrp += realPrice;
 
-
-            // if (product.Discount > 0)
-            // {
-            //     var dis = (decimal)(selected.MSRP * (decimal?)(product.Discount / 100))! * product.Quantity;
-            //     sumOfDiscount += dis;
-            //
-            //     product.SumOfDiscount = dis;
-            // }
-
             var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
             sumOfDiscount += (decimal)dis;
             product.SumOfDiscount = (decimal)dis;
@@ -459,6 +457,11 @@ public class QuotationService : IQuotationService
             product.RealPriceMsrp = realPrice;
 
             response.QuotationProductEntities.Add(product);
+
+            if (!isSpecialPrice)
+            {
+                isSpecialPrice = (decimal)product.Amount < selected.LwPrice;
+            }
         }
 
         amountBeforeVat = realPriceMsrp - sumOfDiscount;
@@ -468,7 +471,10 @@ public class QuotationService : IQuotationService
         amount = price * (decimal)1.07;
         vat = amount - price;
 
+        profit = (100 * amountBeforeVat) / realPriceMsrp;
 
+        response.IsSpecialPrice = isSpecialPrice;
+        response.Profit = profit;
         response.Amount = amount;
         response.Vat = vat;
         response.Price = price;
@@ -511,12 +517,24 @@ public class QuotationService : IQuotationService
         return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
-    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, int page, int pageSize)
+    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, string? startDate,
+        string? endDate, Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
+        string? status, int page, int pageSize, bool? isGreaterThan)
     {
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             keyword = keyword.ToLower();
         }
+
+        DateTime? start = !string.IsNullOrEmpty(startDate)
+            ? DateTime.SpecifyKind(DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                DateTimeKind.Utc)
+            : null;
+
+        DateTime? end = !string.IsNullOrEmpty(endDate)
+            ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                DateTimeKind.Utc)
+            : null;
 
         var userId = _userPrincipalHandler.Id;
 
@@ -524,15 +542,23 @@ public class QuotationService : IQuotationService
             .FirstOrDefault(x => x.UserId == userId);
 
         var query = _quotationRepository.GetQuotationQuery()
+                .Include(x => x.Projects)
                 .Where(x => x.BusinessId == businessId)
                 .Where(x => user.UserId == x.SalePersonId)
                 .Where(x =>
-                        // (string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                        //         || 
-                        (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                         x.QuotationNo.ToLower() == keyword)
-                    // || (string.IsNullOrWhiteSpace(keyword) ||
-                    //     x.Products.Any(p => p.Product.ProductName.Contains(keyword)))
+                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                     x.QuotationNo.ToLower() == keyword)
+                    && (string.IsNullOrEmpty(status) || x.Status == status)
+                    && ((start == null || x.QuotationDateTime.Date >= start)
+                        && (end == null || x.QuotationDateTime.Date <= end)
+                        // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                        //     x.QuotationDateTime.Date <= end)
+                    )
+                    && (!customerId.HasValue || x.CustomerId == customerId)
+                    && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
+                    && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
+                    && (!profit.HasValue || !isGreaterThan.HasValue || (isGreaterThan.Value && x.Profit >= profit) ||
+                        (!isGreaterThan.Value && x.Profit < profit))
                 )
                 .OrderByDescending(x => x.QuotationNo)
             ;
@@ -542,15 +568,25 @@ public class QuotationService : IQuotationService
                                                || user.Role.Contains("Admin")))
         {
             query = _quotationRepository.GetQuotationQuery()
+                    .Include(x => x.Projects)
                     .Where(x => x.BusinessId == businessId)
                     .Where(x =>
-                            // (
-                            // string.IsNullOrWhiteSpace(keyword) || x.Customer.CusName.Contains(keyword))
-                            // || 
-                            (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                             x.QuotationNo.ToLower() == keyword)
-                        // || (string.IsNullOrWhiteSpace(keyword) ||
-                        // x.Products.Any(p => p.Product.ProductName.Contains(keyword))) 
+                        (!salePersonId.HasValue || x.SalePersonId == salePersonId)
+                        && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
+                            x.QuotationNo.ToLower() == keyword)
+                        && (string.IsNullOrEmpty(status) || x.Status == status)
+                        && ((start == null || x.QuotationDateTime.Date >= start)
+                            && (end == null || x.QuotationDateTime.Date <= end)
+                            // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
+                            //     x.QuotationDateTime.Date <= end)
+                        )
+                        && (!customerId.HasValue || x.CustomerId == customerId)
+                        && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
+                        && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
+                        && (!profit.HasValue || !isGreaterThan.HasValue
+                                             || (isGreaterThan.Value && x.Profit >= profit)
+                                             || (!isGreaterThan.Value && x.Profit < profit)
+                        )
                     )
                     .OrderByDescending(x => x.QuotationNo)
                 ;
@@ -576,7 +612,7 @@ public class QuotationService : IQuotationService
                 IssuedByUserId = x.IssuedById,
                 IssuedByUserName = x.IssuedByUser.Username ?? "-",
                 SalePersonId = x.SalePersonId,
-                SalePersonIName = x.SalePerson.FirstNameTh ?? "-",
+                SalePersonName = x.SalePerson.FirstNameTh ?? "-",
                 Status = x.Status,
                 Products = null,
                 ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
@@ -587,6 +623,8 @@ public class QuotationService : IQuotationService
                 Amount = x.RealPriceMsrp - x.SumOfDiscount,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
+                Profit = x.Profit,
+                IsSpecialPrice = x.IsSpecialPrice
             })
             .ToList();
 
@@ -604,7 +642,7 @@ public class QuotationService : IQuotationService
             throw new KeyNotFoundException("id not exists");
         }
 
-        return MapEntityToResponse(quotation);
+        return await MapEntityToResponse(quotation);
     }
 
     public async Task<QuotationResource> ApproveSalePrice(Guid id)
@@ -733,15 +771,47 @@ public class QuotationService : IQuotationService
             To.Add(smtpEmailTo);
         }
 
+        var link =
+            $"<a href = 'https://sales.prom.co.th/erp/quotation/form/{quotation.QuotationId}'>{quotation.QuotationNo}</a>";
+
         string HtmlContent =
             $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49ใบเสนอราคา<br/>" +
             $"เร\u0e35ยน " +
             // $"{managerName}</br>" +
-            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {quotation.QuotationNo ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
-            $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n</dd><br/><br/><br/>\n" +
+            $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49เอกสารใบเสนอราคาเลขท\u0e35\u0e48: {link ?? ""} ได\u0e49ถ\u0e39กจ\u0e31ดทำเสร\u0e47จเร\u0e35ยบร\u0e49อยแล\u0e49ว จ\u0e36งนำเสนอมาเพ\u0e37\u0e48อขออน\u0e38ม\u0e31ต\u0e34ใช\u0e49รายละเอ\u0e35ยดท\u0e31\u0e49งหมดตามในเอกสารด\u0e31งกล\u0e48าวและจะได\u0e49" +
+            $"ดำเน\u0e34นการเสนอราคาแก\u0e48ล\u0e39กค\u0e49าต\u0e48อไป\n<br/><br/><br/>\n" +
             $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
             $"{quotation.IssuedByUser.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {quotation.QuotationNo ?? "-"}";
+
+        try
+        {
+            var sendSmtpEmail = new SendSmtpEmail(Email, To, null, null, HtmlContent, null, Subject);
+            CreateSmtpEmail result = apiInstance.SendTransacEmail(sendSmtpEmail);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
+    public async Task SendGeneralMail(string to, string toName, string subject, string body)
+    {
+        var apiInstance = new TransactionalEmailsApi();
+        string SenderName = "PROM ERP";
+        string SenderEmail = "e-service@prom.co.th";
+        SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
+        List<SendSmtpEmailTo> To = new List<SendSmtpEmailTo>();
+
+        string ToEmail = to;
+        string ToName = toName;
+        SendSmtpEmailTo smtpEmailTo = new SendSmtpEmailTo(ToEmail, ToName);
+        To.Add(smtpEmailTo);
+
+
+        string HtmlContent = body;
+        string Subject = subject;
 
         try
         {
@@ -834,13 +904,17 @@ public class QuotationService : IQuotationService
             To.Add(smtpEmailTo);
         }
 
+        var link =
+            $"<a href = 'https://sales.prom.co.th/erp/quotation/form/{entity.QuotationId}'>{entity.QuotationNo}</a>";
+
+
         string HtmlContent =
             $"เร\u0e37\u0e48อง ขออน\u0e38ม\u0e31ต\u0e34เสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48าท\u0e35\u0e48ถ\u0e39กกำหนด<br/>" +
             $"เร\u0e35ยน ผ\u0e39\u0e49ท\u0e35\u0e48เก\u0e35\u0e48ยวข\u0e49องท\u0e38กท\u0e48าน</br>" +
             $"<dd>เน\u0e37\u0e48องจากในขณะน\u0e35\u0e49ม\u0e35ความจำเป\u0e47นบางประการท\u0e35\u0e48จะต\u0e49องเสนอ ราคาส\u0e38ทธ\u0e34/หน\u0e48วย ท\u0e35\u0e48ต\u0e48ำกว\u0e48า" +
             $"ราคาต\u0e48ำส\u0e38ดซ\u0e36\u0e48งได\u0e49ถ\u0e39กกำหนดไว\u0e49ในระบบเพ\u0e37\u0e48อใช\u0e49เฉพาะก\u0e31บเอกสารใบเสนอราคาเลขท\u0e35\u0e48: " +
-            $"{entity.QuotationNo}<br/><br/><br/>" +
-            $"จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
+            $"{link}<br/><br/><br/>" +
+            $"<dt>จ\u0e36งเร\u0e35ยนมาเพ\u0e37\u0e48อโปรดพ\u0e34จารณา<br/>\n" +
             $"{entity.SalePerson.DisplayNameTH()}<br/>";
         string Subject = @$"ขออนุมัติราคา ใบเสนอราคาเลขที่ {entity.QuotationNo ?? "-"}";
 

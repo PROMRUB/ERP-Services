@@ -342,7 +342,7 @@ namespace ERP.Services.API.Utils
                     {
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {
-                            text.Span("กำหนดส\u0e48งส\u0e34นค\u0e49า (Delivery Date)")
+                            text.Span("สั่งสินค้านาน (Lead Time)")
                                 .FontFamily("Prompt")
                                 .FontSize(6)
                                 .FontColor(Colors.White)
@@ -425,8 +425,8 @@ namespace ERP.Services.API.Utils
                     {
                         var textEth =
                             _entity.Projects.FirstOrDefault() != null &&
-                            _entity.Projects.FirstOrDefault().EthSaleMonth.HasValue
-                                ? _entity.Projects.FirstOrDefault().EthSaleMonth.Value.ToString("MM/yyyy")
+                            _entity.Projects.FirstOrDefault().LeadTime != 0
+                                ? _entity.Projects.FirstOrDefault().LeadTime.ToString()
                                 : "-";
                         column.Item().AlignCenter().Padding(3).Text(text =>
                         {

@@ -17,7 +17,7 @@ public class QuotationResponse
     public Guid? IssuedByUser { get; set; }
     public string IssuedByUserName { get; set; }
     public Guid? SalePersonId { get; set; }
-    public string SalePersonIName{ get; set; }
+    public string SalePersonName{ get; set; }
     public string Status { get; set; }
     public List<QuotationProductResponse> Products { get; set; }
     public List<QuotationProjectResponse> Projects { get; set; }
@@ -34,4 +34,6 @@ public class QuotationResponse
     public decimal AmountBeforeVat { get; set; }
     public string ProjectName { get; set; }
     public string EthSaleMonth { get; set; }
+    public decimal Profit { get; set; }
+    public bool IsSpecialPrice { get; set; }
 }

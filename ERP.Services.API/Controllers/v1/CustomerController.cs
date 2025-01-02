@@ -1,9 +1,7 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Customer;
-using ERP.Services.API.Models.ResponseModels.ApiKey;
 using ERP.Services.API.Models.ResponseModels.Customer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Services.API.Controllers.v1
