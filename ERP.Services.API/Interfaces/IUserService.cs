@@ -12,6 +12,7 @@ namespace ERP.Services.API.Interfaces
         public Task<UserResponse> GetUserByName(string orgId, string userName);
         public void AddUser(string orgId, UserRequest user);
         public Task AddUserToBusinessAsync(string orgId, AddUserToBusinessRequest request);
+        public Task AddRoleToUser(string orgId, Guid userId, Guid businessId, AddUserToBusinessRequest request);
         public Task<IQueryable<UserBusinessEntity>> GetUserBusiness(string orgId);
         public bool IsEmailExist(string orgId, string email);
         public bool IsUserNameExist(string orgId, string userName);

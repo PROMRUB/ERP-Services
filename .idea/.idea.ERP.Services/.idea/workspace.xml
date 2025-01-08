@@ -11,7 +11,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7bb210d0-7c94-462f-b066-267f8ea59852" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ERP.Services/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Models/RequestModels/Quotation/QuotationProductResource.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ERP.Services.API/Services/Product/QuotationService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,6 +37,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/db7395f4add94e6d10e515b3e55373f2821f8323de7dc8e314d78feefacf5584/ActionMethodExecutor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/dbb9922f617e20d8c11b74c37fa79633a46a5cb7d64d2beea1a2812e6ed1475/FileStreamResult.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/eccc5ea223261813a39651dba73c3b5c4ef2d4934eb1dccaa03c5a602ac49ea8/TriggersDbContextOptionsExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/kornkunayothin/Workspace/ERP-Services/ERP.Services.API/Interfaces/IQuotationService.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -163,6 +163,10 @@
       <workItem from="1730080722065" duration="10000" />
       <workItem from="1730081387109" duration="202000" />
       <workItem from="1730369655208" duration="1979000" />
+      <workItem from="1730434643313" duration="378000" />
+      <workItem from="1731557234823" duration="3355000" />
+      <workItem from="1731640424907" duration="819000" />
+      <workItem from="1731911999114" duration="12954000" />
     </task>
     <servers />
   </component>

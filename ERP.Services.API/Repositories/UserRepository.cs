@@ -24,6 +24,27 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
+        public void AddRoleToUser(Guid UserId, Guid BusinessId, UserBusinessEntity user)
+        {
+            var query = context!.UserBusinesses.ToList();
+            var currentUser = query.Where(x => x.UserId == UserId && x.BusinessId == BusinessId).FirstOrDefault();
+            if (currentUser != null)
+            {
+                if (currentUser.EmployeeRunning == 0)
+                {
+                    var maxEmployeeRunning = query.Max(x => x.EmployeeRunning);
+
+                    currentUser.EmployeeRunning = maxEmployeeRunning + 1;
+
+                    currentUser.EmployeeCode = currentUser.EmployeeRunning.ToString("D4");
+                }
+
+                currentUser.Role = user!.Role;
+
+                context.SaveChanges();
+            }
+        }
+
         public IEnumerable<UserEntity> GetUsers()
         {
             var query = context!.Users!.Where(p => !p.UserName!.Equals(null)).ToList();

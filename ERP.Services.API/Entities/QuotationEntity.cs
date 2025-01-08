@@ -49,6 +49,8 @@ public class QuotationEntity
     [Column("amount_before_vat")] public decimal AmountBeforeVat { get; set; }
     [Column("sum_of_discount")] public decimal SumOfDiscount { get; set; }
     [Column("real_price_msrp")] public decimal RealPriceMsrp { get; set; }
+    [Column("profit")] public decimal Profit { get; set; }
+    [Column("is_special_price")] public bool IsSpecialPrice { get; set; }
 
 
     public void SubmitStatus(string status)

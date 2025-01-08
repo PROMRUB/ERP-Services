@@ -184,7 +184,7 @@ namespace ERP.Services.API.Controllers.v1
         }
 
         [HttpGet]
-        [Route("org/{id}/action/GetUser/{businessId}/{role}")]
+        [Route("org/{id}/action/GetUser")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetUser(string id, Guid businessId, string role)
         {

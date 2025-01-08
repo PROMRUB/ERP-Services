@@ -10,6 +10,7 @@ namespace ERP.Services.API.Interfaces
         public Task<UserEntity> GetUserByName(string userName);
         public void AddUser(UserEntity user);
         public void AddUserToBusiness(UserBusinessEntity user);
+        public void AddRoleToUser(Guid UserId, Guid BusinessId, UserBusinessEntity user);
         public bool IsEmailExist(string email);
         public bool IsUserNameExist(string userName);
         public bool IsUserIdExist(string userId);
