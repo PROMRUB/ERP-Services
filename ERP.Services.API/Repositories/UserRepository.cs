@@ -26,7 +26,7 @@ namespace ERP.Services.API.Repositories
 
         public void RemoveUserToBusiness(UserBusinessEntity user)
         {
-            var query = context!.UserBusinesses!.Where(x => x.UserBusinessId == user.UserBusinessId && x.BusinessId == user.BusinessId).FirstOrDefault();
+            var query = context!.UserBusinesses!.Where(x => x.UserId == user.UserId && x.BusinessId == user.BusinessId).FirstOrDefault();
             context!.UserBusinesses.Remove(query);
             context.SaveChanges();
         }
