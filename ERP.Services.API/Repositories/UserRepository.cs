@@ -24,6 +24,13 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
+        public void RemoveUserToBusiness(UserBusinessEntity user)
+        {
+            var query = context!.UserBusinesses!.Where(x => x.UserBusinessId == user.UserBusinessId && x.BusinessId == user.BusinessId).FirstOrDefault();
+            context!.UserBusinesses.Remove(query);
+            context.SaveChanges();
+        }
+
         public void AddRoleToUser(Guid UserId, Guid BusinessId, UserBusinessEntity user)
         {
             var query = context!.UserBusinesses.ToList();
