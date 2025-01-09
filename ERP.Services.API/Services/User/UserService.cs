@@ -256,6 +256,7 @@ namespace ERP.Services.API.Services.User
             var query = mapper.Map<UserRequest, UserEntity>(request);
             repository!.AddUser(query);
         }
+
         public async Task AddUserToBusinessAsync(string orgId, AddUserToBusinessRequest request)
         {
             repository!.SetCustomOrgId(orgId);
@@ -264,6 +265,16 @@ namespace ERP.Services.API.Services.User
             var query = mapper.Map<AddUserToBusinessRequest, UserBusinessEntity>(request);
             query.OrgId = organization.OrgId;
             repository.AddUserToBusiness(query);
+        }
+
+        public async Task RemoveUserToBusinessAsync(string orgId, AddUserToBusinessRequest request)
+        {
+            repository!.SetCustomOrgId(orgId);
+            organizationRepository!.SetCustomOrgId(orgId);
+            var organization = await organizationRepository.GetOrganization();
+            var query = mapper.Map<AddUserToBusinessRequest, UserBusinessEntity>(request);
+            query.OrgId = organization.OrgId;
+            repository.RemoveUserToBusiness(query);
         }
 
         public async Task AddRoleToUser(string orgId, Guid userId, Guid businessId, AddUserToBusinessRequest request)

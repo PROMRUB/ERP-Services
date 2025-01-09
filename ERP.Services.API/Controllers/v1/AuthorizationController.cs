@@ -72,6 +72,24 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpPost]
+        [Route("org/{id}/action/RemoveUserToBusiness")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> RemoveUserToBusiness(string id, AddUserToBusinessRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                await userService.RemoveUserToBusinessAsync(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
         [HttpPost   ]
         [Route("org/{id}/action/AddRole/{userId}/{businessId}")]
         [MapToApiVersion("1")]
