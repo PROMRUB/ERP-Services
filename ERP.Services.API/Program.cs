@@ -14,6 +14,8 @@ using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using sib_api_v3_sdk.Client;
+using System.Threading.RateLimiting;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +94,21 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("GenericRolePolicy", policy => policy.AddRequirements(new GenericRbacRequirement()));
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
+    {
+        var ip = context.Connection.RemoteIpAddress;
+        return RateLimitPartition.GetFixedWindowLimiter(ip!, factory => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+});
+
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddSwaggerGen(config =>
@@ -169,6 +186,8 @@ if (builder.Environment.IsDevelopment())
         }
     );
 }
+
+app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
