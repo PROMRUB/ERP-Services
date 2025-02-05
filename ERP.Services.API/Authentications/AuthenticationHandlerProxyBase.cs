@@ -32,21 +32,21 @@ namespace ERP.Services.API.Authentications
 
             if (!Request.Headers.TryGetValue("Authorization", out var authData))
             {
-                LogFailure(ipAddress, "No Authorization header found");
+                //LogFailure(ipAddress, "No Authorization header found");
                 return AuthenticateResult.Fail("No Authorization header found");
             }
 
             var authHeader = AuthenticationHeaderValue.Parse(authData);
             if (!authHeader.Scheme.Equals("Bearer") && !authHeader.Scheme.Equals("Basic"))
             {
-                LogFailure(ipAddress, $"Unknown scheme [{authHeader.Scheme}]");
+                //LogFailure(ipAddress, $"Unknown scheme [{authHeader.Scheme}]");
                 return AuthenticateResult.Fail($"Unknown scheme [{authHeader.Scheme}]");
             }
 
-            if (IsBlocked(ipAddress))
-            {
-                return AuthenticateResult.Fail("Too many failed attempts. Try again later.");
-            }
+            //if (IsBlocked(ipAddress))
+            //{
+            //    return AuthenticateResult.Fail("Too many failed attempts. Try again later.");
+            //}
 
             Models.Authentications.User? user = null;
             try
@@ -65,17 +65,17 @@ namespace ERP.Services.API.Authentications
             }
             catch (Exception e)
             {
-                LogFailure(ipAddress, $"Invalid Authorization Header for [{authHeader.Scheme}]");
+                //LogFailure(ipAddress, $"Invalid Authorization Header for [{authHeader.Scheme}]");
                 return AuthenticateResult.Fail($"Invalid Authorization Header for [{authHeader.Scheme}]");
             }
 
             if (user == null)
             {
-                LogFailure(ipAddress, $"Invalid username or password for [{authHeader.Scheme}]");
+                //LogFailure(ipAddress, $"Invalid username or password for [{authHeader.Scheme}]");
                 return AuthenticateResult.Fail($"Invalid username or password for [{authHeader.Scheme}]");
             }
 
-            ClearFailure(ipAddress);
+            //ClearFailure(ipAddress);
 
             var identity = new ClaimsIdentity(user.Claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
@@ -86,36 +86,36 @@ namespace ERP.Services.API.Authentications
             return AuthenticateResult.Success(ticket);
         }
 
-        private void LogFailure(string? ipAddress, string reason)
-        {
-            if (string.IsNullOrEmpty(ipAddress)) return;
+        //private void LogFailure(string? ipAddress, string reason)
+        //{
+        //    if (string.IsNullOrEmpty(ipAddress)) return;
 
-            if (!FailedAttemptsCache.TryGetValue(ipAddress, out int attempts))
-            {
-                attempts = 0;
-            }
+        //    if (!FailedAttemptsCache.TryGetValue(ipAddress, out int attempts))
+        //    {
+        //        attempts = 0;
+        //    }
 
-            attempts++;
-            FailedAttemptsCache.Set(ipAddress, attempts, TimeSpan.FromMinutes(5));
+        //    attempts++;
+        //    FailedAttemptsCache.Set(ipAddress, attempts, TimeSpan.FromMinutes(5));
 
-            Log.Warning($"[SECURITY] Failed auth attempt from {ipAddress}. Reason: {reason}. Attempt {attempts}/5");
+        //    Log.Warning($"[SECURITY] Failed auth attempt from {ipAddress}. Reason: {reason}. Attempt {attempts}/5");
 
-            if (attempts >= 5)
-            {
-                Log.Warning($"[SECURITY] Blocking IP {ipAddress} due to excessive failed attempts.");
-            }
-        }
+        //    if (attempts >= 5)
+        //    {
+        //        Log.Warning($"[SECURITY] Blocking IP {ipAddress} due to excessive failed attempts.");
+        //    }
+        //}
 
-        private bool IsBlocked(string? ipAddress)
-        {
-            if (string.IsNullOrEmpty(ipAddress)) return false;
-            return FailedAttemptsCache.TryGetValue(ipAddress, out int attempts) && attempts >= 5;
-        }
+        //private bool IsBlocked(string? ipAddress)
+        //{
+        //    if (string.IsNullOrEmpty(ipAddress)) return false;
+        //    return FailedAttemptsCache.TryGetValue(ipAddress, out int attempts) && attempts >= 5;
+        //}
 
-        private void ClearFailure(string? ipAddress)
-        {
-            if (string.IsNullOrEmpty(ipAddress)) return;
-            FailedAttemptsCache.Remove(ipAddress);
-        }
+        //private void ClearFailure(string? ipAddress)
+        //{
+        //    if (string.IsNullOrEmpty(ipAddress)) return;
+        //    FailedAttemptsCache.Remove(ipAddress);
+        //}
     }
 }
