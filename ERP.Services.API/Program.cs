@@ -187,7 +187,7 @@ if (builder.Environment.IsDevelopment())
     );
 }
 
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 
