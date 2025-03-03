@@ -118,9 +118,22 @@ public class QuotationService : IQuotationService
             var p = new QuotationProductResource()
             {
                 Amount = product.Amount,
+                TotalAmount = 0,
+                Unit = "SSA",
                 ProductId = product.ProductId,
                 Quantity = product.Quantity,
                 Discount = Convert.ToInt32(product.Discount),
+                LatestCost = 0,
+                TotalLatestCost = 0,
+                Profit = 0,
+                ProfitPercent = 0,
+                TotalProfit = 0,
+                CostEstimate = 0,
+                CostEstimatePercent = 0,
+                TotalCostEstimate = 0,
+                CostEstimateProfit = 0,
+                CostEstimateProfitPercent = 0,
+                TotalCostEstimateProfit = 0,
                 Order = product.Order,
                 IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount
             };
@@ -517,6 +530,11 @@ public class QuotationService : IQuotationService
         return _mapper.Map<PaymentAccountEntity, PaymentAccountResponse>(result);
     }
 
+    public async Task<PurchaseDetail> GetProductPurchaseDetail(Guid quotationId, Guid productId)
+    {
+        return await new Task<PurchaseDetail>(() => new PurchaseDetail());
+    }
+
     public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, string? startDate,
         string? endDate, Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
         string? status, int page, int pageSize, bool? isGreaterThan)
@@ -631,6 +649,23 @@ public class QuotationService : IQuotationService
         var afterMutate = new PagedList<QuotationResponse>(list, beforeMutate.TotalCount, page, pageSize);
 
         return afterMutate;
+    }
+
+    public async Task<TotalProductQuotation> GetTotalProductQuotation(Guid id)
+    {
+        return await new Task<TotalProductQuotation>(() => new TotalProductQuotation());
+    }
+
+    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost)
+    {
+        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+
+        if (quotation == null)
+        {
+            throw new KeyNotFoundException("id not exists");
+        }
+
+        return await MapEntityToResponse(quotation);
     }
 
     public async Task<QuotationResource> GetById(Guid id)

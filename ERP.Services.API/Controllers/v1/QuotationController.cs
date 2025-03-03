@@ -15,7 +15,22 @@ namespace ERP.Services.API.Controllers.v1
     [ApiVersion("1")]
     public class QuotationController(IQuotationService service) : BaseController
     {
-        public record QuotationKeyword(string? Keyword, Guid BusinessId,string? StartDate,string? EndDate,Guid? CustomerId,Guid? ProjectId,int? Profit,bool? IsSpecialPrice,Guid? SalesPersonId,string? Status, int Page = 1, int PageSize = 10,bool? IsGreaterThan = null);
+        public record QuotationKeyword(
+            string? Keyword,
+            Guid BusinessId,
+            string? StartDate,
+            string? EndDate,
+            Guid? CustomerId,
+            Guid? ProjectId,
+            int? Profit,
+            bool? IsSpecialPrice,
+            Guid? SalesPersonId,
+            string? Status,
+            int Page = 1,
+            int PageSize = 10,
+            bool? IsGreaterThan = null);
+
+        public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, double EstimateCost);
 
         private readonly IQuotationService _service = service;
 
@@ -25,8 +40,10 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,resource.EndDate,resource.CustomerId,resource.ProjectId,resource.Profit,resource.IsSpecialPrice,resource.SalesPersonId,resource.Status,resource.Page,
-                    resource.PageSize,resource.IsGreaterThan);
+                var result = await _service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,
+                    resource.EndDate, resource.CustomerId, resource.ProjectId, resource.Profit, resource.IsSpecialPrice,
+                    resource.SalesPersonId, resource.Status, resource.Page,
+                    resource.PageSize, resource.IsGreaterThan);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -35,13 +52,60 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpGet("{id:guid}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetTotalProductQuotation([FromQuery] Guid id)
+        {
+            try
+            {
+                var result = await _service.GetTotalProductQuotation(id);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpGet("{quotationId:guid}/product/{productId:guid}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetTotalProductQuotation([FromQuery] Guid quotationId, Guid productId)
+        {
+            try
+            {
+                var result = await _service.GetProductPurchaseDetail(quotationId, productId);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost("update_product_quotation")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> UpdateProductQuotation([FromBody] UpdateProductQuotationParameter parammeter)
+        {
+            try
+            {
+                var result = await _service.UpdateCostEstimateQuotation(parammeter.QuotationId, parammeter.ProductId,
+                    parammeter.EstimateCost);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+
         [HttpGet("quotation_status")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> GetQuotationStatus()
         {
             try
             {
-                var result = await service.QuotationStatus();
+                var result = await _service.QuotationStatus();
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -56,22 +120,23 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.Create(resource);
+                var result = await _service.Create(resource);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
             {
-                return Ok(ResponseHandler.Response("message : " + ex.Message, "inner Exception: " + ex.InnerException?.Message));
+                return Ok(ResponseHandler.Response("message : " + ex.Message,
+                    "inner Exception: " + ex.InnerException?.Message));
             }
         }
-        
+
         [HttpPost("{id:guid}/update_status")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> UpdateStatus(Guid id,[FromBody] QuotationResource resource)
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] QuotationResource resource)
         {
             try
             {
-                var result = await service.UpdateStatus(id,resource);
+                var result = await _service.UpdateStatus(id, resource);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -86,7 +151,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.Update(id, resource);
+                var result = await _service.Update(id, resource);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -101,7 +166,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.Calculate(resource);
+                var result = await _service.Calculate(resource);
                 return Ok(ResponseHandler.Response<QuotationResponse>("1000", null, result));
             }
             catch (Exception ex)
@@ -116,7 +181,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                await service.Delete(id);
+                await _service.Delete(id);
                 return Ok(ResponseHandler.Response<QuotationResponse>("1000", null, null));
             }
             catch (Exception ex)
@@ -124,14 +189,14 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-        
+
         [HttpDelete("all")]
         [MapToApiVersion("1")]
         public async Task<IActionResult> DeleteAll()
         {
             try
             {
-                await service.DeleteAll();
+                await _service.DeleteAll();
                 return Ok(ResponseHandler.Response<QuotationResponse>("1000", null, null));
             }
             catch (Exception ex)
@@ -184,8 +249,10 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,resource.EndDate,resource.CustomerId,resource.ProjectId,resource.Profit,resource.IsSpecialPrice,resource.SalesPersonId,resource.Status,resource.Page,
-                    resource.PageSize,resource.IsGreaterThan);         
+                var result = await service.GetByList(resource.Keyword ?? null, resource.BusinessId, resource.StartDate,
+                    resource.EndDate, resource.CustomerId, resource.ProjectId, resource.Profit, resource.IsSpecialPrice,
+                    resource.SalesPersonId, resource.Status, resource.Page,
+                    resource.PageSize, resource.IsGreaterThan);
                 return Ok(ResponseHandler.Response<PagedList<QuotationResponse>>("1000", null, result));
             }
             catch (Exception ex)
@@ -241,8 +308,8 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-        
-      
+
+
         [AllowAnonymous]
         [HttpGet]
         [Route("pdf/{id:guid}")]
@@ -252,17 +319,17 @@ namespace ERP.Services.API.Controllers.v1
             try
             {
                 QuotationDocument document = await service.GeneratePDF(id);
-                
+
                 byte[] pdfBytes = document.GeneratePdf();
                 MemoryStream ms = new MemoryStream(pdfBytes);
                 return new FileStreamResult(ms, "application/pdf")
                 {
-                    FileDownloadName = document.FileName+".pdf",
+                    FileDownloadName = document.FileName + ".pdf",
                 };
             }
             catch (Exception ex)
             {
-                return Ok(ResponseHandler.Response(ex.Message + "/// " +ex.InnerException?.Message, null));
+                return Ok(ResponseHandler.Response(ex.Message + "/// " + ex.InnerException?.Message, null));
             }
         }
     }
