@@ -52,9 +52,9 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id:guid}/total_product")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetTotalProductQuotation([FromQuery] Guid id)
+        public async Task<IActionResult> GetTotalProductQuotation(Guid id)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace ERP.Services.API.Controllers.v1
 
         [HttpGet("{quotationId:guid}/product/{productId:guid}")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> GetTotalProductQuotation([FromQuery] Guid quotationId, Guid productId)
+        public async Task<IActionResult> GetTotalProductQuotation(Guid quotationId, Guid productId)
         {
             try
             {
