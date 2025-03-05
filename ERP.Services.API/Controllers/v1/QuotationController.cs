@@ -30,7 +30,7 @@ namespace ERP.Services.API.Controllers.v1
             int PageSize = 10,
             bool? IsGreaterThan = null);
 
-        public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, double EstimateCost);
+        public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, double EstimateCost,double Cost);
 
         private readonly IQuotationService _service = service;
 
@@ -89,7 +89,7 @@ namespace ERP.Services.API.Controllers.v1
             try
             {
                 var result = await _service.UpdateCostEstimateQuotation(parammeter.QuotationId, parammeter.ProductId,
-                    parammeter.EstimateCost);
+                    parammeter.EstimateCost,parammeter.Cost);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)

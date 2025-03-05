@@ -118,25 +118,29 @@ public class QuotationService : IQuotationService
             var p = new QuotationProductResource()
             {
                 Amount = product.Amount,
-                TotalAmount = 0,
+                TotalAmount = product.Amount * product.Quantity,
                 Unit = "SSA",
                 ProductId = product.ProductId,
                 Quantity = product.Quantity,
                 Discount = Convert.ToInt32(product.Discount),
-                LatestCost = 0,
-                TotalLatestCost = 0,
-                Profit = 0,
-                ProfitPercent = 0,
-                TotalProfit = 0,
-                CostEstimate = 0,
-                CostEstimatePercent = 0,
-                TotalCostEstimate = 0,
-                CostEstimateProfit = 0,
-                CostEstimateProfitPercent = 0,
-                TotalCostEstimateProfit = 0,
+                // LatestCost = product.LatestCost.ToString(),
+                // TotalLatestCost = (product.LatestCost * product.Quantity).ToString(),
+                // Profit = product.Profit.ToString(),
+                // ProfitPercent = product.ProfitPercent.ToString(),
+                // TotalProfit = (product.Profit * product.Quantity).ToString(),
+                CostEstimate = product.CostEstimate,
+                CostEstimatePercent = product.CostEstimatePercent,
+                TotalCostEstimate = (product.CostEstimate * product.Quantity),
+                CostEstimateProfit = product.CostEstimateProfit,
+                CostEstimateProfitPercent = product.CostEstimateProfitPercent,
                 Order = product.Order,
                 IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount
             };
+
+            if (product.Amount != 0)
+            {
+                p.TotalCostEstimateProfit = product.CostEstimateProfit * product.Quantity;
+            }
 
             list.Add(p);
         }
@@ -532,7 +536,13 @@ public class QuotationService : IQuotationService
 
     public async Task<PurchaseDetail> GetProductPurchaseDetail(Guid quotationId, Guid productId)
     {
-        return await new Task<PurchaseDetail>(() => new PurchaseDetail());
+        var product = await _quotationRepository.GetQuotationProduct(quotationId,productId)
+            .FirstOrDefaultAsync(x => x.QuotationId == quotationId && x.ProductId == productId);
+        var res =  new PurchaseDetail();
+        res.OfferPriceLatest = product.Amount.ToString();
+        res.ProductId = product.ProductId;
+        
+        return res;
     }
 
     public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, string? startDate,
@@ -653,11 +663,51 @@ public class QuotationService : IQuotationService
 
     public async Task<TotalProductQuotation> GetTotalProductQuotation(Guid id)
     {
-        return await new Task<TotalProductQuotation>(() => new TotalProductQuotation());
+        var query = await _quotationRepository.GetQuotationQuery()
+            .Where(x => x.QuotationId == id)
+            .Include(x => x.Products)
+            .SingleOrDefaultAsync();
+
+        var products = query?.Products;
+
+
+        return new TotalProductQuotation
+        {
+            QuotationId = id,
+            TotalAmount = products.Sum(x => x.Amount),
+            TotalCost = 0,
+            Profit = 0,
+            TotalProfitPercent = 0,
+            TotalEstimate = products.Sum(x => x.CostEstimate),
+            TotalEstimatePercent = 0,
+            TotalEstimateProfit = products.Sum(x => x.CostEstimateProfit),
+            TotalEstimateProfitPercent = 0
+        };
+
     }
 
-    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost)
+    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost,double cost)
     {
+        var product = await  _quotationRepository.GetQuotationProduct(id,productId).FirstOrDefaultAsync();
+
+        if (product == null)
+        {
+            throw new Exception("Product not found");
+        }
+      
+        product.Amount = (float)estimateCost;
+        product.LatestCost = (decimal)product?.Amount;
+        product.Profit = 0;
+        product.ProfitPercent = 0;
+        product.CostEstimate = (decimal)cost;
+        product.CostEstimateProfit = (decimal)(estimateCost - cost);
+        product.CostEstimateProfitPercent =  (decimal)(((estimateCost - cost)/cost)* 100);
+       
+        
+        _quotationRepository.UpdateProduct(product);
+
+        await _quotationRepository.Context().SaveChangesAsync();
+        
         var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
