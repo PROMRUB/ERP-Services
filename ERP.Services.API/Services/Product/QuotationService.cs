@@ -674,7 +674,7 @@ public class QuotationService : IQuotationService
         return new TotalProductQuotation
         {
             QuotationId = id,
-            TotalAmount = products.Sum(x => x.Amount),
+            TotalAmount = products.Sum(x => x.Amount * x.Quantity),
             TotalCost = 0,
             Profit = 0,
             TotalProfitPercent = 0,
