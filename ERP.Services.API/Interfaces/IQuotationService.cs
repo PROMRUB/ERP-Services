@@ -20,11 +20,17 @@ public interface IQuotationService
     public Task<PaymentAccountResponse> GetPaymentAccountInformationById(string orgId, Guid businessId,
         Guid paymentAccountId);
 
-    public Task<PurchaseDetail> GetProductPurchaseDetail(Guid quotationId,Guid productId);
+    public Task<PurchaseDetail> GetProductPurchaseDetail(Guid quotationId, Guid productId);
 
-    public Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId,string? startDate,string? endDate,Guid? customerId,Guid? projectId,int? profit,bool? isSpecialPrice,Guid? salePersonId,string? status, int page, int pageSize,bool? isGreaterThan);
+    public Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, string? startDate,
+        string? endDate, Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
+        string? status, int page, int pageSize, bool? isGreaterThan);
+
     public Task<TotalProductQuotation> GetTotalProductQuotation(Guid id);
-    public Task<QuotationResource> UpdateCostEstimateQuotation (Guid id,Guid productId,double estimateCost);
+
+    public Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost,
+        double cost);
+
     public Task<QuotationResource> GetById(Guid id);
     public Task<QuotationResource> ApproveSalePrice(Guid id);
     public Task<QuotationResource> ApproveQuotation(Guid id);

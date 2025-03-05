@@ -7,8 +7,8 @@ public class TotalProductQuotation
     public double TotalCost { get; set; }
     public double Profit { get; set; }
     public double TotalProfitPercent { get; set; }
-    public double TotalEstimate { get; set; }
+    public decimal TotalEstimate { get; set; }
     public double TotalEstimatePercent { get; set; }
-    public double TotalEstimateProfit { get; set; }
+    public decimal TotalEstimateProfit { get; set; }
     public double TotalEstimateProfitPercent { get; set; }
 }
