@@ -18,7 +18,7 @@ public class QuotationProductResource
     public decimal CostEstimatePercent { get; set; }
     public decimal TotalCostEstimate { get; set; }
     public decimal CostEstimateProfit { get; set; }
-    public string TotalProfit { get; set; }
+    public string TotalProfit { get; set; } = "";
     public decimal CostEstimateProfitPercent { get; set; }
     public decimal TotalCostEstimateProfit { get; set; }
 }
