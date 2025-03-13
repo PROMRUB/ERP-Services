@@ -35,6 +35,16 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
         _context.Add(entity);
     }
 
+    public IQueryable<QuotationProductEntity> GetQuotationProduct(Guid quotationId, Guid productId)
+    {
+        return _context.QuotationProduct.Where(x => x.ProductId == productId && x.QuotationId == quotationId);
+    }
+
+    public void UpdateProduct(QuotationProductEntity entity)
+    {
+        _context.QuotationProduct.Update(entity);
+    }
+
     public void Delete(QuotationEntity entity)
     {
         _context.Remove(entity);

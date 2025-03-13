@@ -24,5 +24,12 @@ public class QuotationProductEntity
     [Column("amount_before_vat")] public decimal AmountBeforeVat { get; set; }
     [Column("sum_of_discount")] public decimal SumOfDiscount { get; set; }
     [Column("real_price_msrp")] public decimal RealPriceMsrp { get; set; }
-
+    [Column("estimate_price")] public decimal EstimatePrice { get; set; }
+    [Column("latest_cost")]public decimal LatestCost { get; set; }
+    [Column("profit")]public decimal Profit { get; set; }
+    [Column("profit_percent")]public decimal ProfitPercent { get; set; }
+    [Column("cost_estimate")]public decimal CostEstimate { get; set; }
+    [Column("cost_estimate_percent")]public decimal CostEstimatePercent { get; set; }
+    [Column("cost_estimate_profit")]public decimal CostEstimateProfit { get; set; }
+    [Column("cost_estimate_profit_percent")]public decimal CostEstimateProfitPercent { get; set; }
 }
