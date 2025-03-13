@@ -131,7 +131,7 @@ namespace ERP.Services.API.Services.Condition
                                 ConditionId = Guid.NewGuid(),
                                 OrgId = organization.OrgId,
                                 BusinessId = businessId,
-                                ConditionDescription = worksheet.Cells[row, 1].Text,
+                                ConditionDescription = worksheet.Cells[row, 1].GetValue<string>(),
                                 OrderBy = Int32.Parse(worksheet.Cells[row, 2].Text),
                                 ConditionStatus = RecordStatus.Active.ToString()
                             });
