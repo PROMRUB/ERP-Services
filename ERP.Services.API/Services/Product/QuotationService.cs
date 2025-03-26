@@ -708,7 +708,6 @@ public class QuotationService : IQuotationService
         product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht) ? wht : 0m;
         //product.CostEstimateProfit = (decimal)(estimateCost - cost);
         //product.CostEstimateProfitPercent =  (decimal)(((estimateCost - cost)/cost)* 100);
-
         _quotationRepository.UpdateProduct(product);
 
         await _quotationRepository.Context().SaveChangesAsync();
