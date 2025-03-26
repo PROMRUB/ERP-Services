@@ -138,7 +138,7 @@ public class QuotationService : IQuotationService
                 IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount,
                 AdministrativeCosts = product.AdministrativeCosts,
                 ImportDuty = product.ImportDuty,
-                WHT = product.WHT;
+                WHT = product.WHT
             };
 
             if (product.Amount != 0)
