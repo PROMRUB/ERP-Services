@@ -33,11 +33,16 @@ namespace ERP.Services.API.Controllers.v1
         public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, UpdateProductQuotationDetail Data);
 
         public record UpdateProductQuotationDetail(
-            string? AdministrativeCosts,
+            string? Currency,
+            string? BuyUnitEstimate,
+            string? Wht,
+            string? ExchangeRate,
+            string? Incoterm,
             string? ImportDuty,
-            string? Wht
+            string? CostsEstimate,
+            string? AdministrativeCosts,
+            string? OfferPriceLatest
             );
-
         private readonly IQuotationService _service = service;
 
         [HttpGet]

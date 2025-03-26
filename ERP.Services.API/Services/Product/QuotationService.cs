@@ -124,11 +124,12 @@ public class QuotationService : IQuotationService
                 ProductId = product.ProductId,
                 Quantity = product.Quantity,
                 Discount = Convert.ToInt32(product.Discount),
-                // LatestCost = product.LatestCost.ToString(),
-                // TotalLatestCost = (product.LatestCost * product.Quantity).ToString(),
-                // Profit = product.Profit.ToString(),
-                // ProfitPercent = product.ProfitPercent.ToString(),
-                // TotalProfit = (product.Profit * product.Quantity).ToString(),
+                Currency = product.Currency,
+                BuyUnitEstimate = product.PurchasingPrice,
+                ExchangeRate = product.Exchange,
+                Incoterm = product.Incoterm,
+                CostsEstimate = product.CostEstimate,
+                OfferPriceLatest = product.LatestCost,
                 CostEstimate = product.CostEstimate,
                 CostEstimatePercent = product.CostEstimatePercent,
                 TotalCostEstimate = (product.CostEstimate * product.Quantity),
@@ -543,7 +544,12 @@ public class QuotationService : IQuotationService
         var product = await _quotationRepository.GetQuotationProduct(quotationId,productId)
             .FirstOrDefaultAsync(x => x.QuotationId == quotationId && x.ProductId == productId);
         var res =  new PurchaseDetail();
-        res.OfferPriceLatest = product.Amount.ToString();
+        res.Currency = product.Currency;
+        res.BuyUnitEstimate = product.PurchasingPrice.ToString("0.00", CultureInfo.InvariantCulture);
+        res.ExchangeRate = product.Exchange.ToString("0.00", CultureInfo.InvariantCulture);
+        res.Incoterm = product.Incoterm;
+        res.CostsEstimate = product.CostEstimate.ToString("0.00", CultureInfo.InvariantCulture);
+        res.OfferPriceLatest = product.LatestCost.ToString();
         res.ProductId = product.ProductId;
         res.AdministrativeCosts = product.AdministrativeCosts.ToString("0.00", CultureInfo.InvariantCulture);
         res.ImportDuty = product.ImportDuty.ToString("0.00", CultureInfo.InvariantCulture);
@@ -700,17 +706,19 @@ public class QuotationService : IQuotationService
         {
             throw new Exception("Product not found");
         }
-      
-        //product.Amount = (float)estimateCost;
-        product.LatestCost = (decimal)product?.Amount;
+
+        product.Currency = request.Data.Currency;
+        product.Amount = float.TryParse(request.Data.OfferPriceLatest, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
+        product.LatestCost = decimal.TryParse(request.Data.OfferPriceLatest, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
         product.Profit = 0;
         product.ProfitPercent = 0;
-        //product.CostEstimate = (decimal)cost;
+        product.Exchange = decimal.TryParse(request.Data.ExchangeRate, NumberStyles.Any, CultureInfo.InvariantCulture, out var exchange) ? exchange : 0m;
+        product.Incoterm = request.Data.Incoterm;
+        product.CostEstimate = decimal.TryParse(request.Data.CostsEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var costEstimate) ? costEstimate : 0m;
         product.AdministrativeCosts = decimal.TryParse(request.Data.AdministrativeCosts, NumberStyles.Any, CultureInfo.InvariantCulture, out var administrativeCosts) ? administrativeCosts : 0m;
         product.ImportDuty = decimal.TryParse(request.Data.ImportDuty, NumberStyles.Any, CultureInfo.InvariantCulture, out var importDuty) ? importDuty : 0m;
         product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht) ? wht : 0m;
-        //product.CostEstimateProfit = (decimal)(estimateCost - cost);
-        //product.CostEstimateProfitPercent =  (decimal)(((estimateCost - cost)/cost)* 100);
+
         _quotationRepository.UpdateProduct(product);
 
         await _quotationRepository.Context().SaveChangesAsync();

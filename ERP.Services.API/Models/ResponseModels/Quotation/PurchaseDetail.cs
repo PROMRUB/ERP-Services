@@ -11,6 +11,7 @@ public class PurchaseDetail
     public int BuyQuantity { get; set; }
     public int SellQuantity { get; set; }
 
+    public string Currency { get; set; } = "";
     public string CurrencyInHand { get; set; } = "";
     public string CurrencyLatest { get; set; } = "N/A";
     public string CurrencyEstimate { get; set; } = "";
@@ -29,6 +30,7 @@ public class PurchaseDetail
     public string AmountLatest { get; set; } = "N/A";
     public string AmountEstimate { get; set; } = "N/A";
 
+    public string ExchangeRate { get; set; } = "";
     public string ExchangeRateInHand { get; set; } = "";
     public string ExchangeRateLatest { get; set; } = "N/A";
     public string ExchangeRateEstimate { get; set; } = "N/A";
@@ -37,6 +39,7 @@ public class PurchaseDetail
     public string AmountThaiBahtLatest { get; set; } = "N/A";
     public string AmountThaiBahtEstimate { get; set; } = "N/A";
 
+    public string Incoterm { get; set; } = "";
     public string IncotermInHand { get; set; } = "";
     public string IncotermLatest { get; set; } = "N/A";
     public string IncotermEstimate { get; set; } = "N/A";
