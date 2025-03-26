@@ -19,6 +19,7 @@ public class PurchaseDetail
     public string BuyUnitLatest { get; set; } = "N/A";
     public string BuyUnitEstimate { get; set; } = "N/A";
 
+    public string WHT { get; set; } = "";
     public string WHTInHand { get; set; } = "";
     public string WHTLatest { get; set; } = "N/A";
     public string WHTEstimate { get; set; } = "N/A";
@@ -40,6 +41,9 @@ public class PurchaseDetail
     public string IncotermLatest { get; set; } = "N/A";
     public string IncotermEstimate { get; set; } = "N/A";
 
+    public string ImportDuty { get; set; } = "";
+
+    public string AdministrativeCosts { get; set; } = "";
     public string AdministrativeCostsInHand { get; set; } = "";
     public string AdministrativeCostsLatest { get; set; } = "N/A";
     public string AdministrativeCostsEstimate { get; set; } = "N/A";

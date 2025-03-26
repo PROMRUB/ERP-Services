@@ -542,7 +542,9 @@ public class QuotationService : IQuotationService
         var res =  new PurchaseDetail();
         res.OfferPriceLatest = product.Amount.ToString();
         res.ProductId = product.ProductId;
-        
+        res.AdministrativeCosts = product.AdministrativeCosts.ToString("0.00", CultureInfo.InvariantCulture);
+        res.ImportDuty = product.ImportDuty.ToString("0.00", CultureInfo.InvariantCulture);
+        res.WHT = product.WHT.ToString("0.00", CultureInfo.InvariantCulture);
         return res;
     }
 
