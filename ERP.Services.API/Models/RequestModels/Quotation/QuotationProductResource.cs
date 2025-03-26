@@ -21,4 +21,7 @@ public class QuotationProductResource
     public string TotalProfit { get; set; } = "";
     public decimal CostEstimateProfitPercent { get; set; }
     public decimal TotalCostEstimateProfit { get; set; }
+    public decimal AdministrativeCosts { get; set; }
+    public decimal ImportDuty { get; set; }
+    public decimal WHT { get; set; }
 }
