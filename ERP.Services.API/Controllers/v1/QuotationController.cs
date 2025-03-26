@@ -39,7 +39,7 @@ namespace ERP.Services.API.Controllers.v1
             string? ExchangeRate,
             string? Incoterm,
             string? ImportDuty,
-            string? CostsEstimate,
+            string? CostEstimate,
             string? AdministrativeCosts,
             string? OfferPriceLatest
             );
