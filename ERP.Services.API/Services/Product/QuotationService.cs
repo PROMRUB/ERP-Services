@@ -712,9 +712,10 @@ public class QuotationService : IQuotationService
         product.LatestCost = decimal.TryParse(request.Data.OfferPriceLatest, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
         product.Profit = 0;
         product.ProfitPercent = 0;
+        product.PurchasingPrice = decimal.TryParse(request.Data.BuyUnitEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var purchasingPrice) ? purchasingPrice : 0m;
         product.Exchange = decimal.TryParse(request.Data.ExchangeRate, NumberStyles.Any, CultureInfo.InvariantCulture, out var exchange) ? exchange : 0m;
         product.Incoterm = request.Data.Incoterm;
-        product.CostEstimate = decimal.TryParse(request.Data.CostsEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var costEstimate) ? costEstimate : 0m;
+        product.CostEstimate = decimal.TryParse(request.Data.CostEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var costEstimate) ? costEstimate : 0m;
         product.AdministrativeCosts = decimal.TryParse(request.Data.AdministrativeCosts, NumberStyles.Any, CultureInfo.InvariantCulture, out var administrativeCosts) ? administrativeCosts : 0m;
         product.ImportDuty = decimal.TryParse(request.Data.ImportDuty, NumberStyles.Any, CultureInfo.InvariantCulture, out var importDuty) ? importDuty : 0m;
         product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht) ? wht : 0m;
