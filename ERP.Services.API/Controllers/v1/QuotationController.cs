@@ -30,7 +30,13 @@ namespace ERP.Services.API.Controllers.v1
             int PageSize = 10,
             bool? IsGreaterThan = null);
 
-        public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, double EstimateCost,double Cost);
+        public record UpdateProductQuotationParameter(Guid QuotationId, Guid ProductId, UpdateProductQuotationDetail Data);
+
+        public record UpdateProductQuotationDetail(
+            string? AdministrativeCosts,
+            string? ImportDuty,
+            string? Wht
+            );
 
         private readonly IQuotationService _service = service;
 
@@ -73,8 +79,7 @@ namespace ERP.Services.API.Controllers.v1
         {
             try
             {
-                var result = await _service.UpdateCostEstimateQuotation(parammeter.QuotationId, parammeter.ProductId,
-                    parammeter.EstimateCost,parammeter.Cost);
+                var result = await _service.UpdateCostEstimateQuotation(parammeter.QuotationId, parammeter.ProductId, parammeter);
                 return Ok(ResponseHandler.Response("1000", null, result));
             }
             catch (Exception ex)
@@ -82,7 +87,6 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-
 
         [HttpGet("quotation_status")]
         [MapToApiVersion("1")]

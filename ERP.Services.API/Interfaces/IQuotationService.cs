@@ -3,6 +3,7 @@ using ERP.Services.API.Models.RequestModels.Quotation;
 using ERP.Services.API.Models.ResponseModels.PaymentAccount;
 using ERP.Services.API.Models.ResponseModels.Quotation;
 using ERP.Services.API.Utils;
+using static ERP.Services.API.Controllers.v1.QuotationController;
 
 namespace ERP.Services.API.Interfaces;
 
@@ -27,10 +28,7 @@ public interface IQuotationService
         string? status, int page, int pageSize, bool? isGreaterThan);
 
     public Task<TotalProductQuotation> GetTotalProductQuotation(Guid id);
-
-    public Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost,
-        double cost);
-
+    public Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request);
     public Task<QuotationResource> GetById(Guid id);
     public Task<QuotationResource> ApproveSalePrice(Guid id);
     public Task<QuotationResource> ApproveQuotation(Guid id);

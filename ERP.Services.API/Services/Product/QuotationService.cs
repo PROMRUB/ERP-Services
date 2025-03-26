@@ -11,6 +11,7 @@ using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
 using sib_api_v3_sdk.Api;
 using sib_api_v3_sdk.Model;
+using static ERP.Services.API.Controllers.v1.QuotationController;
 using Task = System.Threading.Tasks.Task;
 
 namespace ERP.Services.API.Services.Product;
@@ -686,7 +687,7 @@ public class QuotationService : IQuotationService
 
     }
 
-    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, double estimateCost,double cost)
+    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request)
     {
         var product = await  _quotationRepository.GetQuotationProduct(id,productId).FirstOrDefaultAsync();
 
@@ -695,15 +696,16 @@ public class QuotationService : IQuotationService
             throw new Exception("Product not found");
         }
       
-        product.Amount = (float)estimateCost;
+        //product.Amount = (float)estimateCost;
         product.LatestCost = (decimal)product?.Amount;
         product.Profit = 0;
         product.ProfitPercent = 0;
-        product.CostEstimate = (decimal)cost;
-        product.CostEstimateProfit = (decimal)(estimateCost - cost);
-        product.CostEstimateProfitPercent =  (decimal)(((estimateCost - cost)/cost)* 100);
-       
-        
+        //product.CostEstimate = (decimal)cost;
+        product.AdministrativeCosts = decimal.TryParse(request.Data.AdministrativeCosts, NumberStyles.Any, CultureInfo.InvariantCulture, out var administrativeCosts) ? administrativeCosts : 0m;
+        product.ImportDuty = decimal.TryParse(request.Data.ImportDuty, NumberStyles.Any, CultureInfo.InvariantCulture, out var importDuty) ? importDuty : 0m;
+        product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht) ? wht : 0m;
+        //product.CostEstimateProfit = (decimal)(estimateCost - cost);
+        //product.CostEstimateProfitPercent =  (decimal)(((estimateCost - cost)/cost)* 100);
         _quotationRepository.UpdateProduct(product);
 
         await _quotationRepository.Context().SaveChangesAsync();

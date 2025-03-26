@@ -32,4 +32,7 @@ public class QuotationProductEntity
     [Column("cost_estimate_percent")]public decimal CostEstimatePercent { get; set; }
     [Column("cost_estimate_profit")]public decimal CostEstimateProfit { get; set; }
     [Column("cost_estimate_profit_percent")]public decimal CostEstimateProfitPercent { get; set; }
+    [Column("administrative_costs")] public decimal AdministrativeCosts { get; set; }
+    [Column("import_duty")] public decimal ImportDuty { get; set; }
+    [Column("wht")] public decimal WHT { get; set; }
 }

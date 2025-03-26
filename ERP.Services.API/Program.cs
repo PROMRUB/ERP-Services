@@ -56,7 +56,6 @@ cfg["PostgreSQL:User"] = Environment.GetEnvironmentVariable("PostgreSQL_User")!;
 cfg["PostgreSQL:Password"] = Environment.GetEnvironmentVariable("PostgreSQL_Password")!;
 cfg["ERP_EMAIL"] = Environment.GetEnvironmentVariable("ERP_EMAIL")!;
 
- 
 Configuration.Default.ApiKey.Add("api-key",
     Environment.GetEnvironmentVariable("ERP_EMAIL"));
 
