@@ -126,12 +126,13 @@ namespace ERP.Services.API.Services.Condition
 
                         for (int row = 2; row <= worksheet.Dimension.Rows; row++)
                         {
+                            var conditionDescription = worksheet.Cells[row, 1].GetValue<string>();
                             items.Add(new ConditionEntity
                             {
                                 ConditionId = Guid.NewGuid(),
                                 OrgId = organization.OrgId,
                                 BusinessId = businessId,
-                                ConditionDescription = worksheet.Cells[row, 1].GetValue<string>(),
+                                ConditionDescription = conditionDescription,
                                 OrderBy = Int32.Parse(worksheet.Cells[row, 2].Text),
                                 ConditionStatus = RecordStatus.Active.ToString()
                             });
