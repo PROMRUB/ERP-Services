@@ -103,6 +103,36 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpGet("{quotationId:guid}/product/{productId:guid}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetTotalProductQuotation(Guid quotationId, Guid productId)
+        {
+            try
+            {
+                var result = await _service.GetProductPurchaseDetail(quotationId, productId);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        [HttpPost("update_product_quotation")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> UpdateProductQuotation([FromBody] UpdateProductQuotationParameter parammeter)
+        {
+            try
+            {
+                var result = await _service.UpdateCostEstimateQuotation(parammeter.QuotationId, parammeter.ProductId,
+                    parammeter.EstimateCost,parammeter.Cost);
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
 
         [HttpGet("quotation_status")]
         [MapToApiVersion("1")]

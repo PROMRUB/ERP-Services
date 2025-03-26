@@ -35,5 +35,4 @@ public class QuotationProductEntity
     [Column("administrative_costs")] public decimal AdministrativeCosts { get; set; }
     [Column("import_duty")] public decimal ImportDuty { get; set; }
     [Column("wht")] public decimal WHT { get; set; }
-
 }
