@@ -41,7 +41,7 @@ namespace ERP.Services.API.Controllers.v1
             string? ImportDuty,
             string? CostEstimate,
             string? AdministrativeCosts,
-            string? OfferPriceLatest
+            string? OfferPriceEstimate
             );
         private readonly IQuotationService _service = service;
 

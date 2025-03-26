@@ -708,8 +708,8 @@ public class QuotationService : IQuotationService
         }
 
         product.Currency = request.Data.Currency;
-        product.Amount = float.TryParse(request.Data.OfferPriceLatest, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
-        product.LatestCost = decimal.TryParse(request.Data.OfferPriceLatest, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
+        product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
+        product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
         product.Profit = 0;
         product.ProfitPercent = 0;
         product.PurchasingPrice = decimal.TryParse(request.Data.BuyUnitEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var purchasingPrice) ? purchasingPrice : 0m;
