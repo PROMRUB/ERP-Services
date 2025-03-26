@@ -135,7 +135,10 @@ public class QuotationService : IQuotationService
                 CostEstimateProfit = product.CostEstimateProfit,
                 CostEstimateProfitPercent = product.CostEstimateProfitPercent,
                 Order = product.Order,
-                IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount
+                IsApproved = (product.Quantity * selected.LwPrice ?? 0) > (decimal)product.Amount,
+                AdministrativeCosts = product.AdministrativeCosts,
+                ImportDuty = product.ImportDuty,
+                WHT = product.WHT;
             };
 
             if (product.Amount != 0)
