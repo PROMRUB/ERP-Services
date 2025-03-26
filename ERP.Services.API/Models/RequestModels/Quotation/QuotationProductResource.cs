@@ -24,4 +24,10 @@ public class QuotationProductResource
     public decimal AdministrativeCosts { get; set; }
     public decimal ImportDuty { get; set; }
     public decimal WHT { get; set; }
+    public string Currency { get; set; } = "";
+    public string Incoterm { get; set; } = "";
+    public decimal BuyUnitEstimate { get; set; }
+    public decimal ExchangeRate { get; set; }   
+    public decimal CostsEstimate { get; set; }
+    public decimal OfferPriceLatest { get; set; }
 }
