@@ -544,6 +544,7 @@ public class QuotationService : IQuotationService
         var product = await _quotationRepository.GetQuotationProduct(quotationId,productId)
             .FirstOrDefaultAsync(x => x.QuotationId == quotationId && x.ProductId == productId);
         var res =  new PurchaseDetail();
+        res.Amount = product.Amount;
         res.Currency = product.Currency;
         res.BuyUnitEstimate = product.PurchasingPrice.ToString("0.00", CultureInfo.InvariantCulture);
         res.ExchangeRate = product.Exchange.ToString("0.00", CultureInfo.InvariantCulture);
