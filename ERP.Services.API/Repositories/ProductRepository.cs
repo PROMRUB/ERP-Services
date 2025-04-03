@@ -22,6 +22,11 @@ namespace ERP.Services.API.Repositories
             return context.Products.Where(x => x.OrgId == orgId && x.BusinessId == businessId);
         }
 
+        public IQueryable<ProductEntity> GetProductByBusiness(Guid businessId)
+        {
+            return context.Products.Where(x => x.BusinessId == businessId);
+        }
+
         public IQueryable<ProductEntity> GetProductList(string keyword)
         {
             keyword = keyword.ToLower();
