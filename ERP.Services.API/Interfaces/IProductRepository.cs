@@ -6,6 +6,7 @@ namespace ERP.Services.API.Interfaces
     public interface IProductRepository
     {
         public IQueryable<ProductCategoryEntity> GetProductCategoryByBusiness(Guid orgId, Guid businessId);
+        public IQueryable<ProductEntity> GetProductByBusiness(Guid businessId);
         public IQueryable<ProductEntity> GetProductByBusiness(Guid orgId, Guid businessId);
         public IQueryable<ProductEntity> GetProductList(string keyword);
         public IQueryable<ProductEntity> GetProductByCustomId(Guid orgId, Guid businessId, string keyword);

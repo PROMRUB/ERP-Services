@@ -703,13 +703,14 @@ public class QuotationService : IQuotationService
     public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request)
     {
         var product = await  _quotationRepository.GetQuotationProduct(id,productId).FirstOrDefaultAsync();
-
+        var quotaion = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        var productItem = await _productRepository.GetProductByBusiness(quotaion!.BusinessId).FirstOrDefaultAsync(x => x.ProductId == productId);
         if (product == null)
         {
             throw new Exception("Product not found");
         }
 
-        product.Discount = (float)product.RealPriceMsrp - float.Parse(request.Data.OfferPriceEstimate);
+        product.Discount = (float)productItem.MSRP - float.Parse(request.Data.OfferPriceEstimate);
         product.Currency = request.Data.Currency;
         product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
         product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
