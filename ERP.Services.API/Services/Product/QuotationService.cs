@@ -658,6 +658,7 @@ public class QuotationService : IQuotationService
                 Products = null,
                 ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
                 EthSaleMonth = x.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
+                TotalOffering = (decimal)x.Products.Sum(y => y.Amount * y.Quantity),
                 Projects = null,
                 Price = x.RealPriceMsrp,
                 Vat = x.SumOfDiscount,
