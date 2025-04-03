@@ -710,7 +710,7 @@ public class QuotationService : IQuotationService
             throw new Exception("Product not found");
         }
 
-        product.Discount = ((float)productItem.MSRP - float.Parse(request.Data.OfferPriceEstimate)) / (float)productItem.MSRP * 100;
+        product.SumOfDiscount = ((decimal)productItem.MSRP - decimal.Parse(request.Data.OfferPriceEstimate));
         product.Currency = request.Data.Currency;
         product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
         product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
