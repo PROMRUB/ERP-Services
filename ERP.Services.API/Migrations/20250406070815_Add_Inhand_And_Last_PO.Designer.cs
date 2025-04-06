@@ -3,6 +3,7 @@ using System;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ERP.Services.API.Migrations
 {
     [DbContext(typeof(PromDbContext))]
-    partial class PromDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250406070815_Add_Inhand_And_Last_PO")]
+    partial class Add_Inhand_And_Last_PO
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -805,12 +808,12 @@ namespace ERP.Services.API.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("cost_last_po");
 
-                    b.Property<string>("CurrencyInhand")
-                        .HasColumnType("text")
+                    b.Property<decimal?>("CurrencyInhand")
+                        .HasColumnType("numeric")
                         .HasColumnName("currency_inhand");
 
-                    b.Property<string>("CurrencyLastPO")
-                        .HasColumnType("text")
+                    b.Property<decimal?>("CurrencyLastPO")
+                        .HasColumnType("numeric")
                         .HasColumnName("currency_last_po");
 
                     b.Property<decimal?>("LwPrice")

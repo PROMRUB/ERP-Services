@@ -17,6 +17,10 @@ namespace ERP.Services.API.Entities
         [Column("product_name")] public string? ProductName { get; set; }
         [Column("msrp")] public decimal? MSRP { get; set; }
         [Column("lw_price")] public decimal? LwPrice { get; set; }
+        [Column("currency_inhand")] public string? CurrencyInhand { get; set; }
+        [Column("cost_inhand")] public decimal? CostInhand { get; set; }
+        [Column("currency_last_po")] public string? CurrencyLastPO { get; set; }
+        [Column("cost_last_po")] public decimal? CostLastPO { get; set; }
         [Column("product_status")] public string? ProductStatus { get; set; }
     }
 }

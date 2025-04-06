@@ -290,6 +290,16 @@ namespace ERP.Services.API.Services.Product
                                 decimal lwPrice = 0;
                                 decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
 
+                                string currencyInhand = worksheet.Cells[row, 5]?.Text ?? string.Empty;
+
+                                decimal costInhand = 0;
+                                decimal.TryParse(worksheet.Cells[row, 6]?.Text, out costInhand);
+
+                                string currencyLastPO = worksheet.Cells[row, 7]?.Text ?? string.Empty;
+
+                                decimal costLastPO = 0;
+                                decimal.TryParse(worksheet.Cells[row, 8]?.Text, out costLastPO);
+
                                 var product = await productRepository.GetProductByCustomId((Guid)organization.OrgId!, businessId, customId).FirstOrDefaultAsync();
 
                                 if (product == null)
@@ -306,6 +316,10 @@ namespace ERP.Services.API.Services.Product
                                         ProductName = productName,
                                         MSRP = msrp,
                                         LwPrice = lwPrice,
+                                        CurrencyInhand = currencyInhand,
+                                        CostInhand = costInhand,
+                                        CurrencyLastPO = currencyLastPO,
+                                        CostLastPO = costLastPO,
                                         ProductStatus = RecordStatus.Active.ToString()
                                     };
 
