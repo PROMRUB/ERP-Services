@@ -1,7 +1,9 @@
 ﻿using ERP.Services.API.Entities;
 using ERP.Services.API.Interfaces;
+using ERP.Services.API.Models.Authentications;
 using ERP.Services.API.PromServiceDbContext;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ERP.Services.API.Repositories
 {
@@ -20,8 +22,24 @@ namespace ERP.Services.API.Repositories
 
         public void AddUserToBusiness(UserBusinessEntity user)
         {
-            context!.UserBusinesses!.Add(user);
-            context.SaveChanges();
+            var query = context!.UserBusinesses.ToList();
+            var currentUser = query.Where(x => x.UserId == user.UserId && x.BusinessId == user.UserBusinessId).FirstOrDefault(); 
+            if (currentUser != null)
+            {
+                if (currentUser.EmployeeRunning == 0)
+                {
+                    var maxEmployeeRunning = query.Max(x => x.EmployeeRunning);
+
+                    currentUser.EmployeeRunning = maxEmployeeRunning + 1;
+
+                    user.EmployeeRunning = maxEmployeeRunning + 1;
+                    user.EmployeeCode = user.EmployeeRunning.ToString("D4");
+                }
+
+                currentUser.Role = user!.Role;
+                context!.UserBusinesses!.Add(user);
+                context.SaveChanges();
+            }
         }
 
         public void RemoveUserToBusiness(UserBusinessEntity user)

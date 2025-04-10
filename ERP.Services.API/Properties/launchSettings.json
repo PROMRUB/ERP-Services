@@ -7,7 +7,12 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "IsDev": "true",
-        "Key": "SolutionKP"
+        "Key": "SolutionKP",
+        "PostgreSQL_Host": "localhost",
+        "PostgreSQL_Database": "erp",
+        "PostgreSQL_User": "postgres",
+        "PostgreSQL_Password": "Initial1!",
+        "ERP_EMAIL": "Test"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7279;http://localhost:5206"
