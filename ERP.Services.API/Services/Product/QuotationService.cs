@@ -543,6 +543,7 @@ public class QuotationService : IQuotationService
     {
         var product = await _quotationRepository.GetQuotationProduct(quotationId,productId)
             .FirstOrDefaultAsync(x => x.QuotationId == quotationId && x.ProductId == productId);
+        var productItem = await _productRepository.GetProductById(productId).FirstOrDefaultAsync();
         var res =  new PurchaseDetail();
         res.Amount = product.Amount;
         res.Currency = product.Currency;
@@ -555,6 +556,10 @@ public class QuotationService : IQuotationService
         res.AdministrativeCosts = product.AdministrativeCosts.ToString("0.00", CultureInfo.InvariantCulture);
         res.ImportDuty = product.ImportDuty.ToString("0.00", CultureInfo.InvariantCulture);
         res.WHT = product.WHT.ToString("0.00", CultureInfo.InvariantCulture);
+        res.CurrencyInHand = productItem.CurrencyInhand;
+        res.BuyUnitInHand = productItem.CostInhand.GetValueOrDefault().ToString("0.00", CultureInfo.InvariantCulture);
+        res.CurrencyLatest = productItem.CurrencyLastPO;
+        res.BuyUnitLatest = productItem.CostLastPO.GetValueOrDefault().ToString("0.00", CultureInfo.InvariantCulture);
         return res;
     }
 

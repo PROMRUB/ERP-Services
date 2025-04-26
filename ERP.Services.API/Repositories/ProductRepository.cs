@@ -42,6 +42,11 @@ namespace ERP.Services.API.Repositories
                 x.ProductCustomId.Equals(keyword));
         }
 
+        public IQueryable<ProductEntity> GetProductById(Guid productId)
+        {
+            return context.Products.Where(x => x.ProductId == productId);
+        }
+
         public IQueryable<ProductEntity> GetProductListQueryable()
         {
             return context.Products;
