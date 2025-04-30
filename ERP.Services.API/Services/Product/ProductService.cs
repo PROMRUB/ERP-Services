@@ -264,7 +264,8 @@ namespace ERP.Services.API.Services.Product
 
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
-            var items = new List<ProductEntity>();
+            var itemsToInsert = new List<ProductEntity>();
+            int updatedCount = 0;
 
             try
             {
@@ -276,77 +277,80 @@ namespace ERP.Services.API.Services.Product
                     using (var package = new ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets[0];
+                        int rowCount = worksheet.Dimension?.Rows ?? 0;
 
-                        for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                        for (int row = 2; row <= rowCount; row++)
                         {
                             string customId = worksheet.Cells[row, 1]?.Text.Trim() ?? string.Empty;
-                            if (!string.IsNullOrEmpty(customId))
+                            if (string.IsNullOrEmpty(customId))
+                                continue;
+
+                            string productName = worksheet.Cells[row, 2]?.Text.Trim() ?? string.Empty;
+
+                            decimal.TryParse(worksheet.Cells[row, 3]?.Text, out decimal msrp);
+                            decimal.TryParse(worksheet.Cells[row, 4]?.Text, out decimal lwPrice);
+                            string currencyInhand = worksheet.Cells[row, 5]?.Text.Trim() ?? string.Empty;
+                            decimal.TryParse(worksheet.Cells[row, 6]?.Text, out decimal costInhand);
+                            string currencyLastPO = worksheet.Cells[row, 7]?.Text.Trim() ?? string.Empty;
+                            decimal.TryParse(worksheet.Cells[row, 8]?.Text, out decimal costLastPO);
+
+                            var product = await productRepository
+                                .GetProductByCustomId((Guid)organization.OrgId!, businessId, customId)
+                                .FirstOrDefaultAsync();
+
+                            if (product == null)
                             {
-                                string productName = worksheet.Cells[row, 2]?.Text ?? string.Empty;
-
-                                decimal msrp = 0;
-                                decimal.TryParse(worksheet.Cells[row, 3]?.Text, out msrp);
-
-                                decimal lwPrice = 0;
-                                decimal.TryParse(worksheet.Cells[row, 4]?.Text, out lwPrice);
-
-                                string currencyInhand = worksheet.Cells[row, 5]?.Text ?? string.Empty;
-
-                                decimal costInhand = 0;
-                                decimal.TryParse(worksheet.Cells[row, 6]?.Text, out costInhand);
-
-                                string currencyLastPO = worksheet.Cells[row, 7]?.Text ?? string.Empty;
-
-                                decimal costLastPO = 0;
-                                decimal.TryParse(worksheet.Cells[row, 8]?.Text, out costLastPO);
-
-                                var product = await productRepository.GetProductByCustomId((Guid)organization.OrgId!, businessId, customId).FirstOrDefaultAsync();
-
-                                if (product == null)
+                                var newProduct = new ProductEntity
                                 {
+                                    ProductId = Guid.NewGuid(),
+                                    OrgId = organization.OrgId,
+                                    BusinessId = businessId,
+                                    ProductCatId = Guid.Empty,
+                                    ProductSubCatId = Guid.Empty,
+                                    ProductCustomId = customId,
+                                    ProductName = productName,
+                                    MSRP = msrp,
+                                    LwPrice = lwPrice,
+                                    CurrencyInhand = currencyInhand,
+                                    CostInhand = costInhand,
+                                    CurrencyLastPO = currencyLastPO,
+                                    CostLastPO = costLastPO,
+                                    ProductStatus = RecordStatus.Active.ToString()
+                                };
 
-                                    var newProduct = new ProductEntity
-                                    {
-                                        ProductId = Guid.NewGuid(),
-                                        OrgId = organization.OrgId,
-                                        BusinessId = businessId,
-                                        ProductCatId = Guid.Empty,
-                                        ProductSubCatId = Guid.Empty,
-                                        ProductCustomId = customId,
-                                        ProductName = productName,
-                                        MSRP = msrp,
-                                        LwPrice = lwPrice,
-                                        CurrencyInhand = currencyInhand,
-                                        CostInhand = costInhand,
-                                        CurrencyLastPO = currencyLastPO,
-                                        CostLastPO = costLastPO,
-                                        ProductStatus = RecordStatus.Active.ToString()
-                                    };
+                                itemsToInsert.Add(newProduct);
+                            }
+                            else
+                            {
+                                product.ProductName = productName;
+                                product.MSRP = msrp;
+                                product.LwPrice = lwPrice;
+                                product.CurrencyInhand = currencyInhand;
+                                product.CostInhand = costInhand;
+                                product.CurrencyLastPO = currencyLastPO;
+                                product.CostLastPO = costLastPO;
 
-                                    items.Add(newProduct);
-                                }
-                                else
-                                {
-                                    product.ProductName = productName;
-                                    product.MSRP = msrp;
-                                    product.LwPrice = lwPrice;
-                                    productRepository.UpdateProduct(product);
-                                }
+                                productRepository.UpdateProduct(product);
+                                updatedCount++;
                             }
                         }
                     }
                 }
-                if(items.Count > 0)
+
+                if (itemsToInsert.Count > 0)
                 {
-                    productRepository.AddProducts(items);
+                    productRepository.AddProducts(itemsToInsert);
                 }
+
                 productRepository.Commit();
+
+                Console.WriteLine($"Inserted: {itemsToInsert.Count}, Updated: {updatedCount}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }
-
         }
+
     }
 }
