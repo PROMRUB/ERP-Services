@@ -642,6 +642,8 @@ public class QuotationService : IQuotationService
         var beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
 
 
+
+
         var list = beforeMutate.Items.Select(x => new QuotationResponse
             {
                 QuotationId = x.QuotationId.Value,
@@ -670,8 +672,13 @@ public class QuotationService : IQuotationService
                 Amount = x.RealPriceMsrp - x.SumOfDiscount,
                 // AccountNo = x.PaymentId.Value,
                 Remark = x.Remark,
-                Profit = x.Profit,
-                IsSpecialPrice = x.IsSpecialPrice
+                Profit = x.Products.Sum(p => p.Amount * p.Quantity) == 0
+                    ? 0
+                    : (
+                        (x.Products.Sum(p => ((decimal)p.Amount - p.CostEstimate) * p.Quantity) * 100) /
+                        x.Products.Sum(p => (decimal)p.Amount * p.Quantity)
+                    ),
+            IsSpecialPrice = x.IsSpecialPrice
             })
             .ToList();
 
