@@ -18,14 +18,16 @@ namespace ERP.Services.API.Services.Product
         private readonly IMapper mapper;
         private readonly IProductRepository productRepository;
         private readonly IOrganizationRepository organizationRepository;
-
+        private readonly IQuotationService quotationService;
         public ProductService(IMapper mapper,
-            IProductRepository productRepository
-            , IOrganizationRepository organizationRepository)
+            IProductRepository productRepository,
+            IOrganizationRepository organizationRepository,
+            IQuotationService quotationService)
         {
             this.mapper = mapper;
             this.productRepository = productRepository;
             this.organizationRepository = organizationRepository;
+            this.quotationService = quotationService;
         }
 
         public async Task<List<ProductCategoryResponse>> GetProducCategorytListByBusiness(string orgId, Guid businessId)
@@ -265,6 +267,7 @@ namespace ERP.Services.API.Services.Product
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
             var itemsToInsert = new List<ProductEntity>();
+            var itemsToUpdate = new List<ProductEntity>();
             int updatedCount = 0;
 
             try
@@ -354,6 +357,7 @@ namespace ERP.Services.API.Services.Product
                                 product.AdministrativeCostEst = adminitrativeCostEst;
                                 product.CostEst = costEst;
                                 productRepository.UpdateProduct(product);
+                                itemsToUpdate.Add(product);
                                 updatedCount++;
                             }
                         }
@@ -367,7 +371,15 @@ namespace ERP.Services.API.Services.Product
 
                 productRepository.Commit();
 
+                foreach (var item in itemsToInsert)
+                {
+                    quotationService.ImportUpdate((Guid)item.ProductId);
+                }
                 
+                foreach (var item in itemsToUpdate)
+                {
+                    quotationService.ImportUpdate((Guid)item.ProductId);
+                }
                 
                 Console.WriteLine($"Inserted: {itemsToInsert.Count}, Updated: {updatedCount}");
             }
