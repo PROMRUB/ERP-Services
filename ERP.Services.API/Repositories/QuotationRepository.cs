@@ -13,8 +13,7 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
     {
         _context = context;
     }
-
-
+    
     public IQueryable<QuotationEntity> GetQuotationQuery()
     {
         return _context.Quotation
@@ -40,6 +39,11 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
         return _context.QuotationProduct.Where(x => x.ProductId == productId && x.QuotationId == quotationId);
     }
 
+    public IQueryable<QuotationProductEntity> GetQuotationProducts(Guid productId)
+    {
+        return _context.QuotationProduct.Where(x => x.ProductId == productId);
+    }
+    
     public void UpdateProduct(QuotationProductEntity entity)
     {
         _context.QuotationProduct.Update(entity);

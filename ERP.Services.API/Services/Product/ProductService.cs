@@ -293,7 +293,15 @@ namespace ERP.Services.API.Services.Product
                             decimal.TryParse(worksheet.Cells[row, 6]?.Text, out decimal costInhand);
                             string currencyLastPO = worksheet.Cells[row, 7]?.Text.Trim() ?? string.Empty;
                             decimal.TryParse(worksheet.Cells[row, 8]?.Text, out decimal costLastPO);
-
+                            string currencyEst = worksheet.Cells[row, 9]?.Text.Trim() ?? string.Empty;	 
+                            decimal.TryParse(worksheet.Cells[row, 10]?.Text.Trim(), out decimal buyunitEst);
+                            decimal.TryParse(worksheet.Cells[row, 11]?.Text.Trim(), out decimal whtEst);
+                            decimal.TryParse(worksheet.Cells[row, 12]?.Text.Trim(), out decimal exchangeRateEst);
+                            string incotermEst = worksheet.Cells[row, 13]?.Text.Trim() ?? string.Empty;
+                            decimal.TryParse(worksheet.Cells[row, 14]?.Text.Trim(), out decimal importDutyEst);
+                            decimal.TryParse(worksheet.Cells[row, 15]?.Text.Trim(), out decimal adminitrativeCostEst);
+                            decimal.TryParse(worksheet.Cells[row, 16]?.Text.Trim(), out decimal costEst);
+                            
                             var product = await productRepository
                                 .GetProductByCustomId((Guid)organization.OrgId!, businessId, customId)
                                 .FirstOrDefaultAsync();
@@ -315,7 +323,14 @@ namespace ERP.Services.API.Services.Product
                                     CostInhand = costInhand,
                                     CurrencyLastPO = currencyLastPO,
                                     CostLastPO = costLastPO,
-                                    
+                                    CurrencyEst = currencyEst,
+                                    BuyUnitEst = buyunitEst,
+                                    WHTEst = whtEst,
+                                    ExchangeRateEst = exchangeRateEst,
+                                    IncortermEst = incotermEst,
+                                    ImportDutyEst = importDutyEst,
+                                    AdministrativeCostEst = adminitrativeCostEst,
+                                    CostEst = costEst,
                                     ProductStatus = RecordStatus.Active.ToString()
                                 };
 
@@ -330,7 +345,14 @@ namespace ERP.Services.API.Services.Product
                                 product.CostInhand = costInhand;
                                 product.CurrencyLastPO = currencyLastPO;
                                 product.CostLastPO = costLastPO;
-
+                                product.CurrencyEst = currencyEst;
+                                product.BuyUnitEst = buyunitEst;
+                                product.WHTEst = whtEst;   
+                                product.ExchangeRateEst = exchangeRateEst;
+                                product.IncortermEst = incotermEst;
+                                product.ImportDutyEst = importDutyEst;
+                                product.AdministrativeCostEst = adminitrativeCostEst;
+                                product.CostEst = costEst;
                                 productRepository.UpdateProduct(product);
                                 updatedCount++;
                             }
@@ -345,6 +367,8 @@ namespace ERP.Services.API.Services.Product
 
                 productRepository.Commit();
 
+                
+                
                 Console.WriteLine($"Inserted: {itemsToInsert.Count}, Updated: {updatedCount}");
             }
             catch (Exception ex)
