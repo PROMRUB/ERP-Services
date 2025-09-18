@@ -21,6 +21,15 @@ namespace ERP.Services.API.Entities
         [Column("cost_inhand")] public decimal? CostInhand { get; set; }
         [Column("currency_last_po")] public string? CurrencyLastPO { get; set; }
         [Column("cost_last_po")] public decimal? CostLastPO { get; set; }
+
+        [Column("currency_est")] public string? CurrencyEst { get; set; }
+        [Column("buyunit_est")] public decimal? BuyUnitEst { get; set; }
+        [Column("wht_po")] public decimal? WHTEst { get; set; }
+        [Column("exchangerate_est")] public decimal? ExchangeRateEst { get; set; }
+        [Column("incoterm_est")] public string? IncortermEst { get; set; }
+        [Column("import_duty_est")] public  decimal? ImportDutyEst { get; set; }
+        [Column("administrative_cost_est")] public decimal? AdministrativeCostEst { get; set; }
+        [Column("cost_est")] public decimal? CostEst { get; set; }
         [Column("product_status")] public string? ProductStatus { get; set; }
     }
 }

@@ -28,6 +28,7 @@ public interface IQuotationService
         string? status, int page, int pageSize, bool? isGreaterThan);
 
     public Task<TotalProductQuotation> GetTotalProductQuotation(Guid id);
+    public Task ImportUpdate(Guid productId);
     public Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request);
     public Task<QuotationResource> GetById(Guid id);
     public Task<QuotationResource> ApproveSalePrice(Guid id);

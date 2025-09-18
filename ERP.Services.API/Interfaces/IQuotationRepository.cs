@@ -8,6 +8,7 @@ public interface IQuotationRepository
     public IQueryable<QuotationEntity> GetQuotationQuery();
     public void Add(QuotationEntity entity);
     public IQueryable<QuotationProductEntity> GetQuotationProduct(Guid quotationId,Guid productId);
+    public IQueryable<QuotationProductEntity> GetQuotationProducts(Guid productId);
     public void UpdateProduct(QuotationProductEntity entity);
     public void Delete(QuotationEntity entity);
     public void AddProduct(List<QuotationProductEntity> entity);

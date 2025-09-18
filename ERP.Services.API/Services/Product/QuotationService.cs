@@ -37,6 +37,11 @@ public class QuotationService : IQuotationService
     // public string Email { get; set; } = "kkunayothin@gmail.com";
     // public string Email { get; set; } = "amornrat.t@securesolutionsasia.com";
 
+    private static readonly HashSet<string> ValidIncoterms = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"
+    };
+    
     public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
     {
         new EmailInformation()
@@ -712,6 +717,77 @@ public class QuotationService : IQuotationService
 
     }
 
+    public async Task ImportUpdate(Guid productId)
+    {
+        // 1) Load
+        var product = await _productRepository.GetProductById(productId).FirstOrDefaultAsync();
+        if (product is null) throw new InvalidOperationException($"Product {productId} not found.");
+
+        var quotations = await _quotationRepository.GetQuotationProducts(productId).ToListAsync();
+        if (quotations.Count == 0) return;
+
+        var errors = new List<string>();
+        decimal purchasingPrice = RequireNonNegative(product.BuyUnitEst, nameof(product.BuyUnitEst), errors);
+        decimal exchange        = RequireGreaterThan(product.ExchangeRateEst, 0m, nameof(product.ExchangeRateEst), errors);
+        string  incoterm        = RequireIncoterm(product.IncortermEst, nameof(product.IncortermEst), errors);
+        decimal costEstimate    = RequireNonNegative(product.CostEst, nameof(product.CostEst), errors);
+        decimal adminCostsPct   = RequirePercent(product.AdministrativeCostEst, nameof(product.AdministrativeCostEst), errors);
+        decimal importDutyPct   = RequirePercent(product.ImportDutyEst, nameof(product.ImportDutyEst), errors);
+        decimal whtPct          = RequirePercent(product.WHTEst, nameof(product.WHTEst), errors);
+
+        if (product.WHTEst >= 100m) errors.Add("WHTEst must be < 100.");
+
+        static decimal R(decimal v, int s) => Math.Round(v, s, MidpointRounding.AwayFromZero);
+
+        var value            = product.BuyUnitEst;                      // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
+        var amountEstimate   = value * 100m / (100m - product.WHTEst);  // gross-up
+        var whtEstimate      = amountEstimate - value;
+
+        var amountTHB        = amountEstimate * product.ExchangeRateEst;
+
+        var importDutyAmt    = amountTHB * (product.ImportDutyEst / 100m);
+        var adminCostsAmt    = amountTHB * (product.AdministrativeCostEst / 100m);
+
+        var costsEstimate    = amountTHB + importDutyAmt + adminCostsAmt;
+
+        // กำไรขั้นต่ำ 25% → lower price
+        const decimal minMargin = 25m;
+        var lowerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
+        var offerPriceEstimate  = lowerPriceEstimate;
+
+        // 4) Apply to each quotation with Amount==0
+        foreach (var quotation in quotations)
+        {
+            if (quotation.Amount != 0) continue;
+
+            // ส่วนลดจาก MSRP เทียบกับราคาเสนอ
+            if (product.MSRP is decimal msrp)
+                quotation.SumOfDiscount = (decimal)(msrp - offerPriceEstimate);
+            else
+                quotation.SumOfDiscount = 0m;
+
+            quotation.Currency          = product.CurrencyEst;
+            quotation.Amount            = (float)R((decimal)offerPriceEstimate, 2); // ถ้า schema เป็น float
+            quotation.LatestCost        = R((decimal)costsEstimate, 2);            // ต้นทุนล่าสุด = ต้นทุนรวม
+            quotation.Profit            = 0m;
+            quotation.ProfitPercent     = 0m;
+
+            // ฟิลด์ validate mapping
+            quotation.PurchasingPrice   = purchasingPrice;
+            quotation.Exchange          = exchange;
+            quotation.Incoterm          = incoterm;
+            quotation.CostEstimate      = costEstimate;
+            quotation.AdministrativeCosts = adminCostsPct;
+            quotation.ImportDuty        = importDutyPct;
+            quotation.WHT               = whtPct;
+
+            _quotationRepository.UpdateProduct(quotation);
+        }
+
+        // 5) Save once
+        await _quotationRepository.Context().SaveChangesAsync();
+    }
+        
     public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request)
     {
         var product = await  _quotationRepository.GetQuotationProduct(id,productId).FirstOrDefaultAsync();
@@ -1045,5 +1121,54 @@ public class QuotationService : IQuotationService
             Console.WriteLine(e.Message);
             throw;
         }
+    }
+    
+    private static decimal RequireNonNegative(decimal? value, string field, List<string> errors)
+    {
+        if (value is null)
+        {
+            errors.Add($"{field} is required.");
+            return 0m;
+        }
+        if (value < 0m)
+            errors.Add($"{field} must be >= 0.");
+        return value.Value;
+    }
+
+    private static decimal RequireGreaterThan(decimal? value, decimal minExclusive, string field, List<string> errors)
+    {
+        if (value is null)
+        {
+            errors.Add($"{field} is required.");
+            return 0m;
+        }
+        if (value <= minExclusive)
+            errors.Add($"{field} must be > {minExclusive.ToString(CultureInfo.InvariantCulture)}.");
+        return value.Value;
+    }
+
+    private static decimal RequirePercent(decimal? value, string field, List<string> errors)
+    {
+        if (value is null)
+        {
+            errors.Add($"{field} (percent) is required.");
+            return 0m;
+        }
+        if (value < 0m || value > 100m)
+            errors.Add($"{field} must be between 0 and 100 (percent).");
+        return value.Value;
+    }
+
+    private static string RequireIncoterm(string? value, string field, List<string> errors)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            errors.Add($"{field} is required (EXW/FOB/FCA/CFR/CIF/CPT/CIP/DAP/DPU/DDP).");
+            return string.Empty;
+        }
+        var normalized = value.Trim().ToUpperInvariant();
+        if (!ValidIncoterms.Contains(normalized))
+            errors.Add($"{field} '{value}' is not a valid Incoterm 2020.");
+        return normalized;
     }
 }
