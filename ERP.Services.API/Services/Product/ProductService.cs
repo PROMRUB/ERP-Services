@@ -315,6 +315,7 @@ namespace ERP.Services.API.Services.Product
                                     CostInhand = costInhand,
                                     CurrencyLastPO = currencyLastPO,
                                     CostLastPO = costLastPO,
+                                    
                                     ProductStatus = RecordStatus.Active.ToString()
                                 };
 
