@@ -794,9 +794,18 @@ public class QuotationService : IQuotationService
         Console.WriteLine($"Offerning Price : {offerPriceEstimate}");
         foreach (var quotation in quotations)
         {
-            Console.WriteLine($"Quotation Amount : {quotation.Amount}");
-            if (quotation.Amount > 0.1) continue;
+            var amountF = Convert.ToSingle(quotation.Amount);
+
+            Console.WriteLine($"Quotation Amount (float) : {amountF:R}"); // :R จะโชว์ค่าจริงแบบ round-trip
+
+            const float SENTINEL = 0.1f;
+            const float EPS      = 1e-6f; // tolerance
+
+            if (MathF.Abs(amountF - SENTINEL) > EPS)
+                continue;
+
             Console.WriteLine($"Quotation Id : {quotation.QuotationId}");
+            
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
             if (product.MSRP is decimal msrp && msrp > 0m)
                 quotation.SumOfDiscount = msrp - offerPriceEstimate;
