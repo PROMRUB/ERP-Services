@@ -784,12 +784,15 @@ public class QuotationService : IQuotationService
         const decimal minMargin = 25m;
         var lowerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
         var offerPriceEstimate  = lowerPriceEstimate;
-
-        // 4) Apply to each quotation with Amount==0
+        
+        Console.WriteLine($"{offerPriceEstimate}");
+        
         foreach (var quotation in quotations)
         {
             if (quotation.Amount != 0.1) continue;
-
+            
+            Console.WriteLine($"{quotation.Amount}");
+            
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ
             if (product.MSRP is decimal msrp)
                 quotation.SumOfDiscount = (decimal)(msrp - offerPriceEstimate);
