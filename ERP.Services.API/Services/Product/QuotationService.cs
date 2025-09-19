@@ -730,7 +730,6 @@ public class QuotationService : IQuotationService
         decimal purchasingPrice = RequireNonNegative(product.BuyUnitEst, nameof(product.BuyUnitEst), errors);
         decimal exchange        = RequireGreaterThan(product.ExchangeRateEst, 0m, nameof(product.ExchangeRateEst), errors);
         string  incoterm        = RequireIncoterm(product.IncortermEst, nameof(product.IncortermEst), errors);
-        decimal costEstimate    = RequireNonNegative(product.CostEst, nameof(product.CostEst), errors);
         decimal adminCostsPct   = RequirePercent(product.AdministrativeCostEst, nameof(product.AdministrativeCostEst), errors);
         decimal importDutyPct   = RequirePercent(product.ImportDutyEst, nameof(product.ImportDutyEst), errors);
         decimal whtPct          = RequirePercent(product.WHTEst, nameof(product.WHTEst), errors);
@@ -776,7 +775,7 @@ public class QuotationService : IQuotationService
             quotation.PurchasingPrice   = purchasingPrice;
             quotation.Exchange          = exchange;
             quotation.Incoterm          = incoterm;
-            quotation.CostEstimate      = costEstimate;
+            quotation.CostEstimate      = (decimal) costsEstimate;
             quotation.AdministrativeCosts = adminCostsPct;
             quotation.ImportDuty        = importDutyPct;
             quotation.WHT               = whtPct;

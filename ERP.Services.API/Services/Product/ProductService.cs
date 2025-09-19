@@ -333,7 +333,6 @@ namespace ERP.Services.API.Services.Product
                                     IncortermEst = incotermEst,
                                     ImportDutyEst = importDutyEst,
                                     AdministrativeCostEst = adminitrativeCostEst,
-                                    CostEst = costEst,
                                     ProductStatus = RecordStatus.Active.ToString()
                                 };
 
@@ -355,7 +354,6 @@ namespace ERP.Services.API.Services.Product
                                 product.IncortermEst = incotermEst;
                                 product.ImportDutyEst = importDutyEst;
                                 product.AdministrativeCostEst = adminitrativeCostEst;
-                                product.CostEst = costEst;
                                 productRepository.UpdateProduct(product);
                                 itemsToUpdate.Add(product);
                                 updatedCount++;
