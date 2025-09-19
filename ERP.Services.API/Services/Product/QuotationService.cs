@@ -791,10 +791,11 @@ public class QuotationService : IQuotationService
         var lowerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
         var offerPriceEstimate  = lowerPriceEstimate;
 
+        Console.WriteLine($"Offerning Price : {offerPriceEstimate}");
         foreach (var quotation in quotations)
         {
             if (quotation.Amount > 0.1) continue;
-
+            Console.WriteLine($"Quotation Id : {quotation.QuotationId}");
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
             if (product.MSRP is decimal msrp && msrp > 0m)
                 quotation.SumOfDiscount = msrp - offerPriceEstimate;
