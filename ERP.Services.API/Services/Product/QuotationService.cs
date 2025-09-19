@@ -218,7 +218,6 @@ public class QuotationService : IQuotationService
             Discount = x.Discount,
             Quantity = x.Quantity,
             Order = x.Order,
-            
         }).ToList();
 
         return products;
@@ -367,6 +366,7 @@ public class QuotationService : IQuotationService
             item.ImportDuty = productItem.ImportDuty;
             item.AdministrativeCosts = productItem.AdministrativeCosts;
             item.CostEstimate = productItem.CostEstimate;
+            item.Order = productItem.Order;
         }
         
         quotation.Products = result.QuotationProductEntities;
