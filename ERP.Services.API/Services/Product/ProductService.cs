@@ -376,17 +376,16 @@ namespace ERP.Services.API.Services.Product
                 if (itemsToInsert.Count > 0)
                     productRepository.AddProducts(itemsToInsert);
 
-                productRepository.Commit(); // ให้ทุก product เซฟให้เสร็จก่อน
+                productRepository.Commit();
 
                 // ✅ รอให้ทุก ImportUpdate เสร็จใน request scope เดียวกัน (กัน DbContext ถูก Dispose)
                 var updateTasks = new List<Task>(itemsToInsert.Count + itemsToUpdate.Count);
                 foreach (var item in itemsToInsert)
-                    updateTasks.Add(quotationService.ImportUpdate((Guid)item.ProductId));
+                    await quotationService.ImportUpdate((Guid)item.ProductId);
+
                 foreach (var item in itemsToUpdate)
-                    updateTasks.Add(quotationService.ImportUpdate((Guid)item.ProductId));
-
-                await Task.WhenAll(updateTasks);
-
+                    await quotationService.ImportUpdate((Guid)item.ProductId);
+                
                 Console.WriteLine($"Inserted: {itemsToInsert.Count}, Updated: {updatedCount}");
             }
             catch

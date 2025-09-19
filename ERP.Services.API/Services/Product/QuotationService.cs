@@ -794,14 +794,9 @@ public class QuotationService : IQuotationService
         Console.WriteLine($"Offerning Price : {offerPriceEstimate}");
         foreach (var quotation in quotations)
         {
-            var amountF = Convert.ToSingle(quotation.Amount);
+            Console.WriteLine($"Quotation Estimate (Decimal) : {quotation.CostEstimate}"); // :R จะโชว์ค่าจริงแบบ round-trip
 
-            Console.WriteLine($"Quotation Amount (float) : {amountF:R}"); // :R จะโชว์ค่าจริงแบบ round-trip
-
-            const float SENTINEL = 0.1f;
-            const float EPS      = 1e-6f; // tolerance
-
-            if (MathF.Abs(amountF - SENTINEL) > EPS)
+            if (quotation.CostEstimate > 0)
                 continue;
 
             Console.WriteLine($"Quotation Id : {quotation.QuotationId}");
