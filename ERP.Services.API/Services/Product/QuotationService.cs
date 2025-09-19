@@ -794,6 +794,7 @@ public class QuotationService : IQuotationService
         Console.WriteLine($"Offerning Price : {offerPriceEstimate}");
         foreach (var quotation in quotations)
         {
+            Console.WriteLine($"Quotation Amount : {quotation.Amount}");
             if (quotation.Amount > 0.1) continue;
             Console.WriteLine($"Quotation Id : {quotation.QuotationId}");
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
