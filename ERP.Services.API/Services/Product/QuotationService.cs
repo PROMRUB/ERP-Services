@@ -218,7 +218,14 @@ public class QuotationService : IQuotationService
             Discount = x.Discount,
             Quantity = x.Quantity,
             Order = x.Order,
-            
+            Currency = x.Currency,
+            PurchasingPrice = x.BuyUnitEstimate,
+            WHT = x.WHT,
+            Exchange = x.ExchangeRate,
+            Incoterm = x.Incoterm,
+            ImportDuty = x.ImportDuty,
+            AdministrativeCosts = x.AdministrativeCosts,
+            CostEstimate = x.CostEstimate
         }).ToList();
 
         return products;
@@ -352,22 +359,6 @@ public class QuotationService : IQuotationService
         quotation.Projects = MutateResourceProject(resource.Projects);
 
         var result = await this.Calculate(resource.Products);
-
-        foreach (var item in result.QuotationProductEntities)
-        {
-            var productItem = quotation.Products.FirstOrDefault(x => x.ProductId == item.ProductId);
-            
-            Console.WriteLine(productItem!.ToString());
-            
-            item.Currency = productItem.Currency;
-            item.PurchasingPrice = productItem.PurchasingPrice;
-            item.WHT = productItem.WHT;
-            item.Exchange = productItem.Exchange;
-            item.Incoterm = productItem.Incoterm;
-            item.ImportDuty = productItem.ImportDuty;
-            item.AdministrativeCosts = productItem.AdministrativeCosts;
-            item.CostEstimate = productItem.CostEstimate;
-        }
         
         quotation.Products = result.QuotationProductEntities;
 
