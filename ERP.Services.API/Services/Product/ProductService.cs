@@ -264,7 +264,7 @@ namespace ERP.Services.API.Services.Product
             organizationRepository.SetCustomOrgId(orgId);
             var organization = await organizationRepository.GetOrganization();
 
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
             var itemsToInsert = new List<ProductEntity>();
             var itemsToUpdate = new List<ProductEntity>();
@@ -272,12 +272,12 @@ namespace ERP.Services.API.Services.Product
 
             try
             {
-                using (var stream = new MemoryStream())
+                await using (var stream = new MemoryStream())
                 {
-                    request.CopyTo(stream);
+                    await request.CopyToAsync(stream);
                     stream.Position = 0;
 
-                    using (var package = new ExcelPackage(stream))
+                    using (var package = new OfficeOpenXml.ExcelPackage(stream))
                     {
                         var worksheet = package.Workbook.Worksheets[0];
                         int rowCount = worksheet.Dimension?.Rows ?? 0;
@@ -285,26 +285,36 @@ namespace ERP.Services.API.Services.Product
                         for (int row = 2; row <= rowCount; row++)
                         {
                             string customId = worksheet.Cells[row, 1]?.Text.Trim() ?? string.Empty;
-                            if (string.IsNullOrEmpty(customId))
-                                continue;
+                            if (string.IsNullOrEmpty(customId)) continue;
 
                             string productName = worksheet.Cells[row, 2]?.Text.Trim() ?? string.Empty;
 
-                            decimal.TryParse(worksheet.Cells[row, 3]?.Text, out decimal msrp);
-                            decimal.TryParse(worksheet.Cells[row, 4]?.Text, out decimal lwPrice);
-                            string currencyInhand = worksheet.Cells[row, 5]?.Text.Trim() ?? string.Empty;
-                            decimal.TryParse(worksheet.Cells[row, 6]?.Text, out decimal costInhand);
-                            string currencyLastPO = worksheet.Cells[row, 7]?.Text.Trim() ?? string.Empty;
-                            decimal.TryParse(worksheet.Cells[row, 8]?.Text, out decimal costLastPO);
-                            string currencyEst = worksheet.Cells[row, 9]?.Text.Trim() ?? string.Empty;	 
-                            decimal.TryParse(worksheet.Cells[row, 10]?.Text.Trim(), out decimal buyunitEst);
-                            decimal.TryParse(worksheet.Cells[row, 11]?.Text.Trim(), out decimal whtEst);
-                            decimal.TryParse(worksheet.Cells[row, 12]?.Text.Trim(), out decimal exchangeRateEst);
-                            string incotermEst = worksheet.Cells[row, 13]?.Text.Trim() ?? string.Empty;
-                            decimal.TryParse(worksheet.Cells[row, 14]?.Text.Trim(), out decimal importDutyEst);
-                            decimal.TryParse(worksheet.Cells[row, 15]?.Text.Trim(), out decimal adminitrativeCostEst);
-                            decimal.TryParse(worksheet.Cells[row, 16]?.Text.Trim(), out decimal costEst);
-                            
+                            // parse แบบ culture-invariant กันจุด/จุลภาค
+                            string s3  = worksheet.Cells[row, 3]?.Text;
+                            string s4  = worksheet.Cells[row, 4]?.Text;
+                            string s6  = worksheet.Cells[row, 6]?.Text;
+                            string s8  = worksheet.Cells[row, 8]?.Text;
+                            string s10 = worksheet.Cells[row,10]?.Text;
+                            string s11 = worksheet.Cells[row,11]?.Text;
+                            string s12 = worksheet.Cells[row,12]?.Text;
+                            string s14 = worksheet.Cells[row,14]?.Text;
+                            string s15 = worksheet.Cells[row,15]?.Text;
+
+                            decimal.TryParse(s3,  System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal msrp);
+                            decimal.TryParse(s4,  System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal lwPrice);
+                            decimal.TryParse(s6,  System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal costInhand);
+                            decimal.TryParse(s8,  System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal costLastPO);
+                            decimal.TryParse(s10, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal buyunitEst);
+                            decimal.TryParse(s11, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal whtEst);
+                            decimal.TryParse(s12, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal exchangeRateEst);
+                            decimal.TryParse(s14, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal importDutyEst);
+                            decimal.TryParse(s15, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal administrativeCostEst);
+
+                            string currencyInhand = worksheet.Cells[row, 5]?.Text.Trim()  ?? string.Empty;
+                            string currencyLastPO = worksheet.Cells[row, 7]?.Text.Trim()  ?? string.Empty;
+                            string currencyEst    = worksheet.Cells[row, 9]?.Text.Trim()  ?? string.Empty;
+                            string incotermEst    = worksheet.Cells[row,13]?.Text.Trim()  ?? string.Empty;
+
                             var product = await productRepository
                                 .GetProductByCustomId((Guid)organization.OrgId!, businessId, customId)
                                 .FirstOrDefaultAsync();
@@ -313,47 +323,48 @@ namespace ERP.Services.API.Services.Product
                             {
                                 var newProduct = new ProductEntity
                                 {
-                                    ProductId = Guid.NewGuid(),
-                                    OrgId = organization.OrgId,
-                                    BusinessId = businessId,
-                                    ProductCatId = Guid.Empty,
-                                    ProductSubCatId = Guid.Empty,
-                                    ProductCustomId = customId,
-                                    ProductName = productName,
-                                    MSRP = msrp,
-                                    LwPrice = lwPrice,
-                                    CurrencyInhand = currencyInhand,
-                                    CostInhand = costInhand,
-                                    CurrencyLastPO = currencyLastPO,
-                                    CostLastPO = costLastPO,
-                                    CurrencyEst = currencyEst,
-                                    BuyUnitEst = buyunitEst,
-                                    WHTEst = whtEst,
-                                    ExchangeRateEst = exchangeRateEst,
-                                    IncortermEst = incotermEst,
-                                    ImportDutyEst = importDutyEst,
-                                    AdministrativeCostEst = adminitrativeCostEst,
-                                    ProductStatus = RecordStatus.Active.ToString()
+                                    ProductId              = Guid.NewGuid(),
+                                    OrgId                  = organization.OrgId,
+                                    BusinessId             = businessId,
+                                    ProductCatId           = Guid.Empty,
+                                    ProductSubCatId        = Guid.Empty,
+                                    ProductCustomId        = customId,
+                                    ProductName            = productName,
+                                    MSRP                   = msrp,
+                                    LwPrice                = lwPrice,
+                                    CurrencyInhand         = currencyInhand,
+                                    CostInhand             = costInhand,
+                                    CurrencyLastPO         = currencyLastPO,
+                                    CostLastPO             = costLastPO,
+                                    CurrencyEst            = currencyEst,
+                                    BuyUnitEst             = buyunitEst,
+                                    WHTEst                 = whtEst,
+                                    ExchangeRateEst        = exchangeRateEst,
+                                    IncortermEst           = incotermEst,
+                                    ImportDutyEst          = importDutyEst,
+                                    AdministrativeCostEst  = administrativeCostEst,
+                                    ProductStatus          = RecordStatus.Active.ToString()
                                 };
 
                                 itemsToInsert.Add(newProduct);
                             }
                             else
                             {
-                                product.ProductName = productName;
-                                product.MSRP = msrp;
-                                product.LwPrice = lwPrice;
-                                product.CurrencyInhand = currencyInhand;
-                                product.CostInhand = costInhand;
-                                product.CurrencyLastPO = currencyLastPO;
-                                product.CostLastPO = costLastPO;
-                                product.CurrencyEst = currencyEst;
-                                product.BuyUnitEst = buyunitEst;
-                                product.WHTEst = whtEst;   
-                                product.ExchangeRateEst = exchangeRateEst;
-                                product.IncortermEst = incotermEst;
-                                product.ImportDutyEst = importDutyEst;
-                                product.AdministrativeCostEst = adminitrativeCostEst;
+                                product.ProductName            = productName;
+                                product.MSRP                   = msrp;
+                                product.LwPrice                = lwPrice;
+                                product.CurrencyInhand         = currencyInhand;
+                                product.CostInhand             = costInhand;
+                                product.CurrencyLastPO         = currencyLastPO;
+                                product.CostLastPO             = costLastPO;
+                                product.CurrencyEst            = currencyEst;
+                                product.BuyUnitEst             = buyunitEst;
+                                product.WHTEst                 = whtEst;
+                                product.ExchangeRateEst        = exchangeRateEst;
+                                product.IncortermEst           = incotermEst;
+                                product.ImportDutyEst          = importDutyEst;
+                                product.AdministrativeCostEst  = administrativeCostEst;
+
                                 productRepository.UpdateProduct(product);
                                 itemsToUpdate.Add(product);
                                 updatedCount++;
@@ -363,29 +374,26 @@ namespace ERP.Services.API.Services.Product
                 }
 
                 if (itemsToInsert.Count > 0)
-                {
                     productRepository.AddProducts(itemsToInsert);
-                }
 
-                productRepository.Commit();
+                productRepository.Commit(); // ให้ทุก product เซฟให้เสร็จก่อน
 
+                // ✅ รอให้ทุก ImportUpdate เสร็จใน request scope เดียวกัน (กัน DbContext ถูก Dispose)
+                var updateTasks = new List<Task>(itemsToInsert.Count + itemsToUpdate.Count);
                 foreach (var item in itemsToInsert)
-                {
-                    quotationService.ImportUpdate((Guid)item.ProductId);
-                }
-                
+                    updateTasks.Add(quotationService.ImportUpdate((Guid)item.ProductId));
                 foreach (var item in itemsToUpdate)
-                {
-                    quotationService.ImportUpdate((Guid)item.ProductId);
-                }
-                
+                    updateTasks.Add(quotationService.ImportUpdate((Guid)item.ProductId));
+
+                await Task.WhenAll(updateTasks);
+
                 Console.WriteLine($"Inserted: {itemsToInsert.Count}, Updated: {updatedCount}");
             }
-            catch (Exception ex)
+            catch
             {
+                // log แล้วค่อยโยนต่อถ้าต้องการ
                 throw;
             }
         }
-
     }
 }
