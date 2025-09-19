@@ -39,7 +39,7 @@ public class QuotationService : IQuotationService
 
     private static readonly HashSet<string> ValidIncoterms = new(StringComparer.OrdinalIgnoreCase)
     {
-        "EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"
+       "N/A", "EXWORK", "FOB", "CIF"
     };
     
     public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
