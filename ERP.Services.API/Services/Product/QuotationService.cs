@@ -793,8 +793,7 @@ public class QuotationService : IQuotationService
 
         foreach (var quotation in quotations)
         {
-            // อัปเดตเฉพาะที่ยังไม่ถูกตั้งราคา (0 หรือเกือบศูนย์)
-            if (Math.Abs(quotation.Amount) > 0.000001f) continue;
+            if (quotation.Amount > 0.1) continue;
 
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
             if (product.MSRP is decimal msrp && msrp > 0m)
