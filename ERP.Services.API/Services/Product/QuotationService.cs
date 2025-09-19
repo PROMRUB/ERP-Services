@@ -353,6 +353,19 @@ public class QuotationService : IQuotationService
 
         var result = await this.Calculate(resource.Products);
 
+        foreach (var item in result.QuotationProductEntities)
+        {
+            var productItem = quotation.Products.FirstOrDefault(x => x.ProductId == item.ProductId);
+            item.Currency = productItem.Currency;
+            item.PurchasingPrice = productItem.PurchasingPrice;
+            item.WHT = productItem.WHT;
+            item.Exchange = productItem.Exchange;
+            item.Incoterm = productItem.Incoterm;
+            item.ImportDuty = productItem.ImportDuty;
+            item.AdministrativeCosts = productItem.AdministrativeCosts;
+            item.CostEstimate = productItem.CostEstimate;
+        }
+        
         quotation.Products = result.QuotationProductEntities;
 
         quotation.Price = result.Price;
@@ -465,39 +478,12 @@ public class QuotationService : IQuotationService
 
         foreach (var product in products)
         {
-            static decimal R(decimal v, int s) => Math.Round(v, s, MidpointRounding.AwayFromZero);
-
             var selected = await _productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
-
+            
             if (selected == null)
                 throw new KeyNotFoundException("product not exists");
 
-            if (product.Amount == 0.1)
-            {
-                // ===== คำนวณ offerPriceEstimate จาก selected =====
-                var buyUnit = (decimal)selected.BuyUnitEst;          // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
-                var whtPct  = (decimal)selected.WHTEst;              // %
-                var fx      = (decimal)selected.ExchangeRateEst;     // THB per unit
-                var impPct  = (decimal)selected.ImportDutyEst;       // %
-                var admPct  = (decimal)selected.AdministrativeCostEst; // %
-
-                if (whtPct >= 100m) throw new InvalidOperationException("WHTEst must be < 100.");
-
-                var amountBeforeWht = buyUnit * 100m / (100m - whtPct); // gross-up เป็นก่อนหัก WHT
-                var baseTHB         = amountBeforeWht * fx;
-                var importAmt       = baseTHB * (impPct / 100m);
-                var adminAmt        = baseTHB * (admPct / 100m);
-                var costsEstimate   = baseTHB + importAmt + adminAmt;
-
-                const decimal minMargin = 25m;
-                var offerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
-
-                // ===== ตั้งค่าให้ product (ใช้ selected เป็นที่มา) =====
-                product.Currency   = selected.CurrencyEst;
-                product.Amount     = (float)R(offerPriceEstimate, 2); // ถ้า schema เป็น float
-            }
-            
             // ===== คำนวณ MSRP/ส่วนลด/ก่อน VAT =====
             var qty       = (decimal)product.Quantity;
             var msrpUnit  = (decimal)selected.MSRP;
@@ -511,8 +497,8 @@ public class QuotationService : IQuotationService
 
             product.SumOfDiscount   = dis;
             product.AmountBeforeVat = realPrice - dis;
-            product.RealPriceMsrp   = realPrice;
-
+            product.RealPriceMsrp   = realPrice;   
+            
             // ถ้าต้องสะสมรายการ
             response.QuotationProductEntities.Add(product);
 
