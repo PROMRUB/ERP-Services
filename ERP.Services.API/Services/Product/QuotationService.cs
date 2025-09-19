@@ -473,29 +473,31 @@ public class QuotationService : IQuotationService
             if (selected == null)
                 throw new KeyNotFoundException("product not exists");
 
-            // ===== คำนวณ offerPriceEstimate จาก selected =====
-            var buyUnit = (decimal)selected.BuyUnitEst;          // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
-            var whtPct  = (decimal)selected.WHTEst;              // %
-            var fx      = (decimal)selected.ExchangeRateEst;     // THB per unit
-            var impPct  = (decimal)selected.ImportDutyEst;       // %
-            var admPct  = (decimal)selected.AdministrativeCostEst; // %
+            if (product.Amount == 0.1)
+            {
+                // ===== คำนวณ offerPriceEstimate จาก selected =====
+                var buyUnit = (decimal)selected.BuyUnitEst;          // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
+                var whtPct  = (decimal)selected.WHTEst;              // %
+                var fx      = (decimal)selected.ExchangeRateEst;     // THB per unit
+                var impPct  = (decimal)selected.ImportDutyEst;       // %
+                var admPct  = (decimal)selected.AdministrativeCostEst; // %
 
-            if (whtPct >= 100m) throw new InvalidOperationException("WHTEst must be < 100.");
+                if (whtPct >= 100m) throw new InvalidOperationException("WHTEst must be < 100.");
 
-            var amountBeforeWht = buyUnit * 100m / (100m - whtPct); // gross-up เป็นก่อนหัก WHT
-            var baseTHB         = amountBeforeWht * fx;
-            var importAmt       = baseTHB * (impPct / 100m);
-            var adminAmt        = baseTHB * (admPct / 100m);
-            var costsEstimate   = baseTHB + importAmt + adminAmt;
+                var amountBeforeWht = buyUnit * 100m / (100m - whtPct); // gross-up เป็นก่อนหัก WHT
+                var baseTHB         = amountBeforeWht * fx;
+                var importAmt       = baseTHB * (impPct / 100m);
+                var adminAmt        = baseTHB * (admPct / 100m);
+                var costsEstimate   = baseTHB + importAmt + adminAmt;
 
-            const decimal minMargin = 25m;
-            var offerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
+                const decimal minMargin = 25m;
+                var offerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
 
-            // ===== ตั้งค่าให้ product (ใช้ selected เป็นที่มา) =====
-            product.Currency   = selected.CurrencyEst;
-            product.Amount     = (float)R(offerPriceEstimate, 2); // ถ้า schema เป็น float
-            product.LatestCost = R(costsEstimate, 2);
-
+                // ===== ตั้งค่าให้ product (ใช้ selected เป็นที่มา) =====
+                product.Currency   = selected.CurrencyEst;
+                product.Amount     = (float)R(offerPriceEstimate, 2); // ถ้า schema เป็น float
+            }
+            
             // ===== คำนวณ MSRP/ส่วนลด/ก่อน VAT =====
             var qty       = (decimal)product.Quantity;
             var msrpUnit  = (decimal)selected.MSRP;
@@ -786,7 +788,7 @@ public class QuotationService : IQuotationService
         // 4) Apply to each quotation with Amount==0
         foreach (var quotation in quotations)
         {
-            if (quotation.Amount != 0) continue;
+            if (quotation.Amount != 0.1) continue;
 
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ
             if (product.MSRP is decimal msrp)
@@ -796,7 +798,6 @@ public class QuotationService : IQuotationService
 
             quotation.Currency          = product.CurrencyEst;
             quotation.Amount            = (float)R((decimal)offerPriceEstimate, 2); // ถ้า schema เป็น float
-            quotation.LatestCost        = R((decimal)costsEstimate, 2);            // ต้นทุนล่าสุด = ต้นทุนรวม
             quotation.Profit            = 0m;
             quotation.ProfitPercent     = 0m;
 
