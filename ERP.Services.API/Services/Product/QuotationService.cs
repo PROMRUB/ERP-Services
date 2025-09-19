@@ -356,6 +356,9 @@ public class QuotationService : IQuotationService
         foreach (var item in result.QuotationProductEntities)
         {
             var productItem = quotation.Products.FirstOrDefault(x => x.ProductId == item.ProductId);
+            
+            Console.WriteLine(productItem!.ToString());
+            
             item.Currency = productItem.Currency;
             item.PurchasingPrice = productItem.PurchasingPrice;
             item.WHT = productItem.WHT;
