@@ -218,6 +218,7 @@ public class QuotationService : IQuotationService
             Discount = x.Discount,
             Quantity = x.Quantity,
             Order = x.Order,
+            
         }).ToList();
 
         return products;
@@ -350,7 +351,6 @@ public class QuotationService : IQuotationService
         quotation.Products = MutateResourceProduct(resource.Products);
         quotation.Projects = MutateResourceProject(resource.Projects);
 
-
         var result = await this.Calculate(resource.Products);
 
         quotation.Products = result.QuotationProductEntities;
@@ -465,30 +465,59 @@ public class QuotationService : IQuotationService
 
         foreach (var product in products)
         {
+            static decimal R(decimal v, int s) => Math.Round(v, s, MidpointRounding.AwayFromZero);
+
             var selected = await _productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
 
             if (selected == null)
-            {
                 throw new KeyNotFoundException("product not exists");
-            }
 
-            var realPrice = (decimal)selected.MSRP * product.Quantity;
+            // ===== คำนวณ offerPriceEstimate จาก selected =====
+            var buyUnit = (decimal)selected.BuyUnitEst;          // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
+            var whtPct  = (decimal)selected.WHTEst;              // %
+            var fx      = (decimal)selected.ExchangeRateEst;     // THB per unit
+            var impPct  = (decimal)selected.ImportDutyEst;       // %
+            var admPct  = (decimal)selected.AdministrativeCostEst; // %
+
+            if (whtPct >= 100m) throw new InvalidOperationException("WHTEst must be < 100.");
+
+            var amountBeforeWht = buyUnit * 100m / (100m - whtPct); // gross-up เป็นก่อนหัก WHT
+            var baseTHB         = amountBeforeWht * fx;
+            var importAmt       = baseTHB * (impPct / 100m);
+            var adminAmt        = baseTHB * (admPct / 100m);
+            var costsEstimate   = baseTHB + importAmt + adminAmt;
+
+            const decimal minMargin = 25m;
+            var offerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
+
+            // ===== ตั้งค่าให้ product (ใช้ selected เป็นที่มา) =====
+            product.Currency   = selected.CurrencyEst;
+            product.Amount     = (float)R(offerPriceEstimate, 2); // ถ้า schema เป็น float
+            product.LatestCost = R(costsEstimate, 2);
+
+            // ===== คำนวณ MSRP/ส่วนลด/ก่อน VAT =====
+            var qty       = (decimal)product.Quantity;
+            var msrpUnit  = (decimal)selected.MSRP;
+            var amountPU  = (decimal)product.Amount;
+
+            var realPrice = msrpUnit * qty;                 // MSRP รวม
             realPriceMsrp += realPrice;
 
-            var dis = (selected.MSRP - (decimal?)product.Amount) * product.Quantity;
-            sumOfDiscount += (decimal)dis;
-            product.SumOfDiscount = (decimal)dis;
+            var dis = (msrpUnit - amountPU) * qty;          // ส่วนลดรวมเทียบกับ MSRP
+            sumOfDiscount += dis;
 
-            product.AmountBeforeVat = realPrice - product.SumOfDiscount;
-            product.RealPriceMsrp = realPrice;
+            product.SumOfDiscount   = dis;
+            product.AmountBeforeVat = realPrice - dis;
+            product.RealPriceMsrp   = realPrice;
 
+            // ถ้าต้องสะสมรายการ
             response.QuotationProductEntities.Add(product);
 
+            // เช็ค special price ต่อหน่วยจาก LwPrice ของ selected
             if (!isSpecialPrice)
-            {
-                isSpecialPrice = (decimal)product.Amount < selected.LwPrice;
-            }
+                isSpecialPrice = amountPU < (decimal)selected.LwPrice;
+
         }
 
         amountBeforeVat = realPriceMsrp - sumOfDiscount;
@@ -771,7 +800,6 @@ public class QuotationService : IQuotationService
             quotation.Profit            = 0m;
             quotation.ProfitPercent     = 0m;
 
-            // ฟิลด์ validate mapping
             quotation.PurchasingPrice   = purchasingPrice;
             quotation.Exchange          = exchange;
             quotation.Incoterm          = incoterm;
