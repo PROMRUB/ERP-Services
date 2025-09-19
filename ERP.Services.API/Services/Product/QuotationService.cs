@@ -750,7 +750,7 @@ public class QuotationService : IQuotationService
 
     public async Task ImportUpdate(Guid productId)
     {
-        // 1) Load
+        // Load
         var product = await _productRepository.GetProductById(productId).FirstOrDefaultAsync();
         if (product is null) throw new InvalidOperationException($"Product {productId} not found.");
 
@@ -765,57 +765,59 @@ public class QuotationService : IQuotationService
         decimal importDutyPct   = RequirePercent(product.ImportDutyEst, nameof(product.ImportDutyEst), errors);
         decimal whtPct          = RequirePercent(product.WHTEst, nameof(product.WHTEst), errors);
 
-        if (product.WHTEst >= 100m) errors.Add("WHTEst must be < 100.");
+        if (whtPct >= 100m) errors.Add("WHTEst must be < 100.");
+        if (errors.Count > 0) throw new ArgumentException(string.Join("; ", errors));
 
         static decimal R(decimal v, int s) => Math.Round(v, s, MidpointRounding.AwayFromZero);
 
-        var value            = product.BuyUnitEst;                      // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
-        var amountEstimate   = value * 100m / (100m - product.WHTEst);  // gross-up
-        var whtEstimate      = amountEstimate - value;
+        // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
+        var value          = purchasingPrice;
 
-        var amountTHB        = amountEstimate * product.ExchangeRateEst;
+        // gross-up กลับไปก่อนหัก WHT
+        var amountEstimate = value * 100m / (100m - whtPct);
+        var whtEstimate    = amountEstimate - value;
 
-        var importDutyAmt    = amountTHB * (product.ImportDutyEst / 100m);
-        var adminCostsAmt    = amountTHB * (product.AdministrativeCostEst / 100m);
+        // แปลงเป็น THB
+        var amountTHB      = amountEstimate * exchange;
 
-        var costsEstimate    = amountTHB + importDutyAmt + adminCostsAmt;
+        // ภาษี/แอดมิน
+        var importDutyAmt  = amountTHB * (importDutyPct / 100m);
+        var adminCostsAmt  = amountTHB * (adminCostsPct / 100m);
 
-        // กำไรขั้นต่ำ 25% → lower price
+        var costsEstimate  = amountTHB + importDutyAmt + adminCostsAmt;
+
+        // กำไรขั้นต่ำ 25%
         const decimal minMargin = 25m;
         var lowerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
         var offerPriceEstimate  = lowerPriceEstimate;
-        
-        Console.WriteLine($"{offerPriceEstimate}");
-        
+
         foreach (var quotation in quotations)
         {
-            if (quotation.Amount != 0.1) continue;
-            
-            Console.WriteLine($"{quotation.Amount}");
-            
-            // ส่วนลดจาก MSRP เทียบกับราคาเสนอ
-            if (product.MSRP is decimal msrp)
-                quotation.SumOfDiscount = (decimal)(msrp - offerPriceEstimate);
+            // อัปเดตเฉพาะที่ยังไม่ถูกตั้งราคา (0 หรือเกือบศูนย์)
+            if (Math.Abs(quotation.Amount) > 0.000001f) continue;
+
+            // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
+            if (product.MSRP is decimal msrp && msrp > 0m)
+                quotation.SumOfDiscount = msrp - offerPriceEstimate;
             else
                 quotation.SumOfDiscount = 0m;
 
-            quotation.Currency          = product.CurrencyEst;
-            quotation.Amount            = (float)R((decimal)offerPriceEstimate, 2); // ถ้า schema เป็น float
-            quotation.Profit            = 0m;
-            quotation.ProfitPercent     = 0m;
+            quotation.Currency              = product.CurrencyEst;
+            quotation.Amount                = (float)R(offerPriceEstimate, 2);
+            quotation.Profit                = 0m;
+            quotation.ProfitPercent         = 0m;
 
-            quotation.PurchasingPrice   = purchasingPrice;
-            quotation.Exchange          = exchange;
-            quotation.Incoterm          = incoterm;
-            quotation.CostEstimate      = (decimal) costsEstimate;
-            quotation.AdministrativeCosts = adminCostsPct;
-            quotation.ImportDuty        = importDutyPct;
-            quotation.WHT               = whtPct;
+            quotation.PurchasingPrice       = purchasingPrice;
+            quotation.Exchange              = exchange;
+            quotation.Incoterm              = incoterm;
+            quotation.CostEstimate          = R(costsEstimate, 2);
+            quotation.AdministrativeCosts   = adminCostsPct;
+            quotation.ImportDuty            = importDutyPct;
+            quotation.WHT                   = whtPct;
 
             _quotationRepository.UpdateProduct(quotation);
         }
 
-        // 5) Save once
         await _quotationRepository.Context().SaveChangesAsync();
     }
         
