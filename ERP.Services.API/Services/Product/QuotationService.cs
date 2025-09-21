@@ -797,7 +797,6 @@ public class QuotationService : IQuotationService
                 quotation.SumOfDiscount = 0m;
 
             quotation.Currency              = product.CurrencyEst;
-            quotation.Amount                = (float)R(offerPriceEstimate, 2);
             quotation.Profit                = 0m;
             quotation.ProfitPercent         = 0m;
 
