@@ -228,6 +228,13 @@ namespace ERP.Services.API.Services.Organization
             return mapper.Map<IEnumerable<OrganizationUserEntity>, List<OrganizationUserResponse>>(query);
         }
 
+        public async Task<List<OrganizationUserResponse>> GetUserAllUser(string orgId)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var query = await organizationRepository!.GetUserListAsync().ToListAsync();
+            return mapper.Map<IEnumerable<OrganizationUserEntity>, List<OrganizationUserResponse>>(query);
+        }
+        
         public bool IsUserNameExist(string orgId, string userName)
         {
             organizationRepository!.SetCustomOrgId(orgId);
