@@ -18,5 +18,6 @@ namespace ERP.Services.API.Interfaces
         public Task<bool> UpdateOrganization(string orgId, OrganizationRequest org);
         public Task<bool> UpdateSecurity(string orgId, OrganizationRequest org);
         public Task<List<OrganizationUserResponse>> GetUserAllowedOrganization(string userName);
+        public Task<List<OrganizationUserResponse>> GetUserAllUser(string orgId);
     }
 }

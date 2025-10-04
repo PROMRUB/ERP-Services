@@ -75,6 +75,25 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpGet]
+        [Route("org/{id}/action/AdminGetUserAll")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AdminGetUserAllowedOrganization(string id)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                var result = await services.GetUserAllUser(id);
+                return Ok(ResponseHandler.Response<List<OrganizationUserResponse>>("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+
+        
         [HttpPost]
         [Route("org/{id}/action/AddUserToOrganization")]
         [MapToApiVersion("1")]
