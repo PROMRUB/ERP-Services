@@ -13,6 +13,7 @@ namespace ERP.Services.API.Interfaces
         public void SetCustomOrgId(string customOrgId);
         public bool IsCustomBusinessIdExist(string orgCustomId);
         public Task AddBusiness(BusinessEntity bus);
+        public Task UpdateBusiness(BusinessEntity bus);
         public void UpdateUserBusiness(List<UserBusinessEntity> bus);
         public DbContext Context();
     }

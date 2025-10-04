@@ -129,6 +129,25 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpPut]
+        [Route("org/{id}/action/AdminUpdateBusiness/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> AdminUpdateBusiness(string id, string businessId, [FromBody] OrganizationRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id) || string.IsNullOrEmpty(businessId))
+                    throw new ArgumentException("1101");
+
+                await services.UpdateBusiness(id, businessId, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
         [HttpGet]
         [Route("org/{id}/action/GetBusiness")]
         [MapToApiVersion("1")]
