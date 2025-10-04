@@ -39,9 +39,9 @@ public class QuotationService : IQuotationService
 
     private static readonly HashSet<string> ValidIncoterms = new(StringComparer.OrdinalIgnoreCase)
     {
-       "N/A", "EXWORK", "FOB", "CIF"
+        "N/A", "EXWORK", "FOB", "CIF"
     };
-    
+
     public List<EmailInformation> Emails { get; set; } = new List<EmailInformation>()
     {
         new EmailInformation()
@@ -325,87 +325,129 @@ public class QuotationService : IQuotationService
 
     public async Task<QuotationResource> Update(Guid id, QuotationResource resource)
     {
-        var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
+        if (resource is null)
+            throw new ArgumentNullException(nameof(resource));
+
+        // ป้องกัน null collection เข้ามา
+        var incomingProducts = resource.Products ?? new List<QuotationProductResource>();
+        var incomingProjects = resource.Projects ?? new List<QuotationProjectResource>();
+
+        var quotation = await _quotationRepository
+            .GetQuotationQuery()
+            .FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
-        {
             throw new KeyNotFoundException("id not exists");
-        }
 
-        quotation.CustomerId = resource.CustomerId;
+        // ปลอดภัยกับ string null (ให้เป็น ""), หรือจะคง null ก็ได้แล้วแต่สเกมา DB ของคุณ
+        quotation.CustomerId = resource.CustomerId; // ถ้าเป็น Guid? ให้ตรวจเพิ่มถ้าจำเป็น
         quotation.CustomerContactId = resource.ContactPersonId;
-        // quotation.QuotationDateTime = DateTime.UtcNow;
         quotation.SalePersonId = resource.SalesPersonId;
         quotation.IssuedById = resource.IssuedById;
-        quotation.Remark = resource.Remark;
+        quotation.Remark = resource.Remark ?? string.Empty;
         quotation.BusinessId = resource.BusinessId;
-        quotation.Status = resource.Status;
+        quotation.Status = resource.Status ?? string.Empty;
         quotation.PaymentId = resource.PaymentAccountId;
 
-        quotation.SubmitStatus(resource.Status);
+        // ถ้า SubmitStatus ต้องการค่าไม่ว่าง ให้เช็คก่อน
+        if (!string.IsNullOrWhiteSpace(resource.Status))
+            quotation.SubmitStatus(resource.Status);
 
-        var temp = quotation.Products;
-        
-        _quotationRepository.DeleteProduct(quotation.Products);
-        _quotationRepository.DeleteProject(quotation.Projects);
+        // เก็บของเดิมไว้แบบปลอดภัย (ถ้า null ให้เป็นลิสต์ว่าง)
+        var temp = quotation.Products ?? new List<QuotationProductEntity>();
 
-        quotation.Products = MutateResourceProduct(resource.Products);
-        quotation.Projects = MutateResourceProject(resource.Projects);
+        // ลบของเดิมแบบ null-safe
+        if (quotation.Products != null && quotation.Products.Count > 0)
+            _quotationRepository.DeleteProduct(quotation.Products);
 
-        var result = await this.Calculate(resource.Products);
+        if (quotation.Projects != null && quotation.Projects.Count > 0)
+            _quotationRepository.DeleteProject(quotation.Projects);
 
-        foreach (var item in result.QuotationProductEntities)
+        // map ของใหม่ (ถ้า mapper คืน null ให้เป็นลิสต์ว่าง)
+        quotation.Products = MutateResourceProduct(incomingProducts) ?? new List<QuotationProductEntity>();
+        quotation.Projects = MutateResourceProject(incomingProjects) ?? new List<QuotationProjectEntity>();
+
+        // ถ้าไม่มีสินค้า ก็ไม่ต้องคำนวณ (รีเซ็ตยอดเป็น 0)
+        if (incomingProducts.Count == 0)
         {
-            var productItem = temp.FirstOrDefault(x => x.ProductId == item.ProductId);
-            
-            item.Currency = productItem.Currency;
-            item.PurchasingPrice = productItem.PurchasingPrice;
-            item.WHT = productItem.WHT;
-            item.Exchange = productItem.Exchange;
-            item.Incoterm = productItem.Incoterm;
-            item.ImportDuty = productItem.ImportDuty;
-            item.AdministrativeCosts = productItem.AdministrativeCosts;
-            item.CostEstimate = productItem.CostEstimate;
-            item.Order = productItem.Order;
-        }
-        
-        quotation.Products = result.QuotationProductEntities;
+            quotation.Price = 0m;
+            quotation.Vat = 0m;
+            quotation.Amount = 0m;
+            quotation.AmountBeforeVat = 0m;
+            quotation.SumOfDiscount = 0m;
+            quotation.RealPriceMsrp = 0m;
+            quotation.Update();
 
+            var ctx0 = _quotationRepository.Context();
+            if (ctx0 == null) throw new InvalidOperationException("DbContext is not available.");
+            await ctx0.SaveChangesAsync();
+
+            return await MapEntityToResponse(quotation);
+        }
+
+        // คำนวณแบบ null-safe
+        var result = await this.Calculate(incomingProducts);
+        if (result == null)
+            throw new InvalidOperationException("Calculate() returned null.");
+
+        var computedItems = result.QuotationProductEntities ?? new List<QuotationProductEntity>();
+
+        // เตรียม dictionary ไว้หา item เดิมเร็วขึ้น และกัน temp เป็น null
+        var oldByProductId = (temp ?? new List<QuotationProductEntity>())
+            .Where(x => x != null)
+            .GroupBy(x => x.ProductId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // อัดค่าบางช่องจากของเดิม ถ้ามี (กัน productItem == null)
+        foreach (var item in computedItems)
+        {
+            if (item == null) continue;
+            if (item.ProductId == Guid.Empty) continue;
+
+            if (oldByProductId.TryGetValue(item.ProductId, out var productItem) && productItem != null)
+            {
+                item.Currency = productItem.Currency;
+                item.PurchasingPrice = productItem.PurchasingPrice;
+                item.WHT = productItem.WHT;
+                item.Exchange = productItem.Exchange;
+                item.Incoterm = productItem.Incoterm;
+                item.ImportDuty = productItem.ImportDuty;
+                item.AdministrativeCosts = productItem.AdministrativeCosts;
+                item.CostEstimate = productItem.CostEstimate;
+                item.Order = productItem.Order;
+            }
+            else
+            {
+                item.Order = 0;
+            }
+        }
+
+        quotation.Products = computedItems;
         quotation.Price = result.Price;
         quotation.Vat = result.Vat;
         quotation.Amount = result.Amount;
         quotation.AmountBeforeVat = result.AmountBeforeVat;
         quotation.SumOfDiscount = result.SumOfDiscount;
         quotation.RealPriceMsrp = result.RealPriceMsrp;
+
         quotation.Update();
+
+        var ctx = _quotationRepository.Context();
+        if (ctx == null) throw new InvalidOperationException("DbContext is not available.");
 
         try
         {
-            await _quotationRepository.Context()!.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            throw new InvalidOperationException("Failed to save changes.", e);
         }
-
-
-        // if (quotation.Status == "อนุมัติ")
-        // {
-        //     try
-        //     {
-        //         await ManagerReplyApproveQuotation(quotation, quotation.SalePerson.DisplayNameTH(),
-        //             quotation.SalePerson.email);
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine(e.Message);
-        //         throw e;
-        //     }
-        // }
 
         return await MapEntityToResponse(quotation);
     }
+
 
     public Task<List<QuotationStatus>> QuotationStatus()
     {
@@ -483,32 +525,31 @@ public class QuotationService : IQuotationService
         {
             var selected = await _productRepository.GetProductListQueryable()
                 .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
-            
+
             if (selected == null)
                 throw new KeyNotFoundException("product not exists");
 
             // ===== คำนวณ MSRP/ส่วนลด/ก่อน VAT =====
-            var qty       = (decimal)product.Quantity;
-            var msrpUnit  = (decimal)selected.MSRP;
-            var amountPU  = (decimal)product.Amount;
+            var qty = (decimal)product.Quantity;
+            var msrpUnit = (decimal)selected.MSRP;
+            var amountPU = (decimal)product.Amount;
 
-            var realPrice = msrpUnit * qty;                 // MSRP รวม
+            var realPrice = msrpUnit * qty; // MSRP รวม
             realPriceMsrp += realPrice;
 
-            var dis = (msrpUnit - amountPU) * qty;          // ส่วนลดรวมเทียบกับ MSRP
+            var dis = (msrpUnit - amountPU) * qty; // ส่วนลดรวมเทียบกับ MSRP
             sumOfDiscount += dis;
 
-            product.SumOfDiscount   = dis;
+            product.SumOfDiscount = dis;
             product.AmountBeforeVat = realPrice - dis;
-            product.RealPriceMsrp   = realPrice;   
-            
+            product.RealPriceMsrp = realPrice;
+
             // ถ้าต้องสะสมรายการ
             response.QuotationProductEntities.Add(product);
 
             // เช็ค special price ต่อหน่วยจาก LwPrice ของ selected
             if (!isSpecialPrice)
                 isSpecialPrice = amountPU < (decimal)selected.LwPrice;
-
         }
 
         amountBeforeVat = realPriceMsrp - sumOfDiscount;
@@ -566,10 +607,10 @@ public class QuotationService : IQuotationService
 
     public async Task<PurchaseDetail> GetProductPurchaseDetail(Guid quotationId, Guid productId)
     {
-        var product = await _quotationRepository.GetQuotationProduct(quotationId,productId)
+        var product = await _quotationRepository.GetQuotationProduct(quotationId, productId)
             .FirstOrDefaultAsync(x => x.QuotationId == quotationId && x.ProductId == productId);
         var productItem = await _productRepository.GetProductById(productId).FirstOrDefaultAsync();
-        var res =  new PurchaseDetail();
+        var res = new PurchaseDetail();
         res.Amount = product.Amount;
         res.Currency = product.Currency;
         res.BuyUnitEstimate = product.PurchasingPrice.ToString("0.00", CultureInfo.InvariantCulture);
@@ -667,8 +708,6 @@ public class QuotationService : IQuotationService
         var beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
 
 
-
-
         var list = beforeMutate.Items.Select(x => new QuotationResponse
             {
                 QuotationId = x.QuotationId.Value,
@@ -703,7 +742,7 @@ public class QuotationService : IQuotationService
                         (x.Products.Sum(p => ((decimal)p.Amount - p.CostEstimate) * p.Quantity) * 100) /
                         x.Products.Sum(p => (decimal)p.Amount * p.Quantity)
                     ),
-            IsSpecialPrice = x.IsSpecialPrice
+                IsSpecialPrice = x.IsSpecialPrice
             })
             .ToList();
 
@@ -734,7 +773,6 @@ public class QuotationService : IQuotationService
             TotalEstimateProfit = products.Sum(x => x.CostEstimateProfit),
             TotalEstimateProfitPercent = 0
         };
-
     }
 
     public async Task ImportUpdate(Guid productId)
@@ -748,11 +786,12 @@ public class QuotationService : IQuotationService
 
         var errors = new List<string>();
         decimal purchasingPrice = RequireNonNegative(product.BuyUnitEst, nameof(product.BuyUnitEst), errors);
-        decimal exchange        = RequireGreaterThan(product.ExchangeRateEst, 0m, nameof(product.ExchangeRateEst), errors);
-        string  incoterm        = RequireIncoterm(product.IncortermEst, nameof(product.IncortermEst), errors);
-        decimal adminCostsPct   = RequirePercent(product.AdministrativeCostEst, nameof(product.AdministrativeCostEst), errors);
-        decimal importDutyPct   = RequirePercent(product.ImportDutyEst, nameof(product.ImportDutyEst), errors);
-        decimal whtPct          = RequirePercent(product.WHTEst, nameof(product.WHTEst), errors);
+        decimal exchange = RequireGreaterThan(product.ExchangeRateEst, 0m, nameof(product.ExchangeRateEst), errors);
+        string incoterm = RequireIncoterm(product.IncortermEst, nameof(product.IncortermEst), errors);
+        decimal adminCostsPct =
+            RequirePercent(product.AdministrativeCostEst, nameof(product.AdministrativeCostEst), errors);
+        decimal importDutyPct = RequirePercent(product.ImportDutyEst, nameof(product.ImportDutyEst), errors);
+        decimal whtPct = RequirePercent(product.WHTEst, nameof(product.WHTEst), errors);
 
         if (whtPct >= 100m) errors.Add("WHTEst must be < 100.");
         if (errors.Count > 0) throw new ArgumentException(string.Join("; ", errors));
@@ -760,88 +799,116 @@ public class QuotationService : IQuotationService
         static decimal R(decimal v, int s) => Math.Round(v, s, MidpointRounding.AwayFromZero);
 
         // ราคาซื้อ/หน่วย (หลังหัก WHT ที่กรอก)
-        var value          = purchasingPrice;
+        var value = purchasingPrice;
 
         // gross-up กลับไปก่อนหัก WHT
         var amountEstimate = value * 100m / (100m - whtPct);
-        var whtEstimate    = amountEstimate - value;
+        var whtEstimate = amountEstimate - value;
 
         // แปลงเป็น THB
-        var amountTHB      = amountEstimate * exchange;
+        var amountTHB = amountEstimate * exchange;
 
         // ภาษี/แอดมิน
-        var importDutyAmt  = amountTHB * (importDutyPct / 100m);
-        var adminCostsAmt  = amountTHB * (adminCostsPct / 100m);
+        var importDutyAmt = amountTHB * (importDutyPct / 100m);
+        var adminCostsAmt = amountTHB * (adminCostsPct / 100m);
 
-        var costsEstimate  = amountTHB + importDutyAmt + adminCostsAmt;
+        var costsEstimate = amountTHB + importDutyAmt + adminCostsAmt;
 
         // กำไรขั้นต่ำ 25%
         const decimal minMargin = 25m;
-        var lowerPriceEstimate  = costsEstimate * 100m / (100m - minMargin);
-        var offerPriceEstimate  = lowerPriceEstimate;
+        var lowerPriceEstimate = costsEstimate * 100m / (100m - minMargin);
+        var offerPriceEstimate = lowerPriceEstimate;
 
         Console.WriteLine($"Offerning Price : {offerPriceEstimate}");
         foreach (var quotation in quotations)
         {
-            Console.WriteLine($"Quotation Estimate (Decimal) : {quotation.CostEstimate}"); // :R จะโชว์ค่าจริงแบบ round-trip
+            Console.WriteLine(
+                $"Quotation Estimate (Decimal) : {quotation.CostEstimate}"); // :R จะโชว์ค่าจริงแบบ round-trip
 
             if (quotation.CostEstimate > 0)
                 continue;
 
             Console.WriteLine($"Quotation Id : {quotation.QuotationId}");
-            
+
             // ส่วนลดจาก MSRP เทียบกับราคาเสนอ (บาท)
             if (product.MSRP is decimal msrp && msrp > 0m)
                 quotation.SumOfDiscount = msrp - offerPriceEstimate;
             else
                 quotation.SumOfDiscount = 0m;
 
-            quotation.Currency              = product.CurrencyEst;
-            quotation.Profit                = 0m;
-            quotation.ProfitPercent         = 0m;
+            quotation.Currency = product.CurrencyEst;
+            quotation.Profit = 0m;
+            quotation.ProfitPercent = 0m;
 
-            quotation.PurchasingPrice       = purchasingPrice;
-            quotation.Exchange              = exchange;
-            quotation.Incoterm              = incoterm;
-            quotation.CostEstimate          = R(costsEstimate, 2);
-            quotation.AdministrativeCosts   = adminCostsPct;
-            quotation.ImportDuty            = importDutyPct;
-            quotation.WHT                   = whtPct;
+            quotation.PurchasingPrice = purchasingPrice;
+            quotation.Exchange = exchange;
+            quotation.Incoterm = incoterm;
+            quotation.CostEstimate = R(costsEstimate, 2);
+            quotation.AdministrativeCosts = adminCostsPct;
+            quotation.ImportDuty = importDutyPct;
+            quotation.WHT = whtPct;
 
             _quotationRepository.UpdateProduct(quotation);
         }
 
         await _quotationRepository.Context().SaveChangesAsync();
     }
-        
-    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId, UpdateProductQuotationParameter request)
+
+    public async Task<QuotationResource> UpdateCostEstimateQuotation(Guid id, Guid productId,
+        UpdateProductQuotationParameter request)
     {
-        var product = await  _quotationRepository.GetQuotationProduct(id,productId).FirstOrDefaultAsync();
+        var product = await _quotationRepository.GetQuotationProduct(id, productId).FirstOrDefaultAsync();
         var quotaion = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
-        var productItem = await _productRepository.GetProductByBusiness(quotaion!.BusinessId).FirstOrDefaultAsync(x => x.ProductId == productId);
+        var productItem = await _productRepository.GetProductByBusiness(quotaion!.BusinessId)
+            .FirstOrDefaultAsync(x => x.ProductId == productId);
         if (product == null)
         {
             throw new Exception("Product not found");
         }
 
-        product.SumOfDiscount = (decimal)productItem.MSRP - decimal.Parse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture);
+        product.SumOfDiscount = (decimal)productItem.MSRP - decimal.Parse(request.Data.OfferPriceEstimate,
+            NumberStyles.Any, CultureInfo.InvariantCulture);
         product.Currency = request.Data.Currency;
-        product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice) ? offeringPrice : 0f;
-        product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var latestCost) ? latestCost : 0m;
+        product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture,
+            out var offeringPrice)
+            ? offeringPrice
+            : 0f;
+        product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var latestCost)
+            ? latestCost
+            : 0m;
         product.Profit = 0;
         product.ProfitPercent = 0;
-        product.PurchasingPrice = decimal.TryParse(request.Data.BuyUnitEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var purchasingPrice) ? purchasingPrice : 0m;
-        product.Exchange = decimal.TryParse(request.Data.ExchangeRate, NumberStyles.Any, CultureInfo.InvariantCulture, out var exchange) ? exchange : 0m;
+        product.PurchasingPrice = decimal.TryParse(request.Data.BuyUnitEstimate, NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var purchasingPrice)
+            ? purchasingPrice
+            : 0m;
+        product.Exchange = decimal.TryParse(request.Data.ExchangeRate, NumberStyles.Any, CultureInfo.InvariantCulture,
+            out var exchange)
+            ? exchange
+            : 0m;
         product.Incoterm = request.Data.Incoterm;
-        product.CostEstimate = decimal.TryParse(request.Data.CostEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var costEstimate) ? costEstimate : 0m;
-        product.AdministrativeCosts = decimal.TryParse(request.Data.AdministrativeCosts, NumberStyles.Any, CultureInfo.InvariantCulture, out var administrativeCosts) ? administrativeCosts : 0m;
-        product.ImportDuty = decimal.TryParse(request.Data.ImportDuty, NumberStyles.Any, CultureInfo.InvariantCulture, out var importDuty) ? importDuty : 0m;
-        product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht) ? wht : 0m;
+        product.CostEstimate = decimal.TryParse(request.Data.CostEstimate, NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var costEstimate)
+            ? costEstimate
+            : 0m;
+        product.AdministrativeCosts = decimal.TryParse(request.Data.AdministrativeCosts, NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var administrativeCosts)
+            ? administrativeCosts
+            : 0m;
+        product.ImportDuty =
+            decimal.TryParse(request.Data.ImportDuty, NumberStyles.Any, CultureInfo.InvariantCulture,
+                out var importDuty)
+                ? importDuty
+                : 0m;
+        product.WHT = decimal.TryParse(request.Data.Wht, NumberStyles.Any, CultureInfo.InvariantCulture, out var wht)
+            ? wht
+            : 0m;
 
         _quotationRepository.UpdateProduct(product);
 
         await _quotationRepository.Context().SaveChangesAsync();
-        
+
         var quotation = await _quotationRepository.GetQuotationQuery().FirstOrDefaultAsync(x => x.QuotationId == id);
 
         if (quotation == null)
@@ -1148,7 +1215,7 @@ public class QuotationService : IQuotationService
             throw;
         }
     }
-    
+
     private static decimal RequireNonNegative(decimal? value, string field, List<string> errors)
     {
         if (value is null)
@@ -1156,6 +1223,7 @@ public class QuotationService : IQuotationService
             errors.Add($"{field} is required.");
             return 0m;
         }
+
         if (value < 0m)
             errors.Add($"{field} must be >= 0.");
         return value.Value;
@@ -1168,6 +1236,7 @@ public class QuotationService : IQuotationService
             errors.Add($"{field} is required.");
             return 0m;
         }
+
         if (value <= minExclusive)
             errors.Add($"{field} must be > {minExclusive.ToString(CultureInfo.InvariantCulture)}.");
         return value.Value;
@@ -1180,6 +1249,7 @@ public class QuotationService : IQuotationService
             errors.Add($"{field} (percent) is required.");
             return 0m;
         }
+
         if (value < 0m || value > 100m)
             errors.Add($"{field} must be between 0 and 100 (percent).");
         return value.Value;
@@ -1192,6 +1262,7 @@ public class QuotationService : IQuotationService
             errors.Add($"{field} is required (EXW/FOB/FCA/CFR/CIF/CPT/CIP/DAP/DPU/DDP).");
             return string.Empty;
         }
+
         var normalized = value.Trim().ToUpperInvariant();
         if (!ValidIncoterms.Contains(normalized))
             errors.Add($"{field} '{value}' is not a valid Incoterm 2020.");
