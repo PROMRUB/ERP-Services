@@ -257,6 +257,30 @@ namespace ERP.Services.API.Services.User
             repository!.AddUser(query);
         }
 
+        public async Task<List<UserToBusinessResponse>> GetUserToBusinessAllAsync(string orgCustomId, Guid userId)
+        {
+            organizationRepository.SetCustomOrgId(orgCustomId);
+            repository.SetCustomOrgId(orgCustomId);
+
+            var org = await organizationRepository.GetOrganization();
+            if (org?.OrgId == null) return new List<UserToBusinessResponse>();
+
+            var list = await repository.GetUserToBusinessAllAsync(org.OrgId!.Value, userId);
+
+            // map แบบ manual (ไม่ต้องพึ่ง AutoMapper ก็ได้)
+            var result = list.Select(x => new UserToBusinessResponse
+            {
+                OrgId = x.OrgId,
+                UserId = x.UserId,
+                BusinessId = x.BusinessId,
+                Role = x.Role,
+                EmployeeRunning = x.EmployeeRunning,
+                EmployeeCode = x.EmployeeCode
+            }).ToList();
+
+            return result;
+        }
+        
         public async Task AddUserToBusinessAsync(string orgId, AddUserToBusinessRequest request)
         {
             repository!.SetCustomOrgId(orgId);

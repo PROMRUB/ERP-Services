@@ -12,8 +12,6 @@ namespace ERP.Services.API.Models.ResponseModels.Organization
         public string? Fullname { get; set; }
         public string? Email { get; set; }
         public string? TelNo { get; set; }
-    
-
         public List<string>? Role { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<OrganizationUserEntity> GetUserProfiles();
         public Task<UserEntity> GetUserByName(string userName);
         public void AddUser(UserEntity user);
+        public Task<List<UserBusinessEntity>> GetUserToBusinessAllAsync(Guid orgId, Guid userId);
         public void AddUserToBusiness(UserBusinessEntity user);
         public void RemoveUserToBusiness(UserBusinessEntity user);
         public void AddRoleToUser(Guid UserId, Guid BusinessId, UserBusinessEntity user);
