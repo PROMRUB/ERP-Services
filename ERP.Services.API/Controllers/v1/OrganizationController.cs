@@ -92,7 +92,6 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
-
         
         [HttpPost]
         [Route("org/{id}/action/AddUserToOrganization")]

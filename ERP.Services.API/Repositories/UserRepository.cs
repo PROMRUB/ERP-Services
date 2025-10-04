@@ -42,6 +42,16 @@ namespace ERP.Services.API.Repositories
             }
         }
 
+        public async Task<List<UserBusinessEntity>> GetUserToBusinessAllAsync(Guid orgId, Guid userId)
+        {
+            return await context.UserBusinesses
+                .AsNoTracking()
+                .Where(x => x.OrgId == orgId && x.UserId == userId)
+                .OrderBy(x => x.BusinessId)
+                .ThenBy(x => x.Role)
+                .ToListAsync();
+        }
+        
         public void RemoveUserToBusiness(UserBusinessEntity user)
         {
             var query = context!.UserBusinesses!.Where(x => x.UserId == user.UserId && x.BusinessId == user.BusinessId).FirstOrDefault();

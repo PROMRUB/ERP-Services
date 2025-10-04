@@ -11,6 +11,7 @@ namespace ERP.Services.API.Interfaces
         public Task<List<OrganizationUserResponse>> GetUsers(string orgId, Guid businessId, string role);
         public Task<UserResponse> GetUserByName(string orgId, string userName);
         public void AddUser(string orgId, UserRequest user);
+        public Task<List<UserToBusinessResponse>> GetUserToBusinessAllAsync(string orgCustomId, Guid userId);
         public Task AddUserToBusinessAsync(string orgId, AddUserToBusinessRequest request);
         public Task RemoveUserToBusinessAsync(string orgId, AddUserToBusinessRequest request);
         public Task AddRoleToUser(string orgId, Guid userId, Guid businessId, AddUserToBusinessRequest request);
