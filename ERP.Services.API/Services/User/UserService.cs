@@ -267,7 +267,6 @@ namespace ERP.Services.API.Services.User
 
             var list = await repository.GetUserToBusinessAllAsync(org.OrgId!.Value, userId);
 
-            // map แบบ manual (ไม่ต้องพึ่ง AutoMapper ก็ได้)
             var result = list.Select(x => new UserToBusinessResponse
             {
                 OrgId = x.OrgId,
@@ -288,7 +287,7 @@ namespace ERP.Services.API.Services.User
             var organization = await organizationRepository.GetOrganization();
             var query = mapper.Map<AddUserToBusinessRequest, UserBusinessEntity>(request);
             query.OrgId = organization.OrgId;
-            repository.AddUserToBusiness(query);
+            await repository.AddUserToBusinessAsync(query);
         }
 
         public async Task RemoveUserToBusinessAsync(string orgId, AddUserToBusinessRequest request)
@@ -298,7 +297,7 @@ namespace ERP.Services.API.Services.User
             var organization = await organizationRepository.GetOrganization();
             var query = mapper.Map<AddUserToBusinessRequest, UserBusinessEntity>(request);
             query.OrgId = organization.OrgId;
-            repository.RemoveUserToBusiness(query);
+            await repository.RemoveUserToBusinessAsync(query);
         }
 
         public async Task AddRoleToUser(string orgId, Guid userId, Guid businessId, AddUserToBusinessRequest request)

@@ -20,43 +20,79 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
-        public void AddUserToBusiness(UserBusinessEntity user)
+        public async Task AddUserToBusinessAsync(UserBusinessEntity user, CancellationToken ct = default)
         {
-            var query = context!.UserBusinesses.ToList();
-            var currentUser = query.Where(x => x.UserId == user.UserId && x.BusinessId == user.UserBusinessId).FirstOrDefault(); 
-            if (currentUser != null)
+            // ควรเช็คให้ครบ key ของความเป็น unique: OrgId + UserId + BusinessId
+            var existing = await context.UserBusinesses
+                .FirstOrDefaultAsync(x =>
+                    x.OrgId == user.OrgId &&
+                    x.UserId == user.UserId &&
+                    x.BusinessId == user.BusinessId, ct);
+
+            if (existing == null)
             {
-                if (currentUser.EmployeeRunning == 0)
-                {
-                    var maxEmployeeRunning = query.Max(x => x.EmployeeRunning);
+                // สร้างใหม่ → คำนวณ EmployeeRunning/EmployeeCode ต่อองค์กร (หรือ scope ที่คุณต้องการ)
+                var maxRunning = await context.UserBusinesses
+                    .Where(x => x.OrgId == user.OrgId)
+                    .Select(x => (int?)x.EmployeeRunning)
+                    .MaxAsync(ct) ?? 0;
 
-                    currentUser.EmployeeRunning = maxEmployeeRunning + 1;
+                user.EmployeeRunning = maxRunning + 1;
+                user.EmployeeCode = user.EmployeeRunning.ToString("D4");
 
-                    user.EmployeeRunning = maxEmployeeRunning + 1;
-                    user.EmployeeCode = user.EmployeeRunning.ToString("D4");
-                }
+                // กำหนด Role จาก request
+                // user.Role = user.Role; // มีอยู่แล้วจาก request
 
-                currentUser.Role = user!.Role;
-                context!.UserBusinesses!.Add(user);
-                context.SaveChanges();
+                await context.UserBusinesses.AddAsync(user, ct);
+                await context.SaveChangesAsync(ct);
+                return;
             }
+
+            // อัปเดตเคส “มีอยู่แล้ว”
+            // ไม่ต้อง Add() ซ้ำ
+            // ถ้าอยากรีเซ็ต employee code เมื่อก่อนเป็น 0 (ตาม logic เดิม) ให้ทำแบบระวัง
+            if (existing.EmployeeRunning == 0)
+            {
+                var maxRunning = await context.UserBusinesses
+                    .Where(x => x.OrgId == existing.OrgId)
+                    .Select(x => (int?)x.EmployeeRunning)
+                    .MaxAsync(ct) ?? 0;
+
+                existing.EmployeeRunning = maxRunning + 1;
+                existing.EmployeeCode = existing.EmployeeRunning.ToString("D4");
+            }
+
+            existing.Role = user.Role;
+
+            context.UserBusinesses.Update(existing);
+            await context.SaveChangesAsync(ct);
         }
 
-        public async Task<List<UserBusinessEntity>> GetUserToBusinessAllAsync(Guid orgId, Guid userId)
+// ปรับเป็น async ให้สอดคล้องกับ service
+        public async Task<List<UserBusinessEntity>> GetUserToBusinessAllAsync(Guid orgId, Guid userId,
+            CancellationToken ct = default)
         {
             return await context.UserBusinesses
                 .AsNoTracking()
                 .Where(x => x.OrgId == orgId && x.UserId == userId)
                 .OrderBy(x => x.BusinessId)
                 .ThenBy(x => x.Role)
-                .ToListAsync();
+                .ToListAsync(ct);
         }
-        
-        public void RemoveUserToBusiness(UserBusinessEntity user)
+
+        public async Task RemoveUserToBusinessAsync(UserBusinessEntity user, CancellationToken ct = default)
         {
-            var query = context!.UserBusinesses!.Where(x => x.UserId == user.UserId && x.BusinessId == user.BusinessId).FirstOrDefault();
-            context!.UserBusinesses.Remove(query);
-            context.SaveChanges();
+            var existing = await context.UserBusinesses
+                .FirstOrDefaultAsync(x =>
+                    x.OrgId == user.OrgId &&
+                    x.UserId == user.UserId &&
+                    x.BusinessId == user.BusinessId, ct);
+
+            if (existing != null)
+            {
+                context.UserBusinesses.Remove(existing);
+                await context.SaveChangesAsync(ct);
+            }
         }
 
         public void AddRoleToUser(Guid UserId, Guid BusinessId, UserBusinessEntity user)
@@ -128,7 +164,8 @@ namespace ERP.Services.API.Repositories
         {
             try
             {
-                var query = context!.OrganizationUsers!.Where(x => x.Username!.Equals(username) && x.Password!.Equals(password));
+                var query = context!.OrganizationUsers!.Where(x =>
+                    x.Username!.Equals(username) && x.Password!.Equals(password));
                 return query;
             }
             catch (Exception)

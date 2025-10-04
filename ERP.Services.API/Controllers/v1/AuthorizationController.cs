@@ -75,15 +75,16 @@ namespace ERP.Services.API.Controllers.v1
         }
         
         [HttpPost]
-        [Route("org/{id}/action/AddUserToBusiness")]
+        [Route("org/{orgCustomId}/action/AddUserToBusiness")]
         [MapToApiVersion("1")]
-        public async Task<IActionResult> AddUserToBusiness(string id, AddUserToBusinessRequest request)
+        public async Task<IActionResult> AddUserToBusiness(string orgCustomId, AddUserToBusinessRequest request)
         {
             try
             {
-                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                if (!ModelState.IsValid || string.IsNullOrEmpty(orgCustomId))
                     throw new ArgumentException("1101");
-                await userService.AddUserToBusinessAsync(id, request);
+
+                await userService.AddUserToBusinessAsync(orgCustomId, request);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)
