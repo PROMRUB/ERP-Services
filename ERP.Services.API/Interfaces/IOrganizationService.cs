@@ -12,6 +12,7 @@ namespace ERP.Services.API.Interfaces
         public Task<bool> VerifyUserInOrganization(string orgId, string userName);
         public Task<bool> AddOrganization(string orgId, OrganizationRequest org);
         public Task<bool> AddBusiness(string orgId, OrganizationRequest org);
+        public Task<bool> UpdateBusiness(string orgId, string businessId, OrganizationRequest req);
         public Task<List<OrganizationResponse>> GetBusiness(string orgId);
         public Task<OrganizationResponse> GetBusinessById(string orgId, string businessId);
         public Task<bool> UpdateOrganization(string orgId, OrganizationRequest org);

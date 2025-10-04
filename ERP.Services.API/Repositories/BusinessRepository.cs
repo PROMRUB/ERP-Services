@@ -57,6 +57,12 @@ namespace ERP.Services.API.Repositories
             await context.SaveChangesAsync();
         }
 
+        public async Task UpdateBusiness(BusinessEntity bus)
+        {
+            context!.Businesses!.Update(bus);
+            await context.SaveChangesAsync();
+        }
+        
         public void UpdateUserBusiness(List<UserBusinessEntity> bus)
         {
             context.UpdateRange(bus);

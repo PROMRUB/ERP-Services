@@ -65,6 +65,70 @@ namespace ERP.Services.API.Services.Organization
             await businessRepository!.AddBusiness(businessRequest);
             return true;
         }
+        
+        public async Task<bool> UpdateBusiness(string orgId, string businessId, OrganizationRequest req)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var orgDetail = await organizationRepository.GetOrganization();
+
+            businessRepository!.SetCustomOrgId(orgId);
+            var entity = await businessRepository!.GetBusinesses((Guid)orgDetail.OrgId)
+                .Where(x => x.BusinessCustomId == businessId)
+                .FirstOrDefaultAsync();
+
+            if (entity == null)
+                throw new ArgumentException("ไม่พบข้อมูลธุรกิจ");
+
+            // อัปเดตเฉพาะฟิลด์ที่ส่งมา (ไม่ทับด้วย null)
+            void SetIf(string? v, Action<string> setter)
+            {
+                if (v != null) setter(v);
+            }
+
+            // core
+            SetIf(req.BusinessType, v => entity.BusinessType = v);
+            SetIf(req.OrgName, v => entity.BusinessName = v);
+            SetIf(req.DisplayName, v => entity.DisplayName = v);
+            SetIf(req.OrgLogo, v => entity.BusinessLogo = v);
+
+            SetIf(req.TaxId, v => entity.TaxId = v);
+            SetIf(req.BrnId, v => entity.BrnId = v);
+
+            // address parts
+            SetIf(req.Building, v => entity.Building = v);
+            SetIf(req.RoomNo, v => entity.RoomNo = v);
+            SetIf(req.Floor, v => entity.Floor = v);
+            SetIf(req.Village, v => entity.Village = v);
+            SetIf(req.Moo, v => entity.Moo = v);
+            SetIf(req.No, v => entity.No = v);
+            SetIf(req.Road, v => entity.Road = v);
+            SetIf(req.Alley, v => entity.Alley = v);
+
+            SetIf(req.Province, v => entity.Province = v);
+            SetIf(req.District, v => entity.District = v);
+            SetIf(req.SubDistrict, v => entity.SubDistrict = v);
+            SetIf(req.PostCode, v => entity.PostCode = v);
+
+            // contact/desc
+            SetIf(req.Website, v =>
+            {
+                entity.Website = v;
+                entity.Url = v;
+            }); // ให้สอดคล้องกับฝั่ง FE
+            SetIf(req.OrgDescription, v => entity.BusinessDescription = v);
+
+            // อัปเดต BusinessCustomId ใหม่ ถ้า taxId/brnId เปลี่ยน (ทั้ง 2 ฟิลด์ต้องมีค่า)
+            if (req.TaxId != null || req.BrnId != null)
+            {
+                var tax = req.TaxId ?? entity.TaxId ?? "";
+                var brn = req.BrnId ?? entity.BrnId ?? "";
+                entity.BusinessCustomId = tax + "." + brn;
+            }
+
+            await businessRepository.UpdateBusiness(entity);
+            return true;
+        }
+
 
         public async Task<bool> UpdateOrganization(string orgId, OrganizationRequest org)
         {
@@ -76,6 +140,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository.Commit();
             return true;
         }
+
         public async Task<bool> UpdateSecurity(string orgId, OrganizationRequest org)
         {
             var customOrgId = org.OrgCustomId;
@@ -94,7 +159,8 @@ namespace ERP.Services.API.Services.Organization
 
         public async Task<OrganizationResponse> GetOrganizationByTaxId(string orgId, string taxId, string brnId)
         {
-            var query = await organizationRepository!.GetOrganizationList().Where(x => x.TaxId.Equals(taxId) && x.BrnId.Equals(brnId)).FirstOrDefaultAsync();
+            var query = await organizationRepository!.GetOrganizationList()
+                .Where(x => x.TaxId.Equals(taxId) && x.BrnId.Equals(brnId)).FirstOrDefaultAsync();
             return mapper.Map<OrganizationEntity, OrganizationResponse>(query);
         }
 
@@ -103,7 +169,8 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join((await userService.GetUserBusiness(orgId)),
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join(
+                (await userService.GetUserBusiness(orgId)),
                 business => business.BusinessId,
                 user => user.BusinessId,
                 (business, user) => new OrganizationEntity
@@ -120,25 +187,38 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId)
+                .Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
-            result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" :"อาคาร " + (query.Building + " ")) +
-                                (string.IsNullOrEmpty(query.RoomNo) ? "" :"ห้อง " + (query.RoomNo + " ")) +
-                                (string.IsNullOrEmpty(query.Floor) ? "" :"ชั้น " + (query.Floor + " ")) +
-                                (string.IsNullOrEmpty(query.Village) ? "" :"หมู่บ้่าน " + (query.Village + " ")) +
-                                (string.IsNullOrEmpty(query.No) ? "" :"เลขที่ " + (query.No + " ")) +
-                                (string.IsNullOrEmpty(query.Moo) ? "" :"หมู่ " + (query.Moo + " ")) +
-                                (string.IsNullOrEmpty(query.Alley) ? "" :"ซอย " + (query.Alley + " ")) +
-                                (string.IsNullOrEmpty(query.Road) ? "" :"ถนน " + (query.Road + " ")) +
-                                (string.IsNullOrEmpty(query.SubDistrict) ? "" :"แขวง " + (systemRepository.GetAll<SubDistrictEntity>().Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict)).FirstOrDefault().SubDistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.District) ? "" :"เขต " + (systemRepository.GetAll<DistrictEntity>().Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault().DistrictNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.Province) ? "" :"จังหวัด " + (systemRepository.GetAll<ProvinceEntity>().Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault().ProvinceNameTh + " ")) +
-                                (string.IsNullOrEmpty(query.PostCode) ? "" :"รหัสไปรษณีย์ " + query.PostCode);
+            result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : "อาคาร " + (query.Building + " ")) +
+                                (string.IsNullOrEmpty(query.RoomNo) ? "" : "ห้อง " + (query.RoomNo + " ")) +
+                                (string.IsNullOrEmpty(query.Floor) ? "" : "ชั้น " + (query.Floor + " ")) +
+                                (string.IsNullOrEmpty(query.Village) ? "" : "หมู่บ้่าน " + (query.Village + " ")) +
+                                (string.IsNullOrEmpty(query.No) ? "" : "เลขที่ " + (query.No + " ")) +
+                                (string.IsNullOrEmpty(query.Moo) ? "" : "หมู่ " + (query.Moo + " ")) +
+                                (string.IsNullOrEmpty(query.Alley) ? "" : "ซอย " + (query.Alley + " ")) +
+                                (string.IsNullOrEmpty(query.Road) ? "" : "ถนน " + (query.Road + " ")) +
+                                (string.IsNullOrEmpty(query.SubDistrict)
+                                    ? ""
+                                    : "แขวง " + (systemRepository.GetAll<SubDistrictEntity>()
+                                        .Where(x => x.SubDistrictCode.ToString().Equals(query.SubDistrict))
+                                        .FirstOrDefault().SubDistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.District)
+                                    ? ""
+                                    : "เขต " + (systemRepository.GetAll<DistrictEntity>()
+                                        .Where(x => x.DistrictCode.ToString().Equals(query.District)).FirstOrDefault()
+                                        .DistrictNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.Province)
+                                    ? ""
+                                    : "จังหวัด " + (systemRepository.GetAll<ProvinceEntity>()
+                                        .Where(x => x.ProvinceCode.ToString().Equals(query.Province)).FirstOrDefault()
+                                        .ProvinceNameTh + " ")) +
+                                (string.IsNullOrEmpty(query.PostCode) ? "" : "รหัสไปรษณีย์ " + query.PostCode);
             result.Url = query.Url;
             result.HotLine = query.Hotline;
             result.Tel = query.Tel;
             result.Email = query.Email;
-            
+
             return result;
         }
 
@@ -167,7 +247,8 @@ namespace ERP.Services.API.Services.Organization
         public async Task<bool> VerifyUserInOrganization(string orgId, string userName)
         {
             organizationRepository!.SetCustomOrgId(orgId);
-            if (await userService.GetUserByName(orgId, userName) == null || await organizationRepository!.GetUserInOrganization(userName) == null)
+            if (await userService.GetUserByName(orgId, userName) == null ||
+                await organizationRepository!.GetUserInOrganization(userName) == null)
                 throw new KeyNotFoundException("1102");
             return true;
         }
