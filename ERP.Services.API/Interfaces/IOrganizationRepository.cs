@@ -10,6 +10,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<OrganizationEntity> GetOrganizationList();
         public void AddUserToOrganization(OrganizationUserEntity user);
         public void UpdateUserToOrganization(OrganizationUserEntity user);
+        public int UpdateUserPassword(Guid orgUserId, string password);
         public IQueryable<OrganizationUserEntity> GetUserListAsync();
         public DbContext Context();
         public void UpdateUserRange(List<OrganizationUserEntity> userList);

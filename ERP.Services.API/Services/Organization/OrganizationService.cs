@@ -3,6 +3,7 @@ using ERP.Services.API.Entities;
 using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Organization;
+using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Models.ResponseModels.Organization;
 using ERP.Services.API.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -282,6 +283,21 @@ namespace ERP.Services.API.Services.Organization
 
             var entity = mapper.Map<OrganizationUserRequest, OrganizationUserEntity>(user);
             organizationRepository!.UpdateUserToOrganization(entity);
+        }
+        
+        public void ChangeUserPassword(string orgId, ChangeUserPasswordRequest req)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+
+            var user = organizationRepository!.GetUserListAsync().FirstOrDefault(x => x.OrgUserId == req.OrgUserId);
+            
+            if (user == null) throw new KeyNotFoundException("User not found in this organization.");
+
+            if (req.NewPassword.Length < 8)
+                throw new ArgumentException("Password too short.");
+
+            var updated = organizationRepository!.UpdateUserPassword(req.OrgUserId, req.NewPassword);
+            if (updated <= 0) throw new Exception("Update password failed.");
         }
         
         public async Task<bool> VerifyUserInOrganization(string orgId, string userName)
