@@ -300,6 +300,19 @@ namespace ERP.Services.API.Services.Organization
             if (updated <= 0) throw new Exception("Update password failed.");
         }
         
+        public void RemoveUserFromOrganization(string orgId, Guid orgUserId)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+
+            var user = organizationRepository.GetUserListAsync().FirstOrDefault(x => x.OrgUserId == orgUserId);
+            if (user == null)
+                throw new KeyNotFoundException("User not found in this organization.");
+
+            var affected = organizationRepository.RemoveUser(orgUserId);
+            if (affected <= 0)
+                throw new Exception("Remove user failed.");
+        }
+        
         public async Task<bool> VerifyUserInOrganization(string orgId, string userName)
         {
             organizationRepository!.SetCustomOrgId(orgId);

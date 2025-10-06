@@ -11,6 +11,7 @@ namespace ERP.Services.API.Interfaces
         public void AddUserToOrganization(OrganizationUserEntity user);
         public void UpdateUserToOrganization(OrganizationUserEntity user);
         public int UpdateUserPassword(Guid orgUserId, string password);
+        public int RemoveUser(Guid orgUserId);
         public IQueryable<OrganizationUserEntity> GetUserListAsync();
         public DbContext Context();
         public void UpdateUserRange(List<OrganizationUserEntity> userList);

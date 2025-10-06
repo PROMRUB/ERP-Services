@@ -153,6 +153,27 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
         
+        [HttpDelete]
+        [Route("org/{id}/action/RemoveUser/{userId}")]
+        [MapToApiVersion("1")]
+        public IActionResult RemoveUser(string id, Guid userId)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101");
+                if (userId == Guid.Empty)
+                    throw new ArgumentException("1102");
+
+                services.RemoveUserFromOrganization(id, userId);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
         [HttpPost]
         [Route("org/{id}/action/AdminAddOrganization")]
         [MapToApiVersion("1")]

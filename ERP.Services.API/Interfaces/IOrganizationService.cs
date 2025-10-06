@@ -11,6 +11,7 @@ namespace ERP.Services.API.Interfaces
         public void AddUserToOrganization(string orgId, OrganizationUserRequest user);
         public void UpdateUserToOrganization(string orgId, OrganizationUserRequest user);
         public void ChangeUserPassword(string orgId, ChangeUserPasswordRequest req);
+        public void RemoveUserFromOrganization(string orgId, Guid orgUserId);
         public bool IsUserNameExist(string orgId, string userName);
         public Task<bool> VerifyUserInOrganization(string orgId, string userName);
         public Task<bool> AddOrganization(string orgId, OrganizationRequest org);
