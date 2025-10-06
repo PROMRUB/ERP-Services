@@ -35,7 +35,7 @@ namespace ERP.Services.API.Repositories
         public void UpdateUserToOrganization(OrganizationUserEntity user)
         {
             var existing = context!.OrganizationUsers!
-                .SingleOrDefault(x => x.OrgUserId == user.OrgUserId && x.OrgCustomId == orgId);
+                .SingleOrDefault(x => x.OrgUserId == user.OrgUserId);
 
             if (existing == null)
                 throw new KeyNotFoundException("1104");
