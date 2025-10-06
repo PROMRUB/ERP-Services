@@ -217,6 +217,24 @@ namespace ERP.Services.API.Services.Organization
             return result;
         }
 
+        public async Task<int> RemoveBusiness(
+            string orgId,
+            Guid businessId,
+            CancellationToken ct = default)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+            var org = await organizationRepository!.GetOrganization();
+            businessRepository!.SetCustomOrgId(orgId);
+
+            var exists = await businessRepository!
+                .GetBusinesses((Guid)org.OrgId)
+                .AnyAsync(b => b.BusinessId == businessId, ct);
+
+            if (!exists) throw new KeyNotFoundException("Business not found in this org.");
+
+            return await businessRepository!.RemoveBusinessesAsync(businessId, ct);
+        }
+        
         public async Task<List<OrganizationUserResponse>> GetUserAllowedOrganization(string userName)
         {
             var query = await organizationRepository!.GetUserAllowedOrganizationAsync(userName);

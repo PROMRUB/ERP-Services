@@ -24,7 +24,18 @@ namespace ERP.Services.API.Repositories
             var query = context.Businesses.Where(x =>  x.BusinessStatus == RecordStatus.Active.ToString()).AsQueryable();
             return query;
         }
-
+        
+        public async Task<int> RemoveBusinessesAsync(
+            Guid orgId,
+            CancellationToken ct = default)
+        {
+            return await context!.Businesses
+                .Where(x => x.OrgId == orgId && x.BusinessStatus == RecordStatus.Active.ToString())
+                .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(x => x.BusinessStatus, _ => RecordStatus.InActive.ToString()),
+                    ct);
+        }
+        
         public IQueryable<UserBusinessEntity> GetUserBusinessQuery()
         {
             return context.UserBusinesses.AsQueryable();

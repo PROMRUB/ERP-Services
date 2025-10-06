@@ -15,6 +15,7 @@ namespace ERP.Services.API.Interfaces
         public Task<bool> UpdateBusiness(string orgId, string businessId, OrganizationRequest req);
         public Task<List<OrganizationResponse>> GetBusiness(string orgId);
         public Task<OrganizationResponse> GetBusinessById(string orgId, string businessId);
+        public Task<int> RemoveBusiness(string orgId, Guid businessId, CancellationToken ct = default);
         public Task<bool> UpdateOrganization(string orgId, OrganizationRequest org);
         public Task<bool> UpdateSecurity(string orgId, OrganizationRequest org);
         public Task<List<OrganizationUserResponse>> GetUserAllowedOrganization(string userName);
