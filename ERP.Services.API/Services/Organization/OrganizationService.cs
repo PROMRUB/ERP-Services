@@ -224,15 +224,17 @@ namespace ERP.Services.API.Services.Organization
         {
             organizationRepository!.SetCustomOrgId(orgId);
             var org = await organizationRepository!.GetOrganization();
+
             businessRepository!.SetCustomOrgId(orgId);
 
             var exists = await businessRepository!
                 .GetBusinesses((Guid)org.OrgId)
                 .AnyAsync(b => b.BusinessId == businessId, ct);
 
-            if (!exists) throw new KeyNotFoundException("Business not found in this org.");
+            if (!exists)
+                throw new KeyNotFoundException("Business not found in this org.");
 
-            return await businessRepository!.RemoveBusinessesAsync(businessId, ct);
+            return await businessRepository!.RemoveBusinessAsync((Guid)org.OrgId, businessId, ct);
         }
         
         public async Task<List<OrganizationUserResponse>> GetUserAllowedOrganization(string userName)

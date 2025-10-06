@@ -25,15 +25,18 @@ namespace ERP.Services.API.Repositories
             return query;
         }
         
-        public async Task<int> RemoveBusinessesAsync(
+        public async Task<int> RemoveBusinessAsync(
             Guid orgId,
+            Guid businessId,
             CancellationToken ct = default)
         {
-            return await context!.Businesses
-                .Where(x => x.OrgId == orgId && x.BusinessStatus == RecordStatus.Active.ToString())
+            return await context!.Businesses!
+                .Where(x => x.OrgId == orgId
+                            && x.BusinessId == businessId
+                            && x.BusinessStatus == RecordStatus.Active.ToString())
                 .ExecuteUpdateAsync(setters => setters
-                        .SetProperty(x => x.BusinessStatus, _ => RecordStatus.InActive.ToString()),
-                    ct);
+                        .SetProperty(x => x.BusinessStatus, _ => RecordStatus.InActive.ToString())
+                    , ct);
         }
         
         public IQueryable<UserBusinessEntity> GetUserBusinessQuery()
