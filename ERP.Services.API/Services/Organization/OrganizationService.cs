@@ -72,7 +72,7 @@ namespace ERP.Services.API.Services.Organization
             var orgDetail = await organizationRepository.GetOrganization();
 
             businessRepository!.SetCustomOrgId(orgId);
-            var entity = await businessRepository!.GetBusinesses()
+            var entity = await businessRepository!.GetBusinesses((Guid)orgDetail.OrgId)
                 .Where(x => x.BusinessCustomId == businessId)
                 .FirstOrDefaultAsync();
 
@@ -167,19 +167,20 @@ namespace ERP.Services.API.Services.Organization
         public async Task<List<OrganizationResponse>> GetBusiness(string orgId)
         {
             organizationRepository!.SetCustomOrgId(orgId);
-            var orgQuery = await organizationRepository!.GetOrganization();
+            var org = await organizationRepository!.GetOrganization();
+
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses().Join(
-                (await userService.GetUserBusiness(orgId)),
-                business => business.BusinessId,
-                user => user.BusinessId,
-                (business, user) => new OrganizationEntity
+
+            var q = businessRepository!.GetBusinesses((Guid)org.OrgId)
+                .Select(b => new OrganizationEntity
                 {
-                    OrgId = business.BusinessId,
-                    OrgCustomId = business.BusinessCustomId,
-                    DisplayName = business.BusinessName,
-                }).ToListAsync();
-            return mapper.Map<List<OrganizationEntity>, List<OrganizationResponse>>(query);
+                    OrgId = b.BusinessId,
+                    OrgCustomId = b.BusinessCustomId,
+                    DisplayName = b.BusinessName,
+                });
+
+            var list = await q.ToListAsync();
+            return mapper.Map<List<OrganizationEntity>, List<OrganizationResponse>>(list);
         }
 
         public async Task<OrganizationResponse> GetBusinessById(string orgId, string businessId)
@@ -187,7 +188,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses()
+            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId)
                 .Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
             result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : "อาคาร " + (query.Building + " ")) +
