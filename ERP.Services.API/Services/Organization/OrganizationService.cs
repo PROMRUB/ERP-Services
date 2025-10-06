@@ -266,6 +266,24 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.AddUserToOrganization(request);
         }
 
+        public void UpdateUserToOrganization(string orgId, OrganizationUserRequest user)
+        {
+            organizationRepository!.SetCustomOrgId(orgId);
+
+            if (user.OrgUserId == null)
+                throw new ArgumentException("1101");
+
+            var newUsername = (user.Username ?? string.Empty).Trim();
+            if (!string.IsNullOrEmpty(newUsername))
+            {
+                if (userService.IsUserNameExist(orgId, newUsername))
+                    throw new ArgumentException("1111");
+            }
+
+            var entity = mapper.Map<OrganizationUserRequest, OrganizationUserEntity>(user);
+            organizationRepository!.UpdateUserToOrganization(entity);
+        }
+        
         public async Task<bool> VerifyUserInOrganization(string orgId, string userName)
         {
             organizationRepository!.SetCustomOrgId(orgId);
