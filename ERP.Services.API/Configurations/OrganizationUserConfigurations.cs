@@ -10,7 +10,11 @@ namespace ERP.Services.API.Configurations
         public OrganizationUserConfigurations()
         {
             CreateMap<OrganizationUserRequest, OrganizationUserEntity>()
-                .ForMember(dest => dest.OrgUserId, opt => opt.MapFrom(_ => Guid.NewGuid()));
+                .ForMember(d => d.OrgUserId, opt => opt.MapFrom((src, dest) =>
+                    src.OrgUserId.HasValue && src.OrgUserId.Value != Guid.Empty
+                        ? src.OrgUserId.Value
+                        : (dest.OrgUserId != Guid.Empty ? dest.OrgUserId : Guid.NewGuid())));
+            
             CreateMap<OrganizationUserEntity, OrganizationUserResponse>()
                 .ForMember(dest => dest.Firstname, opt => opt.MapFrom(x => x.FirstNameTh))
                 .ForMember(dest => dest.Lastname, opt => opt.MapFrom(x => x.LastnameTh))
