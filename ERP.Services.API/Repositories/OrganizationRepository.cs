@@ -34,15 +34,12 @@ namespace ERP.Services.API.Repositories
 
         public void UpdateUserToOrganization(OrganizationUserEntity user)
         {
-            user.OrgCustomId = orgId;
-
             var existing = context!.OrganizationUsers!
                 .SingleOrDefault(x => x.OrgUserId == user.OrgUserId && x.OrgCustomId == orgId);
 
             if (existing == null)
-                throw new KeyNotFoundException("1104"); // not found (เลือกรหัสตามระบบคุณใช้)
+                throw new KeyNotFoundException("1104");
 
-            // ===== กัน username ซ้ำใน org นี้ (ยกเว้นตัวเอง) =====
             if (!string.IsNullOrWhiteSpace(user.Username) &&
                 !string.Equals(existing.Username, user.Username, StringComparison.OrdinalIgnoreCase))
             {
@@ -51,7 +48,7 @@ namespace ERP.Services.API.Repositories
                               && x.Username!.ToLower() == user.Username!.ToLower()
                               && x.OrgUserId != existing.OrgUserId);
                 if (dup)
-                    throw new ArgumentException("1111"); // ชื่อซ้ำ
+                    throw new ArgumentException("1111");
             }
 
             if (!string.IsNullOrWhiteSpace(user.Username))
