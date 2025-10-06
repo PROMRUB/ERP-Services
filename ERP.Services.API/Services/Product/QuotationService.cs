@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using ERP.Services.API.Entities;
 using ERP.Services.API.Enum;
@@ -629,122 +631,295 @@ public class QuotationService : IQuotationService
         return res;
     }
 
-    public async Task<PagedList<QuotationResponse>> GetByList(string keyword, Guid businessId, string? startDate,
-        string? endDate, Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
+    public async Task<PagedList<QuotationResponse>> GetByList(
+        string keyword, Guid businessId, string? startDate, string? endDate,
+        Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
         string? status, int page, int pageSize, bool? isGreaterThan)
     {
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            keyword = keyword.ToLower();
-        }
-
-        DateTime? start = !string.IsNullOrEmpty(startDate)
-            ? DateTime.SpecifyKind(DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
-                DateTimeKind.Utc)
-            : null;
-
-        DateTime? end = !string.IsNullOrEmpty(endDate)
-            ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
-                DateTimeKind.Utc)
-            : null;
-
-        var userId = _userPrincipalHandler.Id;
-
-        var user = _businessRepository.GetUserBusinessQuery()
-            .FirstOrDefault(x => x.UserId == userId);
-        
-        var query = _quotationRepository.GetQuotationQuery()
-                .Include(x => x.Projects)
-                .Where(x => x.BusinessId == businessId)
-                .Where(x => user.UserId == x.SalePersonId)
-                .Where(x =>
-                    (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                     x.QuotationNo.ToLower() == keyword)
-                    && (string.IsNullOrEmpty(status) || x.Status == status)
-                    && ((start == null || x.QuotationDateTime.Date >= start)
-                        && (end == null || x.QuotationDateTime.Date <= end)
-                    )
-                    && (!customerId.HasValue || x.CustomerId == customerId)
-                    && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
-                    && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                    && (!profit.HasValue || !isGreaterThan.HasValue || (isGreaterThan.Value && x.Profit >= profit) ||
-                        (!isGreaterThan.Value && x.Profit < profit))
-                )
-                .OrderByDescending(x => x.QuotationNo)
-            ;
-
-        if (user != null && !string.IsNullOrWhiteSpace(user.Role) &&
-            (user.Role.Contains("SaleManager") || user.Role.Contains("Director")
-                                               || user.Role.Contains("Admin")))
-        {
-            query = _quotationRepository.GetQuotationQuery()
-                    .Include(x => x.Projects)
-                    .Where(x => x.BusinessId == businessId)
-                    .Where(x =>
-                        (!salePersonId.HasValue || x.SalePersonId == salePersonId)
-                        && (string.IsNullOrWhiteSpace(keyword) || x.QuotationNo.ToLower().Contains(keyword) ||
-                            x.QuotationNo.ToLower() == keyword)
-                        && (string.IsNullOrEmpty(status) || x.Status == status)
-                        && ((start == null || x.QuotationDateTime.Date >= start)
-                            && (end == null || x.QuotationDateTime.Date <= end)
-                        )
-                        && (!customerId.HasValue || x.CustomerId == customerId)
-                        && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
-                        && (!isSpecialPrice.HasValue || x.IsSpecialPrice == isSpecialPrice)
-                        && (!profit.HasValue || !isGreaterThan.HasValue
-                                             || (isGreaterThan.Value && x.Profit >= profit)
-                                             || (!isGreaterThan.Value && x.Profit < profit)
-                        )
-                    )
-                    .OrderByDescending(x => x.QuotationNo)
-                ;
-        }
-
-
-        var beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
-
-
-        var list = beforeMutate.Items.Select(x => new QuotationResponse
+        // --- local helpers (throw only) ---
+        static string Dump(object o) => JsonSerializer.Serialize(
+            o,
+            new JsonSerializerOptions
             {
-                QuotationId = x.QuotationId.Value,
-                CustomerId = x.CustomerId,
-                CustomerNo = x.Customer.No,
-                CustomerName = x.Customer.DisplayName,
-                Address = x.Customer.Address(),
-                ContactPerson = x.CustomerContact.DisplayName(),
-                ContactPersonId = x.CustomerContactId,
-                QuotationNo = x.QuotationNo,
-                QuotationDateTime = x.QuotationDateTime.ToString("dd/MM/yyyy"),
-                EditTime = x.EditTime,
-                IssuedByUser = null,
-                IssuedByUserId = x.IssuedById,
-                IssuedByUserName = x.IssuedByUser.Username ?? "-",
-                SalePersonId = x.SalePersonId,
-                SalePersonName = x.SalePerson.FirstNameTh + " " + x.SalePerson.LastnameTh ?? "-",
-                Status = x.Status,
-                Products = null,
-                ProjectName = x.Projects.FirstOrDefault()?.Project.ProjectName,
-                EthSaleMonth = x.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
-                TotalOffering = (decimal)x.Products.Sum(y => y.Amount * y.Quantity),
-                Projects = null,
-                Price = x.RealPriceMsrp,
-                Vat = x.SumOfDiscount,
-                Amount = x.RealPriceMsrp - x.SumOfDiscount,
-                // AccountNo = x.PaymentId.Value,
-                Remark = x.Remark,
-                Profit = x.Products.Sum(p => p.Amount * p.Quantity) == 0
-                    ? 0
-                    : (
-                        (x.Products.Sum(p => ((decimal)p.Amount - p.CostEstimate) * p.Quantity) * 100) /
-                        x.Products.Sum(p => (decimal)p.Amount * p.Quantity)
-                    ),
-                IsSpecialPrice = x.IsSpecialPrice
-            })
-            .ToList();
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
 
-        var afterMutate = new PagedList<QuotationResponse>(list, beforeMutate.TotalCount, page, pageSize);
+        Exception Boom(string stage, object details, Exception? ex = null)
+        {
+            var payload = new
+            {
+                stage,
+                details,
+                ex = ex == null
+                    ? null
+                    : new
+                    {
+                        type = ex.GetType().FullName,
+                        msg = ex.Message,
+                        stack = ex.StackTrace,
+                        inner = ex.InnerException == null
+                            ? null
+                            : new
+                            {
+                                type = ex.InnerException.GetType().FullName,
+                                msg = ex.InnerException.Message,
+                                stack = ex.InnerException.StackTrace
+                            }
+                    }
+            };
+            // ใช้ InvalidOperationException ก็ได้ จะจับง่าย
+            return new InvalidOperationException(Dump(payload));
+        }
 
-        return afterMutate;
+        // ---------- input snapshot ----------
+        var inputSnapshot = new
+        {
+            keyword,
+            businessId,
+            startDate,
+            endDate,
+            customerId,
+            projectId,
+            profit,
+            isSpecialPrice,
+            salePersonId,
+            status,
+            page,
+            pageSize,
+            isGreaterThan
+        };
+
+        try
+        {
+            // ---------- normalize ----------
+            var kw = string.IsNullOrWhiteSpace(keyword) ? null : keyword.Trim().ToLowerInvariant();
+
+            DateTime? start = !string.IsNullOrEmpty(startDate)
+                ? DateTime.SpecifyKind(DateTime.ParseExact(startDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                    DateTimeKind.Utc)
+                : null;
+
+            DateTime? end = !string.IsNullOrEmpty(endDate)
+                ? DateTime.SpecifyKind(DateTime.ParseExact(endDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
+                    DateTimeKind.Utc)
+                : null;
+
+            var userId = _userPrincipalHandler.Id;
+
+            var user = _businessRepository.GetUserBusinessQuery()
+                .FirstOrDefault(x => x.UserId == userId);
+
+            if (user == null)
+                throw Boom("resolve-user", new { inputSnapshot, userId, reason = "user-business mapping not found" });
+
+            // ---------- build query ----------
+            IQueryable<Entities.QuotationEntity> query = _quotationRepository
+                .GetQuotationQuery()
+                .Include(x => x.Projects)
+                .Where(x => x.BusinessId == businessId);
+
+            var isPrivileged = !string.IsNullOrWhiteSpace(user.Role) &&
+                               (user.Role.Contains("SaleManager") ||
+                                user.Role.Contains("Director") ||
+                                user.Role.Contains("Admin"));
+
+            if (isPrivileged)
+            {
+                if (salePersonId.HasValue)
+                    query = query.Where(x => x.SalePersonId == salePersonId.Value);
+            }
+            else
+            {
+                query = query.Where(x => x.SalePersonId == user.UserId);
+            }
+
+            if (kw != null)
+                query = query.Where(x => x.QuotationNo != null &&
+                                         (x.QuotationNo.ToLower().Contains(kw) || x.QuotationNo.ToLower() == kw));
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(x => x.Status == status);
+
+            if (start.HasValue)
+                query = query.Where(x => x.QuotationDateTime.Date >= start.Value.Date);
+            if (end.HasValue)
+                query = query.Where(x => x.QuotationDateTime.Date <= end.Value.Date);
+
+            if (customerId.HasValue)
+                query = query.Where(x => x.CustomerId == customerId.Value);
+
+            if (projectId.HasValue)
+                query = query.Where(x => x.Projects.Any(p => p.ProjectId == projectId.Value));
+
+            if (isSpecialPrice.HasValue)
+                query = query.Where(x => x.IsSpecialPrice == isSpecialPrice.Value);
+
+            if (profit.HasValue && isGreaterThan.HasValue)
+                query = isGreaterThan.Value
+                    ? query.Where(x => x.Profit >= profit.Value)
+                    : query.Where(x => x.Profit < profit.Value);
+
+            query = query.OrderByDescending(x => x.QuotationNo);
+
+            // ---------- capture SQL (ถ้าใช้ได้) ----------
+            string? sql = null;
+            try
+            {
+                sql = query.ToQueryString();
+            }
+            catch
+            {
+                /* EF เวอร์ชันเก่า ก็ปล่อยว่างไป */
+            }
+
+            // ---------- page ----------
+            PagedList<Entities.QuotationEntity> beforeMutate;
+            try
+            {
+                beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
+            }
+            catch (Exception exPage)
+            {
+                throw Boom("page-db", new { inputSnapshot, isPrivileged, sql }, exPage);
+            }
+
+            if (beforeMutate.Items == null)
+                throw Boom("page-null-items", new { inputSnapshot, isPrivileged, sql });
+
+            // ถ้า “ไม่มีผลลัพธ์” และต้องการรู้เหตุ → โยนออกพร้อมสรุปเงื่อนไข/SQL
+            if (beforeMutate.Items.Count == 0)
+                throw Boom("no-results", new
+                {
+                    inputSnapshot,
+                    isPrivileged,
+                    userRole = user.Role,
+                    appliedFilters = new
+                    {
+                        kw,
+                        status,
+                        dateFilter = new { start = start?.ToString("yyyy-MM-dd"), end = end?.ToString("yyyy-MM-dd") },
+                        customerId,
+                        projectId,
+                        isSpecialPrice,
+                        profit,
+                        isGreaterThan,
+                        salePersonIdWhenPrivileged = isPrivileged ? salePersonId : (Guid?)null,
+                        salePersonEnforcedWhenNonPrivileged = !isPrivileged ? user.UserId : (Guid?)null
+                    },
+                    sql
+                });
+
+            // ---------- map (กันพังต่อแถว; เก็บ error summary ไว้ใน throw เดียว) ----------
+            var list = new List<QuotationResponse>(beforeMutate.Items.Count);
+            var mapErrors = new List<object>();
+
+            decimal SumAmtQty(IEnumerable<dynamic> items)
+            {
+                decimal acc = 0m;
+                foreach (var it in items ?? Enumerable.Empty<dynamic>())
+                {
+                    decimal amt = it?.Amount == null ? 0m : Convert.ToDecimal(it.Amount);
+                    decimal qty = it?.Quantity == null ? 0m : Convert.ToDecimal(it.Quantity);
+                    acc += amt * qty;
+                }
+
+                return acc;
+            }
+
+            decimal SumNum(IEnumerable<dynamic> items)
+            {
+                decimal acc = 0m;
+                foreach (var it in items ?? Enumerable.Empty<dynamic>())
+                {
+                    decimal amt = it?.Amount == null ? 0m : Convert.ToDecimal(it.Amount);
+                    decimal cost = it?.CostEstimate == null ? 0m : Convert.ToDecimal(it.CostEstimate);
+                    decimal qty = it?.Quantity == null ? 0m : Convert.ToDecimal(it.Quantity);
+                    acc += (amt - cost) * qty;
+                }
+
+                return acc;
+            }
+
+            for (int i = 0; i < beforeMutate.Items.Count; i++)
+            {
+                var x = beforeMutate.Items[i];
+                try
+                {
+                    var products = x.Products ?? Enumerable.Empty<dynamic>();
+                    var den = SumAmtQty(products);
+                    var num = SumNum(products);
+                    var profitPct = den == 0m ? 0m : (num * 100m) / den;
+
+                    var saleName = string.Join(" ", new[]
+                    {
+                        x.SalePerson?.FirstNameTh ?? "",
+                        x.SalePerson?.LastnameTh ?? ""
+                    }.Where(s => !string.IsNullOrWhiteSpace(s))).Trim();
+                    if (string.IsNullOrWhiteSpace(saleName)) saleName = "-";
+
+                    list.Add(new QuotationResponse
+                    {
+                        QuotationId = x.QuotationId ?? Guid.Empty,
+                        CustomerId = x.CustomerId,
+                        CustomerNo = x.Customer?.No,
+                        CustomerName = x.Customer?.DisplayName,
+                        Address = x.Customer?.Address(),
+                        ContactPerson = x.CustomerContact?.DisplayName(),
+                        ContactPersonId = x.CustomerContactId,
+                        QuotationNo = x.QuotationNo ?? "-",
+                        QuotationDateTime = x.QuotationDateTime.ToString("dd/MM/yyyy"),
+                        EditTime = x.EditTime,
+                        IssuedByUser = null,
+                        IssuedByUserId = x.IssuedById,
+                        IssuedByUserName = x.IssuedByUser?.Username ?? "-",
+                        SalePersonId = x.SalePersonId,
+                        SalePersonName = saleName,
+                        Status = x.Status,
+                        Products = null,
+                        ProjectName = x.Projects?.FirstOrDefault()?.Project?.ProjectName,
+                        EthSaleMonth = x.Projects?.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
+                        TotalOffering = SumAmtQty(products),
+                        Projects = null,
+                        Price = x.RealPriceMsrp,
+                        Vat = x.SumOfDiscount,
+                        Amount = ((decimal?)x.RealPriceMsrp ?? 0m) - ((decimal?)x.SumOfDiscount ?? 0m),
+                        Remark = x.Remark,
+                        Profit = profitPct,
+                        IsSpecialPrice = x.IsSpecialPrice
+                    });
+                }
+                catch (Exception exRow)
+                {
+                    mapErrors.Add(new
+                    {
+                        index = i,
+                        quotationId = x?.QuotationId,
+                        ex = new { type = exRow.GetType().FullName, msg = exRow.Message, stack = exRow.StackTrace }
+                    });
+                    // ข้ามแถวนี้ไปตามคำสั่ง “ต้องพ่นผ่าน throw” → จะโยนรวบตอนท้าย
+                }
+            }
+
+            if (mapErrors.Count > 0)
+            {
+                // โยนรวม พร้อมแนบจำนวนที่สำเร็จ เพื่อดูว่าพังตรงไหน
+                throw Boom("map-errors", new
+                {
+                    succeeded = list.Count,
+                    failed = mapErrors.Count,
+                    mapErrors,
+                    sql
+                });
+            }
+
+            // สำเร็จ ปกติ return
+            return new PagedList<QuotationResponse>(list, beforeMutate.TotalCount, page, pageSize);
+        }
+        catch (Exception ex)
+        {
+            throw Boom("fatal", new { inputSnapshot }, ex);
+        }
     }
 
     public async Task<TotalProductQuotation> GetTotalProductQuotation(Guid id)
