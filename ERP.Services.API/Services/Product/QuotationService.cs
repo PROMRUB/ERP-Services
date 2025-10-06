@@ -668,7 +668,6 @@ public class QuotationService : IQuotationService
                             }
                     }
             };
-            // ใช้ InvalidOperationException ก็ได้ จะจับง่าย
             return new InvalidOperationException(Dump(payload));
         }
 
@@ -713,10 +712,14 @@ public class QuotationService : IQuotationService
             if (user == null)
                 throw Boom("resolve-user", new { inputSnapshot, userId, reason = "user-business mapping not found" });
 
-            // ---------- build query ----------
-            IQueryable<Entities.QuotationEntity> query = _quotationRepository
+            // ---------- build base query (no Customer/Contact refs to avoid INNER JOIN) ----------
+            // รวมเฉพาะที่จำเป็นต่อ filter/sort และ include เฉพาะ collection ที่ต้องใช้คำนวณ
+            // (Projects/Products) เพื่อให้ยังได้ผลลัพธ์ แม้ Customer/Contact จะว่าง/ขาด
+            IQueryable<Entities.QuotationEntity> baseQuery = _quotationRepository
                 .GetQuotationQuery()
-                .Include(x => x.Projects)
+                .AsNoTracking()
+                .Include(x => x.Projects) // ใช้กรองตาม projectId และดึงชื่อโปรเจกต์
+                .Include(x => x.Products) // ใช้คำนวณยอด/กำไร
                 .Where(x => x.BusinessId == businessId);
 
             var isPrivileged = !string.IsNullOrWhiteSpace(user.Role) &&
@@ -727,68 +730,67 @@ public class QuotationService : IQuotationService
             if (isPrivileged)
             {
                 if (salePersonId.HasValue)
-                    query = query.Where(x => x.SalePersonId == salePersonId.Value);
+                    baseQuery = baseQuery.Where(x => x.SalePersonId == salePersonId.Value);
             }
             else
             {
-                query = query.Where(x => x.SalePersonId == user.UserId);
+                baseQuery = baseQuery.Where(x => x.SalePersonId == user.UserId);
             }
 
             if (kw != null)
-                query = query.Where(x => x.QuotationNo != null &&
-                                         (x.QuotationNo.ToLower().Contains(kw) || x.QuotationNo.ToLower() == kw));
+                baseQuery = baseQuery.Where(x => x.QuotationNo != null &&
+                                                 (x.QuotationNo.ToLower().Contains(kw) ||
+                                                  x.QuotationNo.ToLower() == kw));
 
             if (!string.IsNullOrEmpty(status))
-                query = query.Where(x => x.Status == status);
+                baseQuery = baseQuery.Where(x => x.Status == status);
 
             if (start.HasValue)
-                query = query.Where(x => x.QuotationDateTime.Date >= start.Value.Date);
+                baseQuery = baseQuery.Where(x => x.QuotationDateTime.Date >= start.Value.Date);
+
             if (end.HasValue)
-                query = query.Where(x => x.QuotationDateTime.Date <= end.Value.Date);
+                baseQuery = baseQuery.Where(x => x.QuotationDateTime.Date <= end.Value.Date);
 
             if (customerId.HasValue)
-                query = query.Where(x => x.CustomerId == customerId.Value);
+                baseQuery = baseQuery.Where(x => x.CustomerId == customerId.Value);
 
             if (projectId.HasValue)
-                query = query.Where(x => x.Projects.Any(p => p.ProjectId == projectId.Value));
+                baseQuery = baseQuery.Where(x => x.Projects.Any(p => p.ProjectId == projectId.Value));
 
             if (isSpecialPrice.HasValue)
-                query = query.Where(x => x.IsSpecialPrice == isSpecialPrice.Value);
+                baseQuery = baseQuery.Where(x => x.IsSpecialPrice == isSpecialPrice.Value);
 
             if (profit.HasValue && isGreaterThan.HasValue)
-                query = isGreaterThan.Value
-                    ? query.Where(x => x.Profit >= profit.Value)
-                    : query.Where(x => x.Profit < profit.Value);
+                baseQuery = isGreaterThan.Value
+                    ? baseQuery.Where(x => x.Profit >= profit.Value)
+                    : baseQuery.Where(x => x.Profit < profit.Value);
 
-            query = query.OrderByDescending(x => x.QuotationNo);
+            baseQuery = baseQuery.OrderByDescending(x => x.QuotationNo);
 
-            // ---------- capture SQL (ถ้าใช้ได้) ----------
+            // ---------- capture SQL (best-effort) ----------
             string? sql = null;
             try
             {
-                sql = query.ToQueryString();
+                sql = baseQuery.ToQueryString();
             }
             catch
             {
-                /* EF เวอร์ชันเก่า ก็ปล่อยว่างไป */
+                /* ignore */
             }
 
-            // ---------- page ----------
-            PagedList<Entities.QuotationEntity> beforeMutate;
+            // ---------- manual paging (เพื่อเลี่ยง side-effect จาก PagedList.Create) ----------
+            int totalCount;
             try
             {
-                beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
+                totalCount = await baseQuery.CountAsync();
             }
-            catch (Exception exPage)
+            catch (Exception exCount)
             {
-                throw Boom("page-db", new { inputSnapshot, isPrivileged, sql }, exPage);
+                throw Boom("count-db", new { inputSnapshot, isPrivileged, sql }, exCount);
             }
 
-            if (beforeMutate.Items == null)
-                throw Boom("page-null-items", new { inputSnapshot, isPrivileged, sql });
-
-            // ถ้า “ไม่มีผลลัพธ์” และต้องการรู้เหตุ → โยนออกพร้อมสรุปเงื่อนไข/SQL
-            if (beforeMutate.Items.Count == 0)
+            if (totalCount == 0)
+            {
                 throw Boom("no-results", new
                 {
                     inputSnapshot,
@@ -809,9 +811,40 @@ public class QuotationService : IQuotationService
                     },
                     sql
                 });
+            }
 
-            // ---------- map (กันพังต่อแถว; เก็บ error summary ไว้ใน throw เดียว) ----------
-            var list = new List<QuotationResponse>(beforeMutate.Items.Count);
+            List<Entities.QuotationEntity> pageItems;
+            try
+            {
+                pageItems = await baseQuery
+                    .Skip((Math.Max(1, page) - 1) * Math.Max(1, pageSize))
+                    .Take(Math.Max(1, pageSize))
+                    .ToListAsync();
+            }
+            catch (Exception exTake)
+            {
+                throw Boom("page-db", new { inputSnapshot, isPrivileged, sql }, exTake);
+            }
+
+            if (pageItems == null)
+                throw Boom("page-null-items", new { inputSnapshot, isPrivileged, sql });
+
+            if (pageItems.Count == 0)
+            {
+                // มีข้อมูลรวม แต่หน้า/ขนาดเพจทำให้หน้าเปล่า
+                throw Boom("page-empty", new
+                {
+                    inputSnapshot,
+                    isPrivileged,
+                    sql,
+                    totalCount,
+                    effectivePage = page,
+                    effectivePageSize = pageSize
+                });
+            }
+
+            // ---------- map (null-safe, ไม่บังคับโหลด Customer/Contact) ----------
+            var list = new List<QuotationResponse>(pageItems.Count);
             var mapErrors = new List<object>();
 
             decimal SumAmtQty(IEnumerable<dynamic> items)
@@ -841,9 +874,9 @@ public class QuotationService : IQuotationService
                 return acc;
             }
 
-            for (int i = 0; i < beforeMutate.Items.Count; i++)
+            for (int i = 0; i < pageItems.Count; i++)
             {
-                var x = beforeMutate.Items[i];
+                var x = pageItems[i];
                 try
                 {
                     var products = x.Products ?? Enumerable.Empty<dynamic>();
@@ -851,6 +884,7 @@ public class QuotationService : IQuotationService
                     var num = SumNum(products);
                     var profitPct = den == 0m ? 0m : (num * 100m) / den;
 
+                    // ไม่ดึง Customer/Contact บังคับ — ใช้ได้เฉพาะเมื่อมีจริงเท่านั้น
                     var saleName = string.Join(" ", new[]
                     {
                         x.SalePerson?.FirstNameTh ?? "",
@@ -862,10 +896,10 @@ public class QuotationService : IQuotationService
                     {
                         QuotationId = x.QuotationId ?? Guid.Empty,
                         CustomerId = x.CustomerId,
-                        CustomerNo = x.Customer?.No,
-                        CustomerName = x.Customer?.DisplayName,
-                        Address = x.Customer?.Address(),
-                        ContactPerson = x.CustomerContact?.DisplayName(),
+                        CustomerNo = x.Customer?.No, // อาจเป็น null ถ้าไม่โหลด
+                        CustomerName = x.Customer?.DisplayName, // อาจเป็น null ถ้าไม่โหลด
+                        Address = x.Customer?.Address(), // อาจเป็น null ถ้าไม่โหลด
+                        ContactPerson = x.CustomerContact?.DisplayName(), // อาจเป็น null ถ้าไม่โหลด
                         ContactPersonId = x.CustomerContactId,
                         QuotationNo = x.QuotationNo ?? "-",
                         QuotationDateTime = x.QuotationDateTime.ToString("dd/MM/yyyy"),
@@ -879,10 +913,10 @@ public class QuotationService : IQuotationService
                         Products = null,
                         ProjectName = x.Projects?.FirstOrDefault()?.Project?.ProjectName,
                         EthSaleMonth = x.Projects?.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
-                        TotalOffering = SumAmtQty(products),
+                        TotalOffering = den,
                         Projects = null,
-                        Price = x.RealPriceMsrp,
-                        Vat = x.SumOfDiscount,
+                        Price = x.RealPriceMsrp, // decimal? แนะนำให้เป็น nullable
+                        Vat = x.SumOfDiscount, // decimal? แนะนำให้เป็น nullable
                         Amount = ((decimal?)x.RealPriceMsrp ?? 0m) - ((decimal?)x.SumOfDiscount ?? 0m),
                         Remark = x.Remark,
                         Profit = profitPct,
@@ -897,13 +931,12 @@ public class QuotationService : IQuotationService
                         quotationId = x?.QuotationId,
                         ex = new { type = exRow.GetType().FullName, msg = exRow.Message, stack = exRow.StackTrace }
                     });
-                    // ข้ามแถวนี้ไปตามคำสั่ง “ต้องพ่นผ่าน throw” → จะโยนรวบตอนท้าย
+                    // ข้ามแถวนี้ไป แล้วจะโยนรวบตอนท้าย
                 }
             }
 
             if (mapErrors.Count > 0)
             {
-                // โยนรวม พร้อมแนบจำนวนที่สำเร็จ เพื่อดูว่าพังตรงไหน
                 throw Boom("map-errors", new
                 {
                     succeeded = list.Count,
@@ -913,8 +946,7 @@ public class QuotationService : IQuotationService
                 });
             }
 
-            // สำเร็จ ปกติ return
-            return new PagedList<QuotationResponse>(list, beforeMutate.TotalCount, page, pageSize);
+            return new PagedList<QuotationResponse>(list, totalCount, page, pageSize);
         }
         catch (Exception ex)
         {
