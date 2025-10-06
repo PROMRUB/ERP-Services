@@ -171,16 +171,10 @@ namespace ERP.Services.API.Services.Organization
 
             businessRepository!.SetCustomOrgId(orgId);
 
-            var q = businessRepository!.GetBusinesses((Guid)org.OrgId)
-                .Select(b => new OrganizationEntity
-                {
-                    OrgId = b.BusinessId,
-                    OrgCustomId = b.BusinessCustomId,
-                    DisplayName = b.BusinessName,
-                });
-
+            var q = businessRepository!.GetBusinesses((Guid)org.OrgId);
+                
             var list = await q.ToListAsync();
-            return mapper.Map<List<OrganizationEntity>, List<OrganizationResponse>>(list);
+            return mapper.Map<List<BusinessEntity>, List<OrganizationResponse>>(list);
         }
 
         public async Task<OrganizationResponse> GetBusinessById(string orgId, string businessId)
