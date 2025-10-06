@@ -183,6 +183,27 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message, null));
             }
         }
+        
+        [HttpDelete]
+        [Route("org/{id}/action/RemoveBusiness/{businessId}")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> RemoveBusiness(string id, Guid businessId, CancellationToken ct)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(id) || businessId == Guid.Empty)
+                    throw new ArgumentException("1101"); 
+                
+                var affected = await services.RemoveBusiness(id, businessId, ct);
+
+                return Ok(ResponseHandler.Response<int>("1000", null, affected));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
 
         [HttpGet]
         [Route("org/{id}/action/GetBusinessById/{businessId}")]

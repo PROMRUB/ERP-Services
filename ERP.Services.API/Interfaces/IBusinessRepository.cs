@@ -8,6 +8,7 @@ namespace ERP.Services.API.Interfaces
         public IQueryable<BusinessEntity> GetBusinesses(Guid orgId);
         public IQueryable<BusinessEntity> GetBusinessesQuery();
         public IQueryable<UserBusinessEntity> GetUserBusinessQuery();
+        public Task<int> RemoveBusinessesAsync(Guid orgId, CancellationToken ct = default);
         public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid? userId, Guid orgId);
         public IQueryable<UserBusinessEntity> GetBusinessUserList();
         public void SetCustomOrgId(string customOrgId);
