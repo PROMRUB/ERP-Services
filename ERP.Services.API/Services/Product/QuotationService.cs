@@ -636,7 +636,7 @@ public class QuotationService : IQuotationService
         Guid? customerId, Guid? projectId, int? profit, bool? isSpecialPrice, Guid? salePersonId,
         string? status, int page, int pageSize, bool? isGreaterThan)
     {
-        // --- local helpers (throw only) ---
+        // --- helpers (throw only) ---
         static string Dump(object o) => JsonSerializer.Serialize(
             o,
             new JsonSerializerOptions
@@ -671,7 +671,6 @@ public class QuotationService : IQuotationService
             return new InvalidOperationException(Dump(payload));
         }
 
-        // ---------- input snapshot ----------
         var inputSnapshot = new
         {
             keyword,
@@ -712,14 +711,13 @@ public class QuotationService : IQuotationService
             if (user == null)
                 throw Boom("resolve-user", new { inputSnapshot, userId, reason = "user-business mapping not found" });
 
-            // ---------- build base query (no Customer/Contact refs to avoid INNER JOIN) ----------
-            // รวมเฉพาะที่จำเป็นต่อ filter/sort และ include เฉพาะ collection ที่ต้องใช้คำนวณ
-            // (Projects/Products) เพื่อให้ยังได้ผลลัพธ์ แม้ Customer/Contact จะว่าง/ขาด
-            IQueryable<Entities.QuotationEntity> baseQuery = _quotationRepository
+            // ---------- build query ----------
+            // จุดสำคัญ: IgnoreAutoIncludes() กัน EF ไป INNER JOIN Customer/CustomerContact ให้เอง
+            IQueryable<Entities.QuotationEntity> query = _quotationRepository
                 .GetQuotationQuery()
                 .AsNoTracking()
-                .Include(x => x.Projects) // ใช้กรองตาม projectId และดึงชื่อโปรเจกต์
-                .Include(x => x.Products) // ใช้คำนวณยอด/กำไร
+                .IgnoreAutoIncludes()
+                .Include(x => x.Projects) // ยัง LEFT JOIN Projects เหมือนเดิม
                 .Where(x => x.BusinessId == businessId);
 
             var isPrivileged = !string.IsNullOrWhiteSpace(user.Role) &&
@@ -730,67 +728,66 @@ public class QuotationService : IQuotationService
             if (isPrivileged)
             {
                 if (salePersonId.HasValue)
-                    baseQuery = baseQuery.Where(x => x.SalePersonId == salePersonId.Value);
+                    query = query.Where(x => x.SalePersonId == salePersonId.Value);
             }
             else
             {
-                baseQuery = baseQuery.Where(x => x.SalePersonId == user.UserId);
+                query = query.Where(x => x.SalePersonId == user.UserId);
             }
 
             if (kw != null)
-                baseQuery = baseQuery.Where(x => x.QuotationNo != null &&
-                                                 (x.QuotationNo.ToLower().Contains(kw) ||
-                                                  x.QuotationNo.ToLower() == kw));
+                query = query.Where(x => x.QuotationNo != null &&
+                                         (x.QuotationNo.ToLower().Contains(kw) || x.QuotationNo.ToLower() == kw));
 
             if (!string.IsNullOrEmpty(status))
-                baseQuery = baseQuery.Where(x => x.Status == status);
+                query = query.Where(x => x.Status == status);
 
             if (start.HasValue)
-                baseQuery = baseQuery.Where(x => x.QuotationDateTime.Date >= start.Value.Date);
-
+                query = query.Where(x => x.QuotationDateTime.Date >= start.Value.Date);
             if (end.HasValue)
-                baseQuery = baseQuery.Where(x => x.QuotationDateTime.Date <= end.Value.Date);
+                query = query.Where(x => x.QuotationDateTime.Date <= end.Value.Date);
 
             if (customerId.HasValue)
-                baseQuery = baseQuery.Where(x => x.CustomerId == customerId.Value);
+                query = query.Where(x => x.CustomerId == customerId.Value);
 
             if (projectId.HasValue)
-                baseQuery = baseQuery.Where(x => x.Projects.Any(p => p.ProjectId == projectId.Value));
+                query = query.Where(x => x.Projects.Any(p => p.ProjectId == projectId.Value));
 
             if (isSpecialPrice.HasValue)
-                baseQuery = baseQuery.Where(x => x.IsSpecialPrice == isSpecialPrice.Value);
+                query = query.Where(x => x.IsSpecialPrice == isSpecialPrice.Value);
 
             if (profit.HasValue && isGreaterThan.HasValue)
-                baseQuery = isGreaterThan.Value
-                    ? baseQuery.Where(x => x.Profit >= profit.Value)
-                    : baseQuery.Where(x => x.Profit < profit.Value);
+                query = isGreaterThan.Value
+                    ? query.Where(x => x.Profit >= profit.Value)
+                    : query.Where(x => x.Profit < profit.Value);
 
-            baseQuery = baseQuery.OrderByDescending(x => x.QuotationNo);
+            query = query.OrderByDescending(x => x.QuotationNo);
 
-            // ---------- capture SQL (best-effort) ----------
+            // ---------- capture SQL ----------
             string? sql = null;
             try
             {
-                sql = baseQuery.ToQueryString();
+                sql = query.ToQueryString();
             }
             catch
             {
-                /* ignore */
             }
 
-            // ---------- manual paging (เพื่อเลี่ยง side-effect จาก PagedList.Create) ----------
-            int totalCount;
+            // ---------- page ----------
+            PagedList<Entities.QuotationEntity> beforeMutate;
             try
             {
-                totalCount = await baseQuery.CountAsync();
+                beforeMutate = await PagedList<Entities.QuotationEntity>.Create(query, page, pageSize);
             }
-            catch (Exception exCount)
+            catch (Exception exPage)
             {
-                throw Boom("count-db", new { inputSnapshot, isPrivileged, sql }, exCount);
+                throw Boom("page-db", new { inputSnapshot, isPrivileged, sql }, exPage);
             }
 
-            if (totalCount == 0)
-            {
+            if (beforeMutate.Items == null)
+                throw Boom("page-null-items", new { inputSnapshot, isPrivileged, sql });
+
+            if (beforeMutate.Items.Count == 0)
                 throw Boom("no-results", new
                 {
                     inputSnapshot,
@@ -811,43 +808,12 @@ public class QuotationService : IQuotationService
                     },
                     sql
                 });
-            }
 
-            List<Entities.QuotationEntity> pageItems;
-            try
-            {
-                pageItems = await baseQuery
-                    .Skip((Math.Max(1, page) - 1) * Math.Max(1, pageSize))
-                    .Take(Math.Max(1, pageSize))
-                    .ToListAsync();
-            }
-            catch (Exception exTake)
-            {
-                throw Boom("page-db", new { inputSnapshot, isPrivileged, sql }, exTake);
-            }
-
-            if (pageItems == null)
-                throw Boom("page-null-items", new { inputSnapshot, isPrivileged, sql });
-
-            if (pageItems.Count == 0)
-            {
-                // มีข้อมูลรวม แต่หน้า/ขนาดเพจทำให้หน้าเปล่า
-                throw Boom("page-empty", new
-                {
-                    inputSnapshot,
-                    isPrivileged,
-                    sql,
-                    totalCount,
-                    effectivePage = page,
-                    effectivePageSize = pageSize
-                });
-            }
-
-            // ---------- map (null-safe, ไม่บังคับโหลด Customer/Contact) ----------
-            var list = new List<QuotationResponse>(pageItems.Count);
+            // ---------- map with per-row guard ----------
+            var list = new List<QuotationResponse>(beforeMutate.Items.Count);
             var mapErrors = new List<object>();
 
-            decimal SumAmtQty(IEnumerable<dynamic> items)
+            decimal SumAmtQty(IEnumerable<dynamic>? items)
             {
                 decimal acc = 0m;
                 foreach (var it in items ?? Enumerable.Empty<dynamic>())
@@ -860,7 +826,7 @@ public class QuotationService : IQuotationService
                 return acc;
             }
 
-            decimal SumNum(IEnumerable<dynamic> items)
+            decimal SumNum(IEnumerable<dynamic>? items)
             {
                 decimal acc = 0m;
                 foreach (var it in items ?? Enumerable.Empty<dynamic>())
@@ -874,17 +840,16 @@ public class QuotationService : IQuotationService
                 return acc;
             }
 
-            for (int i = 0; i < pageItems.Count; i++)
+            for (int i = 0; i < beforeMutate.Items.Count; i++)
             {
-                var x = pageItems[i];
+                var x = beforeMutate.Items[i];
                 try
                 {
-                    var products = x.Products ?? Enumerable.Empty<dynamic>();
+                    var products = x.Products as IEnumerable<dynamic>;
                     var den = SumAmtQty(products);
                     var num = SumNum(products);
                     var profitPct = den == 0m ? 0m : (num * 100m) / den;
 
-                    // ไม่ดึง Customer/Contact บังคับ — ใช้ได้เฉพาะเมื่อมีจริงเท่านั้น
                     var saleName = string.Join(" ", new[]
                     {
                         x.SalePerson?.FirstNameTh ?? "",
@@ -896,10 +861,10 @@ public class QuotationService : IQuotationService
                     {
                         QuotationId = x.QuotationId ?? Guid.Empty,
                         CustomerId = x.CustomerId,
-                        CustomerNo = x.Customer?.No, // อาจเป็น null ถ้าไม่โหลด
-                        CustomerName = x.Customer?.DisplayName, // อาจเป็น null ถ้าไม่โหลด
-                        Address = x.Customer?.Address(), // อาจเป็น null ถ้าไม่โหลด
-                        ContactPerson = x.CustomerContact?.DisplayName(), // อาจเป็น null ถ้าไม่โหลด
+                        CustomerNo = x.Customer?.No, // จะเป็น null ได้ถ้าไม่ได้โหลด ก็โอเค
+                        CustomerName = x.Customer?.DisplayName, // ป้องกัน null แล้ว fallback ฝั่ง UI
+                        Address = x.Customer?.Address(),
+                        ContactPerson = x.CustomerContact?.DisplayName(),
                         ContactPersonId = x.CustomerContactId,
                         QuotationNo = x.QuotationNo ?? "-",
                         QuotationDateTime = x.QuotationDateTime.ToString("dd/MM/yyyy"),
@@ -915,9 +880,10 @@ public class QuotationService : IQuotationService
                         EthSaleMonth = x.Projects?.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy"),
                         TotalOffering = den,
                         Projects = null,
-                        Price = x.RealPriceMsrp, // decimal? แนะนำให้เป็น nullable
-                        Vat = x.SumOfDiscount, // decimal? แนะนำให้เป็น nullable
-                        Amount = ((decimal?)x.RealPriceMsrp ?? 0m) - ((decimal?)x.SumOfDiscount ?? 0m),
+                        Price = x.RealPriceMsrp,
+                        Vat = x.SumOfDiscount,
+                        // แก้เรื่อง ?? กับ decimal non-nullable
+                        Amount = (((decimal?)x.RealPriceMsrp) ?? 0m) - (((decimal?)x.SumOfDiscount) ?? 0m),
                         Remark = x.Remark,
                         Profit = profitPct,
                         IsSpecialPrice = x.IsSpecialPrice
@@ -931,7 +897,6 @@ public class QuotationService : IQuotationService
                         quotationId = x?.QuotationId,
                         ex = new { type = exRow.GetType().FullName, msg = exRow.Message, stack = exRow.StackTrace }
                     });
-                    // ข้ามแถวนี้ไป แล้วจะโยนรวบตอนท้าย
                 }
             }
 
@@ -946,13 +911,14 @@ public class QuotationService : IQuotationService
                 });
             }
 
-            return new PagedList<QuotationResponse>(list, totalCount, page, pageSize);
+            return new PagedList<QuotationResponse>(list, beforeMutate.TotalCount, page, pageSize);
         }
         catch (Exception ex)
         {
             throw Boom("fatal", new { inputSnapshot }, ex);
         }
     }
+
 
     public async Task<TotalProductQuotation> GetTotalProductQuotation(Guid id)
     {
