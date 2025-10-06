@@ -652,9 +652,6 @@ public class QuotationService : IQuotationService
 
         var user = _businessRepository.GetUserBusinessQuery()
             .FirstOrDefault(x => x.UserId == userId);
-
-        
-        throw new ArgumentException(user.ToString());
         
         var query = _quotationRepository.GetQuotationQuery()
                 .Include(x => x.Projects)
