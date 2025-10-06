@@ -32,6 +32,46 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
+        public void UpdateUserToOrganization(OrganizationUserEntity user)
+        {
+            user.OrgCustomId = orgId;
+
+            var existing = context!.OrganizationUsers!
+                .SingleOrDefault(x => x.OrgUserId == user.OrgUserId && x.OrgCustomId == orgId);
+
+            if (existing == null)
+                throw new KeyNotFoundException("1104"); // not found (เลือกรหัสตามระบบคุณใช้)
+
+            // ===== กัน username ซ้ำใน org นี้ (ยกเว้นตัวเอง) =====
+            if (!string.IsNullOrWhiteSpace(user.Username) &&
+                !string.Equals(existing.Username, user.Username, StringComparison.OrdinalIgnoreCase))
+            {
+                var dup = context.OrganizationUsers!
+                    .Any(x => x.OrgCustomId == orgId
+                              && x.Username!.ToLower() == user.Username!.ToLower()
+                              && x.OrgUserId != existing.OrgUserId);
+                if (dup)
+                    throw new ArgumentException("1111"); // ชื่อซ้ำ
+            }
+
+            if (!string.IsNullOrWhiteSpace(user.Username))
+                existing.Username = user.Username!.Trim();
+
+            if (!string.IsNullOrWhiteSpace(user.FirstNameTh))
+                existing.FirstNameTh = user.FirstNameTh!.Trim();
+
+            if (!string.IsNullOrWhiteSpace(user.LastnameTh))
+                existing.LastnameTh = user.LastnameTh!.Trim();
+
+            if (user.email != null) 
+                existing.email = user.email;
+
+            if (user.TelNo != null)
+                existing.TelNo = user.TelNo;
+            
+            context.SaveChanges();
+        }
+
         public IQueryable<OrganizationUserEntity> GetUserListAsync()
         {
             return context!.OrganizationUsers!;
@@ -49,8 +89,7 @@ namespace ERP.Services.API.Repositories
 
         public async Task<IEnumerable<OrganizationUserEntity>> GetUserAllowedOrganizationAsync(string userName)
         {
-            var query = await context!.OrganizationUsers!.Where(
-                x => x!.Username!.Equals(userName))
+            var query = await context!.OrganizationUsers!.Where(x => x!.Username!.Equals(userName))
                 .OrderByDescending(e => e.OrgCustomId).ToListAsync();
             return query;
         }
@@ -90,7 +129,8 @@ namespace ERP.Services.API.Repositories
             try
             {
                 var currentDate = DateTime.Today.Date.ToUniversalTime().ToString("yyyyMMdd");
-                var query = await context!.OrganizationNumbers!.Where(x => x.OrgDate == currentDate).FirstOrDefaultAsync();
+                var query = await context!.OrganizationNumbers!.Where(x => x.OrgDate == currentDate)
+                    .FirstOrDefaultAsync();
                 bool HaveOrganization = true;
                 while (HaveOrganization)
                 {
@@ -104,13 +144,15 @@ namespace ERP.Services.API.Repositories
                         };
                         context.OrganizationNumbers!.Add(newRec);
                         context.SaveChanges();
-                        query = await context.OrganizationNumbers!.Where(x => x.OrgDate == currentDate).FirstOrDefaultAsync();
+                        query = await context.OrganizationNumbers!.Where(x => x.OrgDate == currentDate)
+                            .FirstOrDefaultAsync();
                     }
                     else
                     {
                         HaveOrganization = false;
                     }
                 }
+
                 query!.Allocated++;
                 context.SaveChanges();
                 return query;

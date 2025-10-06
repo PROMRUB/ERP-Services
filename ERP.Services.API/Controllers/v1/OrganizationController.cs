@@ -111,6 +111,25 @@ namespace ERP.Services.API.Controllers.v1
             }
         }
 
+        [HttpPut]
+        [Route("org/{id}/action/UpdateUserToOrganization")]
+        [MapToApiVersion("1")]
+        public IActionResult UpdateUserToOrganization(string id, [FromBody] OrganizationUserRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrWhiteSpace(id) || request?.OrgUserId == null)
+                    throw new ArgumentException("1101"); 
+
+                services.UpdateUserToOrganization(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
         [HttpPost]
         [Route("org/{id}/action/AdminAddOrganization")]
         [MapToApiVersion("1")]
