@@ -13,9 +13,9 @@ namespace ERP.Services.API.Repositories
             this.context = context;
         }
 
-        public IQueryable<BusinessEntity> GetBusinesses()
+        public IQueryable<BusinessEntity> GetBusinesses(Guid orgId)
         {
-            var query = context!.Businesses!.Where(x => x.BusinessStatus == RecordStatus.Active.ToString());
+            var query = context!.Businesses!.Where(x => x.OrgId == orgId && x.BusinessStatus == RecordStatus.Active.ToString());
             return query;
         }
         
