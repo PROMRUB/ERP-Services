@@ -5,7 +5,7 @@ namespace ERP.Services.API.Interfaces
 {
     public interface IBusinessRepository
     {
-        public IQueryable<BusinessEntity> GetBusinesses(Guid orgId);
+        public IQueryable<BusinessEntity> GetBusinesses();
         public IQueryable<BusinessEntity> GetBusinessesQuery();
         public IQueryable<UserBusinessEntity> GetUserBusinessQuery();
         public IQueryable<UserBusinessEntity> GetUserBusinessList(Guid? userId, Guid orgId);

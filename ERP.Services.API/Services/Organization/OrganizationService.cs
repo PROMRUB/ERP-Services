@@ -72,7 +72,7 @@ namespace ERP.Services.API.Services.Organization
             var orgDetail = await organizationRepository.GetOrganization();
 
             businessRepository!.SetCustomOrgId(orgId);
-            var entity = await businessRepository!.GetBusinesses((Guid)orgDetail.OrgId)
+            var entity = await businessRepository!.GetBusinesses()
                 .Where(x => x.BusinessCustomId == businessId)
                 .FirstOrDefaultAsync();
 
@@ -87,7 +87,7 @@ namespace ERP.Services.API.Services.Organization
 
             // core
             SetIf(req.BusinessType, v => entity.BusinessType = v);
-            SetIf(req.OrgName, v => entity.BusinessName = v);
+            SetIf(req.DisplayName, v => entity.BusinessName = v);
             SetIf(req.DisplayName, v => entity.DisplayName = v);
             SetIf(req.OrgLogo, v => entity.BusinessLogo = v);
 
@@ -169,7 +169,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId).Join(
+            var query = await businessRepository!.GetBusinesses().Join(
                 (await userService.GetUserBusiness(orgId)),
                 business => business.BusinessId,
                 user => user.BusinessId,
@@ -187,7 +187,7 @@ namespace ERP.Services.API.Services.Organization
             organizationRepository!.SetCustomOrgId(orgId);
             var orgQuery = await organizationRepository!.GetOrganization();
             businessRepository!.SetCustomOrgId(orgId);
-            var query = await businessRepository!.GetBusinesses((Guid)orgQuery.OrgId)
+            var query = await businessRepository!.GetBusinesses()
                 .Where(x => x.BusinessCustomId == businessId).FirstOrDefaultAsync();
             var result = mapper.Map<BusinessEntity, OrganizationResponse>(query);
             result.OrgAddress = (string.IsNullOrEmpty(query.Building) ? "" : "อาคาร " + (query.Building + " ")) +
