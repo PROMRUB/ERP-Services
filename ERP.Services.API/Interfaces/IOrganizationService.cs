@@ -1,4 +1,5 @@
 ﻿using ERP.Services.API.Models.RequestModels.Organization;
+using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Models.ResponseModels.Organization;
 
 namespace ERP.Services.API.Interfaces
@@ -9,6 +10,7 @@ namespace ERP.Services.API.Interfaces
         public Task<OrganizationResponse> GetOrganizationByTaxId(string orgId, string taxId, string brnId);
         public void AddUserToOrganization(string orgId, OrganizationUserRequest user);
         public void UpdateUserToOrganization(string orgId, OrganizationUserRequest user);
+        public void ChangeUserPassword(string orgId, ChangeUserPasswordRequest req);
         public bool IsUserNameExist(string orgId, string userName);
         public Task<bool> VerifyUserInOrganization(string orgId, string userName);
         public Task<bool> AddOrganization(string orgId, OrganizationRequest org);

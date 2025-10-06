@@ -69,6 +69,16 @@ namespace ERP.Services.API.Repositories
             context.SaveChanges();
         }
 
+        public int UpdateUserPassword(Guid orgUserId, string password)
+        {
+            var affected = context!.OrganizationUsers!
+                .Where(u => u.OrgUserId == orgUserId)
+                .ExecuteUpdate(setters => setters
+                    .SetProperty(u => u.Password, _ => password));
+
+            return affected;
+        }
+        
         public IQueryable<OrganizationUserEntity> GetUserListAsync()
         {
             return context!.OrganizationUsers!;

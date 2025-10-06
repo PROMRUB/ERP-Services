@@ -1,6 +1,7 @@
 ﻿using ERP.Services.API.Handlers;
 using ERP.Services.API.Interfaces;
 using ERP.Services.API.Models.RequestModels.Organization;
+using ERP.Services.API.Models.RequestModels.User;
 using ERP.Services.API.Models.ResponseModels.Organization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -122,6 +123,28 @@ namespace ERP.Services.API.Controllers.v1
                     throw new ArgumentException("1101"); 
 
                 services.UpdateUserToOrganization(id, request);
+                return Ok(ResponseHandler.Response("1000", null));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
+        
+        [HttpPost]
+        [Route("org/{id}/action/ChangeUserPassword")]
+        [MapToApiVersion("1")]
+        public IActionResult ChangeUserPassword(string id, [FromBody] ChangeUserPasswordRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
+                    throw new ArgumentException("1101"); // invalid
+
+                if (request == null || request.OrgUserId == Guid.Empty || string.IsNullOrWhiteSpace(request.NewPassword))
+                    throw new ArgumentException("1102"); // bad request
+
+                services.ChangeUserPassword(id, request);
                 return Ok(ResponseHandler.Response("1000", null));
             }
             catch (Exception ex)
