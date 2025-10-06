@@ -79,6 +79,13 @@ namespace ERP.Services.API.Repositories
             return affected;
         }
         
+        public int RemoveUser(Guid orgUserId)
+        {
+            return context!.OrganizationUsers!
+                .Where(u => u.OrgUserId == orgUserId)
+                .ExecuteDelete();
+        }
+        
         public IQueryable<OrganizationUserEntity> GetUserListAsync()
         {
             return context!.OrganizationUsers!;

@@ -653,6 +653,9 @@ public class QuotationService : IQuotationService
         var user = _businessRepository.GetUserBusinessQuery()
             .FirstOrDefault(x => x.UserId == userId);
 
+        
+        throw new ArgumentException(user.ToString());
+        
         var query = _quotationRepository.GetQuotationQuery()
                 .Include(x => x.Projects)
                 .Where(x => x.BusinessId == businessId)
@@ -663,8 +666,6 @@ public class QuotationService : IQuotationService
                     && (string.IsNullOrEmpty(status) || x.Status == status)
                     && ((start == null || x.QuotationDateTime.Date >= start)
                         && (end == null || x.QuotationDateTime.Date <= end)
-                        // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                        //     x.QuotationDateTime.Date <= end)
                     )
                     && (!customerId.HasValue || x.CustomerId == customerId)
                     && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
@@ -689,8 +690,6 @@ public class QuotationService : IQuotationService
                         && (string.IsNullOrEmpty(status) || x.Status == status)
                         && ((start == null || x.QuotationDateTime.Date >= start)
                             && (end == null || x.QuotationDateTime.Date <= end)
-                            // && (start != null && end != null && x.QuotationDateTime.Date >= start &&
-                            //     x.QuotationDateTime.Date <= end)
                         )
                         && (!customerId.HasValue || x.CustomerId == customerId)
                         && (!projectId.HasValue || x.Projects.Any(p => p.ProjectId == projectId))
