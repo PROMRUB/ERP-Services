@@ -341,5 +341,24 @@ namespace ERP.Services.API.Controllers.v1
                 return Ok(ResponseHandler.Response(ex.Message + "/// " + ex.InnerException?.Message, null));
             }
         }
+        
+        public record DashboardQuery(Guid BusinessId, string? StartDate, string? EndDate);
+
+        [HttpGet("dashboard")]
+        [MapToApiVersion("1")]
+        public async Task<IActionResult> GetDashboard([FromQuery] DashboardQuery q)
+        {
+            try
+            {
+                QuotationDashboardResponse result =
+                    await _service.GetDashboardAsync(q.BusinessId, q.StartDate, q.EndDate);
+
+                return Ok(ResponseHandler.Response("1000", null, result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ResponseHandler.Response(ex.Message, null));
+            }
+        }
     }
 }

@@ -1437,4 +1437,114 @@ public class QuotationService : IQuotationService
             errors.Add($"{field} '{value}' is not a valid Incoterm 2020.");
         return normalized;
     }
+
+
+    private static DateTime? ParseDate(string? ddMMyyyy)
+    {
+        if (string.IsNullOrWhiteSpace(ddMMyyyy)) return null;
+        var dt = DateTime.ParseExact(ddMMyyyy, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+        return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+    }
+
+    public async Task<QuotationDashboardResponse> GetDashboardAsync(Guid businessId, string? startDate, string? endDate)
+    {
+        var start = ParseDate(startDate);
+        var end = ParseDate(endDate);
+
+        // ===== base quotation (ผ่าน repo) =====
+        var qset = _quotationRepository.Context().Set<QuotationEntity>().AsNoTracking();
+
+        IQueryable<QuotationEntity> baseQuotation = qset
+            .Where(q => q.BusinessId == businessId && q.Status != "Delete");
+
+        if (start.HasValue) baseQuotation = baseQuotation.Where(q => q.QuotationDateTime.Date >= start.Value.Date);
+        if (end.HasValue) baseQuotation = baseQuotation.Where(q => q.QuotationDateTime.Date <= end.Value.Date);
+
+        var totalCount = await baseQuotation.CountAsync();
+        var totalInclVat = await baseQuotation.SumAsync(q => (decimal?)q.Amount) ?? 0m; // รวม VAT
+        var totalExVat = await baseQuotation.SumAsync(q => (decimal?)q.Price) ?? 0m; // ไม่รวม VAT
+
+        // ===== Top Customers (ตาม Amount รวม VAT) =====
+        var cusAgg = await baseQuotation
+            .GroupBy(q => q.CustomerId)
+            .Select(g => new { CustomerId = g.Key, Total = g.Sum(x => x.Amount) })
+            .OrderByDescending(x => x.Total)
+            .Take(5)
+            .ToListAsync();
+
+        var topCusIds = cusAgg.Select(x => x.CustomerId).ToList();
+
+        // ดึงชื่อ customer ผ่าน repo ที่ include customer อยู่แล้ว
+        var customerNames = await _quotationRepository.GetQuotationQuery()
+            .AsNoTracking()
+            .Where(q => topCusIds.Contains(q.CustomerId))
+            .Select(q => new { q.CustomerId, Name = q.Customer != null ? q.Customer.DisplayName : null })
+            .Distinct()
+            .ToListAsync();
+
+        var customerNameDict = customerNames
+            .GroupBy(x => x.CustomerId)
+            .ToDictionary(g => g.Key, g => g.Select(v => v.Name).FirstOrDefault());
+
+        var topCustomers = cusAgg.Select(x => new TopCustomerItem
+        {
+            CustomerId = x.CustomerId,
+            CustomerName = customerNameDict.TryGetValue(x.CustomerId, out var n) ? n : null,
+            TotalAmount = x.Total
+        }).ToList();
+
+        // ===== Top Products (Amount * Quantity) =====
+        var qpBase = _quotationRepository.Context().Set<QuotationProductEntity>().AsNoTracking()
+            .Where(qp => qp.Quotation.BusinessId == businessId && qp.Quotation.Status != "Delete");
+
+        if (start.HasValue) qpBase = qpBase.Where(qp => qp.Quotation.QuotationDateTime.Date >= start.Value.Date);
+        if (end.HasValue) qpBase = qpBase.Where(qp => qp.Quotation.QuotationDateTime.Date <= end.Value.Date);
+
+        var prodAgg = await qpBase
+            .GroupBy(qp => qp.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                Quantity = g.Sum(x => x.Quantity),
+                Total = g.Sum(x => (decimal)x.Amount * (decimal)x.Quantity)
+            })
+            .OrderByDescending(x => x.Total)
+            .Take(5)
+            .ToListAsync();
+
+        var prodIds = prodAgg.Select(x => x.ProductId).ToList();
+
+        var productNames = await _quotationRepository.GetQuotationQuery()
+            .AsNoTracking()
+            .SelectMany(q => q.Products)
+            .Where(p => prodIds.Contains(p.ProductId))
+            .Select(p => new
+            {
+                p.ProductId,
+                Name = p.Product != null ? p.Product.ProductName : null
+            })
+            .Distinct()
+            .ToListAsync();
+
+        var productNameDict = productNames
+            .GroupBy(x => x.ProductId)
+            .ToDictionary(g => g.Key, g => g.Select(v => v.Name).FirstOrDefault());
+
+        var topProducts = prodAgg.Select(x => new TopProductItem
+        {
+            ProductId = x.ProductId,
+            ProductName = productNameDict.TryGetValue(x.ProductId, out var n) ? n : null,
+            Quantity = x.Quantity,
+            TotalAmount = x.Total
+        }).ToList();
+
+        return new QuotationDashboardResponse
+        {
+            TotalQuotations = totalCount,
+            TotalValueInclVat = totalInclVat,
+            TotalValueExVat = totalExVat,
+            TopProducts = topProducts,
+            TopCustomers = topCustomers
+        };
+    }
 }

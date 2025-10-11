@@ -36,4 +36,5 @@ public interface IQuotationService
     public Task<QuotationDocument> GeneratePDF(Guid id);
     public Task SendGeneralMail(string to, string toName, string subject, string body);
     public Task DeleteAll();
+    Task<QuotationDashboardResponse> GetDashboardAsync(Guid businessId, string? startDate, string? endDate);
 }
