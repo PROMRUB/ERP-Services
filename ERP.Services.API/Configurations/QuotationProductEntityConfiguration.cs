@@ -13,6 +13,10 @@ public class QuotationProductEntityConfiguration : IEntityTypeConfiguration<Quot
             .WithMany(x => x.Products)
             .HasForeignKey(x => x.QuotationId);
 
+        builder.Property(x => x.Amount)
+            .HasColumnType("numeric(18,2)")
+            .ValueGeneratedNever();
+        
         builder.HasOne(x => x.Product)
             .WithMany()
             .HasForeignKey(x => x.ProductId);
