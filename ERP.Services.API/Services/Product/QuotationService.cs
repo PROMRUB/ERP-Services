@@ -1038,10 +1038,11 @@ public class QuotationService : IQuotationService
         product.SumOfDiscount = (decimal)productItem.MSRP - decimal.Parse(request.Data.OfferPriceEstimate,
             NumberStyles.Any, CultureInfo.InvariantCulture);
         product.Currency = request.Data.Currency;
-        product.Amount = float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture,
-            out var offeringPrice)
-            ? offeringPrice
-            : 0f;
+        if (float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice))
+        {
+            product.Amount = offeringPrice;               
+            _quotationRepository.Context().Entry(product).Property(p => p.Amount).IsModified = true;  // บังคับ mark modified
+        }
         product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any,
             CultureInfo.InvariantCulture, out var latestCost)
             ? latestCost
