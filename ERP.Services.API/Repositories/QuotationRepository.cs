@@ -17,7 +17,7 @@ public class QuotationRepository : BaseRepository, IQuotationRepository
     public IQueryable<QuotationEntity> GetQuotationQuery()
     {
         return _context.Quotation
-            .Include(x => x.Products.OrderBy(x => x.Order))
+            .Include(x => x.Products)
             .ThenInclude(x => x.Product)
             .Include(x => x.Projects)
             .ThenInclude(x => x.Project)

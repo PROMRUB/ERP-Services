@@ -202,6 +202,7 @@ public class QuotationService : IQuotationService
                 response.EthSaleMonth = quotation.Projects.FirstOrDefault()?.EthSaleMonth?.ToString("MM/yyyy");
             }
 
+            response.Products = response.Products.OrderBy(x => x.Order).ToList();
             return response;
         }
         catch (Exception e)
@@ -1198,7 +1199,6 @@ public class QuotationService : IQuotationService
 
         var queryCustomer = quotation.Customer;
         var cusAddress = queryCustomer.CusFullAddress;
-
         return new QuotationDocument(quotation, business, orgAddress, cusAddress);
     }
 
