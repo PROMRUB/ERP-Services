@@ -342,8 +342,7 @@ public class QuotationService : IQuotationService
         if (quotation == null)
             throw new KeyNotFoundException("id not exists");
 
-        // ปลอดภัยกับ string null (ให้เป็น ""), หรือจะคง null ก็ได้แล้วแต่สเกมา DB ของคุณ
-        quotation.CustomerId = resource.CustomerId; // ถ้าเป็น Guid? ให้ตรวจเพิ่มถ้าจำเป็น
+        quotation.CustomerId = resource.CustomerId;
         quotation.CustomerContactId = resource.ContactPersonId;
         quotation.SalePersonId = resource.SalesPersonId;
         quotation.IssuedById = resource.IssuedById;
@@ -352,25 +351,24 @@ public class QuotationService : IQuotationService
         quotation.Status = resource.Status ?? string.Empty;
         quotation.PaymentId = resource.PaymentAccountId;
 
-        // ถ้า SubmitStatus ต้องการค่าไม่ว่าง ให้เช็คก่อน
         if (!string.IsNullOrWhiteSpace(resource.Status))
             quotation.SubmitStatus(resource.Status);
 
-        // เก็บของเดิมไว้แบบปลอดภัย (ถ้า null ให้เป็นลิสต์ว่าง)
+        // เก็บของเดิมไว้
         var temp = quotation.Products ?? new List<QuotationProductEntity>();
 
-        // ลบของเดิมแบบ null-safe
+        // ลบของเดิม
         if (quotation.Products != null && quotation.Products.Count > 0)
             _quotationRepository.DeleteProduct(quotation.Products);
 
         if (quotation.Projects != null && quotation.Projects.Count > 0)
             _quotationRepository.DeleteProject(quotation.Projects);
 
-        // map ของใหม่ (ถ้า mapper คืน null ให้เป็นลิสต์ว่าง)
+        // map ของใหม่เข้า entity (อันนี้จะใช้ order จาก resource อยู่แล้ว ถ้า MutateResourceProduct แก้ตามที่คุยกัน)
         quotation.Products = MutateResourceProduct(incomingProducts) ?? new List<QuotationProductEntity>();
         quotation.Projects = MutateResourceProject(incomingProjects) ?? new List<QuotationProjectEntity>();
 
-        // ถ้าไม่มีสินค้า ก็ไม่ต้องคำนวณ (รีเซ็ตยอดเป็น 0)
+        // ถ้าไม่มีสินค้า ก็ไม่ต้องคำนวณ
         if (incomingProducts.Count == 0)
         {
             quotation.Price = 0m;
@@ -388,25 +386,39 @@ public class QuotationService : IQuotationService
             return await MapEntityToResponse(quotation);
         }
 
-        // คำนวณแบบ null-safe
+        // คำนวณ
         var result = await this.Calculate(incomingProducts);
         if (result == null)
             throw new InvalidOperationException("Calculate() returned null.");
 
         var computedItems = result.QuotationProductEntities ?? new List<QuotationProductEntity>();
 
-        // เตรียม dictionary ไว้หา item เดิมเร็วขึ้น และกัน temp เป็น null
+        // product เดิมจาก DB (ดึงเอา metadata เดิม เช่น currency ฯลฯ)
         var oldByProductId = (temp ?? new List<QuotationProductEntity>())
             .Where(x => x != null)
             .GroupBy(x => x.ProductId)
             .ToDictionary(g => g.Key, g => g.First());
 
-        // อัดค่าบางช่องจากของเดิม ถ้ามี (กัน productItem == null)
+        // ❗ order จาก FE (resource) เอาอันนี้เป็นเจ้าหลักในการจัดลำดับ
+        var orderByProductId = (incomingProducts ?? new List<QuotationProductResource>())
+            .Where(x => x != null)
+            .GroupBy(x => x.ProductId)
+            .ToDictionary(
+                g => g.Key,
+                g =>
+                {
+                    var first = g.First();
+                    // ถ้า FE ส่ง 0/ไม่ส่งมา ก็ดันไป 0 ก่อนแล้วค่อย normalize ทีหลัง
+                    return first.Order > 0 ? first.Order : 0;
+                });
+
+        // inject metadata + ใช้ order จาก resource
         foreach (var item in computedItems)
         {
             if (item == null) continue;
             if (item.ProductId == Guid.Empty) continue;
 
+            // ดึง metadata เดิมจาก DB (แต่ไม่เอา Order)
             if (oldByProductId.TryGetValue(item.ProductId, out var productItem) && productItem != null)
             {
                 item.Currency = productItem.Currency;
@@ -417,7 +429,12 @@ public class QuotationService : IQuotationService
                 item.ImportDuty = productItem.ImportDuty;
                 item.AdministrativeCosts = productItem.AdministrativeCosts;
                 item.CostEstimate = productItem.CostEstimate;
-                item.Order = productItem.Order;
+            }
+
+            // ✅ set Order จาก resource เท่านั้น
+            if (orderByProductId.TryGetValue(item.ProductId, out var incomingOrder) && incomingOrder > 0)
+            {
+                item.Order = incomingOrder;
             }
             else
             {
@@ -425,7 +442,16 @@ public class QuotationService : IQuotationService
             }
         }
 
-        quotation.Products = computedItems;
+        // normalize order ให้เป็น 1..n ตามลำดับจาก resource (กันเคสมี 0)
+        quotation.Products = computedItems
+            .OrderBy(p => p.Order > 0 ? p.Order : int.MaxValue)
+            .Select((p, idx) =>
+            {
+                p.Order = idx + 1; // เซฟลง DB เป็น 1,2,3 ตามลำดับ FE
+                return p;
+            })
+            .ToList();
+
         quotation.Price = result.Price;
         quotation.Vat = result.Vat;
         quotation.Amount = result.Amount;
@@ -450,7 +476,6 @@ public class QuotationService : IQuotationService
 
         return await MapEntityToResponse(quotation);
     }
-
 
     public Task<List<QuotationStatus>> QuotationStatus()
     {
@@ -1039,11 +1064,14 @@ public class QuotationService : IQuotationService
         product.SumOfDiscount = (decimal)productItem.MSRP - decimal.Parse(request.Data.OfferPriceEstimate,
             NumberStyles.Any, CultureInfo.InvariantCulture);
         product.Currency = request.Data.Currency;
-        if (float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture, out var offeringPrice))
+        if (float.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any, CultureInfo.InvariantCulture,
+                out var offeringPrice))
         {
-            product.Amount = offeringPrice;               
-            _quotationRepository.Context().Entry(product).Property(p => p.Amount).IsModified = true;  // บังคับ mark modified
+            product.Amount = offeringPrice;
+            _quotationRepository.Context().Entry(product).Property(p => p.Amount).IsModified =
+                true; // บังคับ mark modified
         }
+
         product.LatestCost = decimal.TryParse(request.Data.OfferPriceEstimate, NumberStyles.Any,
             CultureInfo.InvariantCulture, out var latestCost)
             ? latestCost
